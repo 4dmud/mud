@@ -2500,12 +2500,12 @@ void process_peek ( void *go, struct script_data *sc, trig_data *trig, int type,
 void process_attach ( void *go, struct script_data *sc, trig_data *trig, int type, char *cmd )
 {
     char arg[MAX_INPUT_LENGTH], trignum_s[MAX_INPUT_LENGTH];
-    char result[MAX_INPUT_LENGTH], *id_p;
+    char *id_p;
     trig_data *trig_to_add;
     Character *c = nullptr;
     obj_data *o = nullptr;
     Room *r = nullptr;
-    long trignum, id;
+    long trignum, id = 0;
 
     id_p = two_arguments ( cmd, arg, trignum_s );
     skip_spaces ( &id_p );
@@ -2517,21 +2517,21 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig, int typ
         return;
     }
 
-    if ( !id_p || !*id_p || atoi ( id_p ) ==0 )
+    if ( id_p && *id_p )
+    {
+        if ( *id_p == UID_CHAR )
+            id = atol ( id_p+1 );
+        else
+            id = atol ( id_p );
+    }
+
+    if ( id == 0 )
     {
         script_log ( "Trigger: %s, VNum %d. attach invalid id arg. Line %d: %s",
                      GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
         return;
     }
 
-    /* parse and locate the id specified */
-    eval_expr ( id_p, result, sizeof ( result ), go, sc, trig, type );
-    if ( ! ( id = atoi ( result ) ) )
-    {
-        script_log ( "Trigger: %s, VNum %d. attach invalid id arg. Line %d: %s",
-                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
-        return;
-    }
     c = find_char ( id );
     if ( !c )
     {

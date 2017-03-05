@@ -28,6 +28,7 @@ zone_rnum real_zone_by_thing(room_vnum vznum);
 script_data* create_script();
 void set_script_types ( script_data *sc );
 trig_data *find_trigger ( script_data *sc, trig_vnum vnum );
+bool error_check ( char *line, trig_data *trig, int line_nr, Descriptor *d );
 
 /*locals*/
 void trigedit_disp_menu(Descriptor *d);
@@ -989,7 +990,7 @@ int format_script(Descriptor *d) {
     char nsc[MAX_CMD_LENGTH], *t, line[READ_SIZE];
     char *sc;
     size_t len = 0, nlen = 0, llen = 0;
-    int indent = 0, i, line_num = 0, while_count = 0, brac;
+    int indent = 0, i, line_num = 0, while_count = 0;
     bool indent_next = FALSE, found_case = FALSE, first_case = FALSE, in_switch = FALSE, error = FALSE;
 
     if (!d->str || !*d->str)
@@ -1002,39 +1003,7 @@ int format_script(Descriptor *d) {
     while (t) {
         line_num++;
         skip_spaces(&t);
-        brac = check_braces(t);
-
-        if ( *t != '*' && brac != 0 && ( !strn_cmp("elseif ", t, 7) || !strn_cmp("else", t, 4)
-            || !strn_cmp("else if ", t, 8) || !strn_cmp(t, "if ", 3) || !strn_cmp("while ", t, 6)
-            || !strn_cmp("switch ", t, 7) || !strn_cmp( "extract ",t, 8) || !strn_cmp("case ", t, 5)
-            || !strn_cmp( "eval ",t, 5) || !strn_cmp( "nop ",t, 4) || !strn_cmp( "set ",t, 4))) {
-            d->Output( "Unmatched %s bracket in line %d: %s\r\n", brac < 0 ? "right" : "left", line_num, t);
-            error = TRUE;
-        }
-
-        if ( *t != '*' && char_count ( t, '%' ) % 2 == 1 )
-        {
-            d->Output ( "Uneven number of %% in line %d: %s\r\n", line_num, t );
-            error = TRUE;
-        }
-
-        if ( *t != '*' )
-        {
-            char *c = t;
-            while ( TRUE )
-            {
-                c = strchr ( c, '=' );
-                if ( !c )
-                    break;
-                if ( c != t && *(c+1) != '=' && *(c-1) != '=' && *(c-1) != '!' && *(c-1) != '<' && *(c-1) != '>' && *(c-1) != '|' && *(c-1) != '/' )
-                {
-                    d->Output ( "Found a single '=', should it be '=='? Line %d: %s\r\n", line_num, t );
-                    error = TRUE;
-                    break;
-                }
-                c++;
-            }
-        }
+        error = error_check ( t, nullptr, line_num, d );
 
         if (!strncasecmp(t, "if ", 3))
             indent_next = TRUE;

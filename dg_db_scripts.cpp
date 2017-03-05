@@ -25,8 +25,11 @@
 #include "comm.h"
 #include "constants.h"
 #include "oasis.h"
+#include "descriptor.h"
 
+/* external functions */
 int check_braces ( char *str );
+void skip_spaces ( char **string );
 
 script_data* create_script()
 {
@@ -59,6 +62,65 @@ int char_count ( const char* s, const char c )
         str++;
     }
     return count;
+}
+
+/* check a trigger line for errors when it's parsed or entered in trigedit */
+bool error_check ( char *line, trig_data *trig, int line_nr, Descriptor *d )
+{
+    bool error = FALSE;
+    skip_spaces ( &line );
+
+    // skip comments
+    if ( *line == '*' )
+        return error;
+
+    // check for uneven number of %
+    if ( char_count ( line, '%' ) % 2 == 1 )
+    {
+        if ( d )
+            d->Output ( "Uneven number of %% in line %d: %s\r\n", line_nr, line );
+        else
+            // only the rnum can be supplied here, not the vnum
+            new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger rnum [%d] '%s' Uneven number of %% in line %d. %s", GET_TRIG_RNUM ( trig ), trig->name, line_nr, line );
+        error = TRUE;
+    }
+
+    // check for uneven number of parentheses
+    int brac = check_braces ( line );
+    if ( brac != 0 && ( !strn_cmp ( "elseif ", line, 7 ) || !strn_cmp ( "else ", line, 4 )
+        || !strn_cmp ( "else if ", line, 8 ) || !strn_cmp ( "if ", line, 3 )
+        || !strn_cmp ( "while ", line, 6 ) || !strn_cmp ( "switch ", line, 7 )
+        || !strn_cmp ( "extract ", line, 8 ) || !strn_cmp ( "case ", line, 5 )
+        || !strn_cmp ( "eval ", line, 5 ) || !strn_cmp ( "nop ", line, 4 )
+        || !strn_cmp ( "set ", line, 4 ) ) )
+    {
+        if ( d )
+            d->Output ( "Unmatched %s bracket in line %d: %s\r\n", brac < 0 ? "right" : "left", line_nr, line );
+        else
+            new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger rnum [%d] '%s'. Unmatched %s bracket in line %d: %s", GET_TRIG_RNUM ( trig ), trig->name, brac < 0 ? "right" : "left", line_nr, line );
+        error = TRUE;
+    }
+
+    // check for '=' which possibly should be '=='
+    char *c = line;
+    while ( TRUE )
+    {
+        c = strchr ( c, '=' );
+        if ( !c )
+            break;
+        if ( c != line && *(c+1) != '=' && *(c-1) != '=' && *(c-1) != '!' && *(c-1) != '<' && *(c-1) != '>' && *(c-1) != '|' && *(c-1) != '/' )
+        {
+            if ( d )
+                d->Output ( "Found a single '=', should it be '=='? Line %d: %s\r\n", line_nr, line );
+            else
+                new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger rnum [%d] '%s'. Single '=' should be '=='? Line %d: %s\r\n", GET_TRIG_RNUM ( trig ), trig->name, line_nr, line );
+            error = TRUE;
+            break;
+        }
+        c++;
+    }
+
+    return error;
 }
 
 void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
@@ -103,53 +165,14 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
     trig->cmdlist->cmd = strdup(strtok(s, "\n\r"));
     cle = trig->cmdlist;
     cle->line_nr = 1;
-
-    if ( *cle->cmd != '*' && char_count ( cle->cmd, '%' ) % 2 == 1 )
-        new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger [%d] '%s' Uneven number of %% in line %d. %s", nr, trig->name, cle->line_nr, cle->cmd );
-
-    int brac = check_braces ( cle->cmd );
-    if ( *cle->cmd != '*' && brac != 0 && ( !strn_cmp ( "elseif ", cle->cmd, 7 ) || !strn_cmp ( "else ", cle->cmd, 4 )
-            || !strn_cmp ( "else if ", cle->cmd, 8 ) || !strn_cmp ( "if ", cle->cmd, 3 )
-            || !strn_cmp ( "while ", cle->cmd, 6 ) || !strn_cmp ( "switch ", cle->cmd, 7 )
-            || !strn_cmp ( "extract ", cle->cmd, 8 ) || !strn_cmp ( "case ", cle->cmd, 5 )
-            || !strn_cmp ( "eval ", cle->cmd, 5 ) || !strn_cmp ( "nop ", cle->cmd, 4 )
-            || !strn_cmp ( "set ", cle->cmd, 4 ) ) )
-        new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger [%d] '%s'. Unmatched %s bracket in line %d: %s", nr, trig->name, brac < 0 ? "right" : "left", cle->line_nr, cle->cmd );
-
-    if ( *cle->cmd != '*' )
-    {
-        char *c = cle->cmd;
-        while ( TRUE )
-        {
-            c = strchr ( c, '=' );
-            if ( !c )
-                break;
-            if ( c != cle->cmd && *(c+1) != '=' && *(c-1) != '=' && *(c-1) != '!' && *(c-1) != '<' && *(c-1) != '>' && *(c-1) != '|' && *(c-1) != '/' )
-            {
-                new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger [%d] '%s'. Single '=' should be '=='? Line %d: %s\r\n", nr, trig->name, cle->line_nr, cle->cmd );
-                break;
-            }
-            c++;
-        }
-    }
+    error_check ( cle->cmd, trig, cle->line_nr, nullptr );
 
     while ((s = strtok(NULL, "\n\r"))) {
         CREATE(cle->next, struct cmdlist_element, 1);
         cle->next->line_nr = cle->line_nr + 1;
         cle = cle->next;
         cle->cmd = strdup(s);
-
-        if ( *cle->cmd != '*' && char_count ( cle->cmd, '%' ) % 2 == 1 )
-            new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger [%d] '%s' Uneven number of %% in line %d. %s", nr, trig->name, cle->line_nr, cle->cmd );
-
-        brac = check_braces ( cle->cmd );
-        if ( *cle->cmd != '*' && brac != 0 && ( !strn_cmp ( "elseif ", cle->cmd, 7 ) || !strn_cmp ( "else ", cle->cmd, 4 )
-                || !strn_cmp ( "else if ", cle->cmd, 8 ) || !strn_cmp ( "if ", cle->cmd, 3 )
-                || !strn_cmp ( "while ", cle->cmd, 6 ) || !strn_cmp ( "switch ", cle->cmd, 7 )
-                || !strn_cmp ( "extract ", cle->cmd, 8 ) || !strn_cmp ( "case ", cle->cmd, 5 )
-                || !strn_cmp ( "eval ", cle->cmd, 5 ) || !strn_cmp ( "nop ", cle->cmd, 4 )
-                || !strn_cmp ( "set ", cle->cmd, 4 ) ) )
-            new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger [%d] '%s' Unmatched %s bracket in line %d. %s", nr, trig->name, brac < 0 ? "right" : "left", cle->line_nr, cle->cmd );
+        error_check ( cle->cmd, trig, cle->line_nr, nullptr );
     }
 
     free(cmds);
