@@ -44,6 +44,7 @@ void trigedit_string_cleanup ( Descriptor *d, int terminator );
 void help_string_cleanup ( Descriptor *d, int action );
 void note_string_cleanup ( Descriptor *d, int action );
 void qedit_string_cleanup ( Descriptor *d, int action );
+void msg_string_cleanup ( Descriptor *d, int action );
 Character *find_char ( long n );
 
 
@@ -253,6 +254,9 @@ void string_add ( Descriptor *d, char *str )
                         *d->str = NULL;
                     free_string ( &d->backstr );
                     break;
+                case CON_MSG_EDIT:
+                    free ( *d->str );
+                    break;
                 default:
                     log ( "SYSERR: string_add: Aborting write from unknown state %d of %s", STATE ( d ), d->character ? GET_NAME ( d->character ) : "?" );
                     break;
@@ -264,7 +268,8 @@ void string_add ( Descriptor *d, char *str )
                 free ( *d->str );
                 *d->str = strdup ( "Nothing.\r\n" );
             }
-            free_string ( &d->backstr );
+            if ( STATE ( d ) != CON_MSG_EDIT )
+                free_string ( &d->backstr );
             break;
         case STRINGADD_ACTION:
             break;
@@ -291,8 +296,9 @@ void string_add ( Descriptor *d, char *str )
             { CON_TRIGEDIT, trigedit_string_cleanup },
             { CON_EXDESC , exdesc_string_cleanup },
             { CON_PLAYING, playing_string_cleanup },
-            { CON_HEDIT,  help_string_cleanup},
-            { CON_NOTE_EDIT, note_string_cleanup},
+            { CON_HEDIT,  help_string_cleanup },
+            { CON_NOTE_EDIT, note_string_cleanup },
+            { CON_MSG_EDIT , msg_string_cleanup },
             { -1, NULL }
         };
 

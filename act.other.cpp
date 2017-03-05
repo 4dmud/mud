@@ -201,7 +201,9 @@ void add_follower ( Character *ch, Character *leader );
 void raw_kill ( Character *ch, Character *killer );
 void ReplaceString ( char * str, const char *search, const char *replace , size_t len );
 int perf_balance(int weapon_type);
-
+void send_editor_help(Descriptor *d);
+void parse_note ( Character *ch, char *argument, int type );
+void note_attach ( Character *ch, int type );
 
 /* local functions */
 int perform_group ( Character *ch, Character *vict );
@@ -1656,6 +1658,51 @@ void remove_tags ( char * buf )
     ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
 }
 
+void msg_string_cleanup ( Descriptor *d, int action )
+{
+    // automatically send a note to the one who made the bug/typo report
+    // subject: report fixed/unfixed
+    // text: report (d->cstr) plus a possible message (d->backstr)
+
+    note_attach ( d->character, NOTE_NOTE );
+    bool fixed = d->cstr.substr ( d->cstr.size() - 7 ) == "(fixed)";
+
+    if ( fixed )
+        d->character->pnote->subject = str_dup ( "report fixed" );
+    else
+        d->character->pnote->subject = str_dup ( "report unfixed" );
+
+    string receiver;
+    stringstream ss ( d->cstr );
+    ss >> receiver;
+    receiver = receiver.substr ( 3 ); // skip {cc
+    d->character->pnote->to_list = str_dup ( receiver.c_str() );
+
+    string date, s;
+    ss >> s >> date >> s;
+    date += " " + s;
+
+    string text = "On " + date + " you sent the following report:\r\n\r\n";
+    size_t pos = d->cstr.find ( ":" ) + 5;
+    if ( fixed )
+    {
+        text += d->cstr.substr ( pos, d->cstr.size() - pos - 10 );
+        text += "\r\n\r\nThe status has been changed to: fixed.\r\n";
+    }
+    else
+    {
+        text += d->cstr.substr ( pos );
+        text += "\r\n\r\nThe status has been changed to: unfixed.\r\n";
+    }
+    if ( d->backstr )
+        text += "\r\n" + string ( d->backstr ) + "\r\n";
+    d->character->pnote->text = str_dup ( text.c_str() );
+
+    free_string ( &d->backstr );
+    parse_note ( d->character, (char*) "send", NOTE_NOTE );
+    STATE ( d ) = CON_PLAYING;
+}
+
 ACMD ( do_file )
 {
     struct file_struct
@@ -1796,6 +1843,13 @@ ACMD ( do_file )
     if ( !strcmp ( arg2, "fixed" ) && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "syslog" ) )
     {
 
+        // can't send the note if ch is working on one
+        if ( ch->pnote && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) )
+        {
+            ch->Send ( "You can't do this when you're working on a note.\r\n" );
+            return;
+        }
+
         int line_number = atoi ( arg3 );
 
         if ( line_number < 1 || line_number > entries.size() )
@@ -1804,11 +1858,11 @@ ACMD ( do_file )
             return;
         }
 
+        bool add_fixed = entries[ line_number-1 ].substr ( entries[ line_number-1 ].size() - 7 ) != "(fixed)";
         int syslog_lines_changed = 0;
         if ( fields[l].cmd == "syslog" )
         {
             // toggle (fixed) in all lines with the same content, apart from the date, which has length 19
-            bool add_fixed = entries[ line_number-1 ].substr ( entries[ line_number-1 ].size() - 7 ) != "(fixed)";
             for ( int i = 0; i < entries.size(); ++i )
                 if ( i != line_number-1 && entries[i].substr ( 19 ) == entries[ line_number-1 ].substr ( 19 ) )
                 {
@@ -1820,10 +1874,10 @@ ACMD ( do_file )
                 }
         }
 
-        if ( entries[ line_number-1 ].substr ( entries[ line_number-1 ].size() - 7 ) == "(fixed)" )
-            entries[ line_number-1 ]  = entries[ line_number-1 ].substr ( 0, entries[ line_number-1 ].size() - 7 );
-        else
+        if ( add_fixed )
             entries [ line_number-1 ] += "(fixed)";
+        else
+            entries[ line_number-1 ] = entries[ line_number-1 ].substr ( 0, entries[ line_number-1 ].size() - 7 );
 
         if ( fields[l].cmd == "syslog" )
         {
@@ -1835,7 +1889,12 @@ ACMD ( do_file )
         {
             strlcpy ( buf, entries[ line_number-1 ].c_str(), sizeof ( buf ) );
             remove_tags ( buf );
-            ch->Send ( "%d. %s\r\n", line_number, buf );
+            ch->Send ( "%d. %s\r\n\r\n", line_number, buf );
+            ch->desc->cstr = string ( buf );
+            send_editor_help ( ch->desc );
+            ch->Send ( "Please enter the note message:\r\n" );
+            STATE ( ch->desc ) = CON_MSG_EDIT;
+            string_write ( ch->desc, &ch->desc->backstr, MAX_STRING_LENGTH, 0, nullptr );
         }
 
         if ( ! ( req_file = fopen ( fields[l].file.c_str(), "w" ) ) )

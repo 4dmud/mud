@@ -726,8 +726,6 @@ void parse_note ( Character *ch, char *argument, int type )
     if ( IS_NPC ( ch ) )
         return;
 
-
-
     switch ( type )
     {
         default:
@@ -978,55 +976,59 @@ void parse_note ( Character *ch, char *argument, int type )
 
     if ( !str_cmp ( arg, "+" ) )
     {
-        note_attach ( ch,type );
+        if ( ch->pnote == NULL )
+        {
+            ch->Send ( "You have no note in progress.\r\n" );
+            return;
+        }
+
         if ( ch->pnote->type != type )
         {
-            send_to_char (
-                "You already have a different note in progress.\r\n",ch );
+            ch->Send ( "You already have a different note in progress.\r\n" );
             return;
         }
 
-        if ( strlen ( ch->pnote->text ) +strlen ( argument ) >= 4096 )
+        if ( strlen ( ch->pnote->text ) + strlen ( argument ) >= 4096 )
         {
-            send_to_char ( "Note too long.\r\n", ch );
+            ch->Send ( "The note will be too long.\r\n" );
             return;
         }
-
-
 
         strcpy ( buffer, ch->pnote->text );
-        strcat ( buffer,argument );
-        strcat ( buffer,"\r\n" );
+        strcat ( buffer, argument );
+        strcat ( buffer, "\r\n" );
         free_string ( &ch->pnote->text );
         ch->pnote->text = strdup ( buffer );
-        send_to_char ( "Ok.\r\n", ch );
+        ch->Send ( "Ok.\r\n" );
         return;
     }
 
-    if ( !str_cmp ( arg,"-" ) )
+    if ( !str_cmp ( arg, "-" ) )
     {
-        int len;
-        bool found = FALSE;
+        if ( ch->pnote == NULL )
+        {
+            ch->Send ( "You have no note in progress.\r\n" );
+            return;
+        }
 
-        note_attach ( ch,type );
         if ( ch->pnote->type != type )
         {
-            send_to_char (
-                "You already have a different note in progress.\r\n",ch );
+            ch->Send ( "You already have a different note in progress.\r\n" );
             return;
         }
 
         if ( ch->pnote->text == NULL || ch->pnote->text[0] == '\0' )
         {
-            send_to_char ( "No lines left to remove.\r\n",ch );
+            ch->Send ( "No lines left to remove.\r\n" );
             return;
         }
 
-        strcpy ( buf,ch->pnote->text );
+        strcpy ( buf, ch->pnote->text );
+        bool found = FALSE;
 
-        for ( len = strlen ( buf ); len > 0; len-- )
+        for ( int len = strlen ( buf ); len > 0; len-- )
         {
-            if ( buf[len] == '\r' )
+            if ( buf[len] == '\n' )
             {
                 if ( !found )  /* back it up */
                 {
@@ -1039,6 +1041,7 @@ void parse_note ( Character *ch, char *argument, int type )
                     buf[len + 1] = '\0';
                     free_string ( &ch->pnote->text );
                     ch->pnote->text = str_dup ( buf );
+                    ch->Send ( "Removed the last line of the note.\r\n" );
                     return;
                 }
             }
@@ -1046,6 +1049,7 @@ void parse_note ( Character *ch, char *argument, int type )
         buf[0] = '\0';
         free_string ( &ch->pnote->text );
         ch->pnote->text = str_dup ( buf );
+        ch->Send ( "Removed the last line of the note.\r\n" );
         return;
     }
 
@@ -1086,13 +1090,12 @@ void parse_note ( Character *ch, char *argument, int type )
         note_attach ( ch,type );
         if ( ch->pnote->type != type )
         {
-            send_to_char (
-                "You already have a different note in progress.\r\n",ch );
+            ch->Send ( "You already have a different note in progress.\r\n" );
             return;
         }
         free_string ( &ch->pnote->to_list );
         ch->pnote->to_list = str_dup ( argument );
-        send_to_char ( "Ok.\r\n", ch );
+        ch->Send ( "Ok.\r\n" );
         return;
     }
 
@@ -1172,7 +1175,7 @@ void parse_note ( Character *ch, char *argument, int type )
         strtime = asctime ( localtime ( &current_time ) );
         * ( strtime + strlen ( strtime ) - 1 ) = '\0';
         ch->pnote->date			= str_dup ( strtime );
-        ch->pnote->date_stamp		= current_time;
+        ch->pnote->date_stamp	= current_time;
 
         append_note ( ch->pnote );
 
@@ -1352,9 +1355,14 @@ void parse_note ( Character *ch, char *argument, int type )
                "%s SHOW\r\n"
                "Then you can submit the note to the recipients with\r\n"
                "%s SEND\r\n"
-               "Or alternitively you can,\r\n"
+               "Or alternatively you can,\r\n"
                "%s CLEAR\r\n"
                "To clear the %s you were working on.\r\n"
+               "==============EDITING==================\r\n"
+               "%s + <line>\r\n"
+               "Appends the line.\r\n"
+               "%s -\r\n"
+               "Deletes the last line.\r\n"
                "==============READING==================\r\n"
                "%s LIST\r\n"
                "Will display all %s's available for you to read,\r\n"
@@ -1369,12 +1377,12 @@ void parse_note ( Character *ch, char *argument, int type )
                "%s REMOVE\r\n"
                "Will let you delete any message that has been sent to you\r\n"
                "that has your name in the recipient list.\r\n"
-           "=============FORWARDING=================\r\n"
-           "%s FORWARD <num> <recipients>\r\n"
+               "=============FORWARDING=================\r\n"
+               "%s FORWARD <num> <recipients>\r\n"
                "Will let you forward any message that has been sent to you.\r\n",
                list_name,list_name,list_name,list_name,list_name,list_name,list_name,list_name,
                list_name,list_name,list_name,list_name,list_name,list_name,list_name,list_name,
-               list_name,list_name,list_name
+               list_name,list_name,list_name,list_name,list_name
              );
     return;
 }

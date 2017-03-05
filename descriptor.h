@@ -105,7 +105,7 @@ public:
     protocol_t *pProtocol; /* @TODO:PROTOCOL */
     /*private:*/
     string output;
-    string cstr;
+    string cstr; // holds the bug/typo report when setting fixed
     string stxt;
 };
 

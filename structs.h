@@ -561,33 +561,34 @@ class Room;
 
 
 /* Modes of connectedness: used by descriptor_data.state */
-#define CON_PLAYING     	0     /* Playing - Nominal state      */
-#define CON_CLOSE       	1     /* Disconnecting                */
-#define CON_GET_NAME         	2     /* By what name ..?             */
-#define CON_NAME_CNFRM       	3   /* Did I get that right, x?     */
-#define CON_PASSWORD         	4     /* Password:                    */
-#define CON_NEWPASSWD        	5     /* Give me a password for x     */
-#define CON_CNFPASSWD        	6     /* Please retype password:      */
-#define CON_RMOTD       	9     /* PRESS RETURN after MOTD      */
-#define CON_MENU       		10     /* Your choice: (main menu)     */
-#define CON_EXDESC     		11     /* Enter a new description:     */
+#define CON_PLAYING     	0  /* Playing - Nominal state      */
+#define CON_CLOSE       	1  /* Disconnecting                */
+#define CON_GET_NAME        2  /* By what name ..?             */
+#define CON_NAME_CNFRM      3  /* Did I get that right, x?     */
+#define CON_PASSWORD        4  /* Password:                    */
+#define CON_NEWPASSWD       5  /* Give me a password for x     */
+#define CON_CNFPASSWD       6  /* Please retype password:      */
+#define CON_RMOTD       	9  /* PRESS RETURN after MOTD      */
+#define CON_MENU       		10 /* Your choice: (main menu)     */
+#define CON_EXDESC     		11 /* Enter a new description:     */
 #define CON_CHPWD_GETOLD   	12 /* Changing passwd: get old     */
 #define CON_CHPWD_GETNEW   	13 /* Changing passwd: get new     */
 #define CON_CHPWD_VRFY     	14 /* Verify new password          */
-#define CON_DELCNF1    		15     /* Delete confirmation 1        */
-#define CON_DELCNF2    		16     /* Delete confirmation 2        */
-#define CON_DISCONNECT      	17     /* In-game disconnection        */
-#define CON_OEDIT    		18  /* OLC mode - object editor        */
-#define CON_REDIT    		19  /* OLC mode - room editor          */
-#define CON_ZEDIT    		20  /* OLC mode - zone info editor          */
-#define CON_MEDIT    		21  /* OLC mode - mobile editor        */
-#define CON_SEDIT    		22  /* OLC mode - shop editor          */
-#define CON_TEDIT    		23  /* OLC mode - text editor          */
-#define CON_CEDIT    		24  /* OLC mode - conf editor          */
-#define CON_AEDIT        	25     /* OLC mode - social (action) edit      */
-#define CON_TRIGEDIT       	26 /*. OLC mode - trigger edit    . */
+#define CON_DELCNF1    		15 /* Delete confirmation 1        */
+#define CON_DELCNF2    		16 /* Delete confirmation 2        */
+#define CON_DISCONNECT     	17 /* In-game disconnection        */
+#define CON_OEDIT    		18 /* OLC mode - object editor     */
+#define CON_REDIT    		19 /* OLC mode - room editor       */
+#define CON_ZEDIT    		20 /* OLC mode - zone info editor  */
+#define CON_MEDIT    		21 /* OLC mode - mobile editor     */
+#define CON_SEDIT    		22 /* OLC mode - shop editor       */
+#define CON_TEDIT    		23 /* OLC mode - text editor       */
+#define CON_CEDIT    		24 /* OLC mode - conf editor       */
+#define CON_AEDIT        	25 /* OLC mode - social (action) edit */
+#define CON_TRIGEDIT       	26 /* OLC mode - trigger edit      */
 #define CON_HEDIT          	27
-#define CON_QEDIT           28  /* OLC mode - questcard editor     */
+#define CON_QEDIT           28 /* OLC mode - questcard editor  */
+#define CON_MSG_EDIT        29 /* msg attached to bug/typo note */
 #define CON_LINE_INPUT     	32 /* line input */
 #define CON_NOTE_EDIT      	35
 #define CON_IDENT          	36
@@ -598,7 +599,7 @@ class Room;
 #define CON_CREATE_NEW 		42
 #define CON_VEDIT      		43
 #define CON_FIND_HELP  		44
-#define CON_ASSEDIT      	45     /* OLC mode - Assemblies                */
+#define CON_ASSEDIT      	45 /* OLC mode - Assemblies          */
 
 #define STATE_ANSI    		0
 #define STATE_NEW_HERE 		1
