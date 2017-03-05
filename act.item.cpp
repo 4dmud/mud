@@ -1553,7 +1553,7 @@ ACMD ( do_get )
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg3[MAX_INPUT_LENGTH] = "";
-    char num[MAX_INPUT_LENGTH] = "";
+    char num[MAX_INPUT_LENGTH] = "1";
     char *from = NULL;
 
     skip_spaces ( &argument );
@@ -1569,7 +1569,6 @@ ACMD ( do_get )
     if ( from && *from )
     {
         strlcpy ( arg3, from, sizeof ( arg3 ) );
-
     }
     else
     {
@@ -1580,10 +1579,6 @@ ACMD ( do_get )
             argument = any_one_arg ( argument, arg3 );
         }
     }
-    //one_argument(two_arguments(argument, arg1, arg2), arg3);
-
-
-
 
     if ( IS_CARRYING_N ( ch ) >= CAN_CARRY_N ( ch ) )
     {
@@ -1594,17 +1589,10 @@ ACMD ( do_get )
     if ( !IS_NPC ( ch ) )
         SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
 
-    // get <number> <item>
-    if ( *num && !*arg3 )
+    // get [<number>] <item>
+    if ( !*arg3 )
     {
         get_from_room ( ch, arg1, atoi ( num ) );
-        return;
-    }
-
-    // get <item>
-    if ( !*arg3 || !str_cmp ( arg3, "room" ) )
-    {
-        get_from_room ( ch, arg1, 1 );
         return;
     }
 
