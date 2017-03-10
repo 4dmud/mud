@@ -1859,8 +1859,9 @@ ACMD ( do_file )
         }
 
         bool add_fixed = entries[ line_number-1 ].substr ( entries[ line_number-1 ].size() - 7 ) != "(fixed)";
+        bool using_syslog = fields[l].cmd == "syslog";
         int syslog_lines_changed = 0;
-        if ( fields[l].cmd == "syslog" )
+        if ( using_syslog )
         {
             // toggle (fixed) in all lines with the same content, apart from the date, which has length 19
             for ( int i = 0; i < entries.size(); ++i )
@@ -1879,7 +1880,7 @@ ACMD ( do_file )
         else
             entries[ line_number-1 ] = entries[ line_number-1 ].substr ( 0, entries[ line_number-1 ].size() - 7 );
 
-        if ( fields[l].cmd == "syslog" )
+        if ( using_syslog )
         {
             ch->Send ( "%d. %s\r\n", line_number, entries[ line_number-1 ].c_str() );
             if ( syslog_lines_changed > 0 )
@@ -1897,7 +1898,10 @@ ACMD ( do_file )
             string_write ( ch->desc, &ch->desc->backstr, MAX_STRING_LENGTH, 0, nullptr );
         }
 
-        if ( ! ( req_file = fopen ( fields[l].file.c_str(), "w" ) ) )
+        if ( using_syslog )
+            fclose ( logfile );
+
+        if ( !( req_file = fopen ( fields[l].file.c_str(), "w" ) ) )
         {
             new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "SYSERR: Error writing to file %s.", fields[l].file.c_str() );
             return;
@@ -1909,6 +1913,9 @@ ACMD ( do_file )
             fputs ( "\n", req_file );
         }
         fclose ( req_file );
+
+        if ( using_syslog )
+            logfile = fopen ( fields[l].file.c_str(), "a" );
 
         return;
     }
