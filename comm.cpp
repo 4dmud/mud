@@ -3986,9 +3986,7 @@ void brag(Character *ch, Character *vict) {
                 i->Output( "%s", CCNRM(i->character, C_NRM));
 
             if (CHAMPION == GET_IDNUM(vict) && IS_PK(ch))
-                i->character->Send("%s just lost his title to %s!\r\n", GET_NAME(vict), GET_NAME(ch));
-
-
+                i->character->Send("%s just lost %s title to %s!\r\n", GET_NAME(vict), HSHR(vict), GET_NAME(ch));
         }
     }
 }

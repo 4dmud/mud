@@ -2368,7 +2368,7 @@ ACMD ( do_score )
     //  float damspeed = (DAM_SPEED_MULTI(ch));
     float blocking = 0.0;
     int remorts = MIN(REMORTS(ch), 50);
-bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_MAGE || GET_CLASS ( ch ) == CLASS_ESPER || has_staff ( ch );
+    bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_MAGE || GET_CLASS ( ch ) == CLASS_ESPER || has_staff ( ch );
 
 
     blank = blankbuf;
@@ -2399,6 +2399,21 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
     if ( AFF_FLAGGED ( ch, AFF_POLY_LION ) )
     {
         ch->Send ( "You puzzle, but your lion mind can't comprehend that!\r\n" );
+        return;
+    }
+
+    char arg[MAX_INPUT_LENGTH];
+    one_argument ( argument, arg );
+    if ( *arg )
+    {
+        if ( is_abbrev ( arg, "hitpoints" ) )
+            ch->Send ( "Hitpoints: %d\r\n", GET_HIT ( ch ) );
+        else if ( is_abbrev ( arg, "mana" ) )
+            ch->Send ( "Mana: %d\r\n", GET_MANA ( ch ) );
+        else if ( is_abbrev ( arg, "moves" ) )
+            ch->Send ( "Moves: %d\r\n", GET_MOVE ( ch ) );
+        else
+            ch->Send ( "Score doesn't recognize the argument '%s'.\r\n", arg );
         return;
     }
 
