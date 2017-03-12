@@ -726,7 +726,7 @@ ACMD ( do_put )
 
     skip_spaces ( &argument );
 
-    if ( strncasecmp ( argument, "all ", 4 ) )
+    if ( !strncasecmp ( argument, "all ", 4 ) )
     {
         /** put all of the stuff that can fit, from inventory to container.
             all the rest of argument is container description. **/

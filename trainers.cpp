@@ -586,14 +586,16 @@ ACMD ( do_practice )
 
 
     SET_SKILL ( ch, skill_num, MIN ( learned, percent ) );
+    int total_perc = total_chance ( ch, skill_num );
+
     if ( REMORTS ( ch ) > 2 )
     {
         ch->Gold ( -cig, GOLD_HAND );
-        ch->Send ( "You pay %lld gold and a practice point to train your skill to %d%%.\r\n", cig, GET_SKILL ( ch,skill_num ) );
+        ch->Send ( "You pay %lld gold and a practice point to train your skill to %d%%.\r\n", cig, total_perc );
     }
     else
     {
-        ch->Send ( "You pay a practice point and train your skill up to %d%%.\r\n", GET_SKILL ( ch,skill_num ) );
+        ch->Send ( "You pay a practice point and train your skill up to %d%%.\r\n", total_perc );
     }
     GET_PRACTICES ( ch )--;
 

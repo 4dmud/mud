@@ -1893,7 +1893,7 @@ ACMD ( do_file )
             ch->Send ( "%d. %s\r\n\r\n", line_number, buf );
             ch->desc->cstr = string ( buf );
             send_editor_help ( ch->desc );
-            ch->Send ( "Please enter the note message:\r\n" );
+            ch->Send ( "Please enter the note message (if any):\r\n" );
             STATE ( ch->desc ) = CON_MSG_EDIT;
             string_write ( ch->desc, &ch->desc->backstr, MAX_STRING_LENGTH, 0, nullptr );
         }

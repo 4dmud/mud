@@ -304,7 +304,7 @@ ACMD(do_descend)
             else
             {
               act("As you start descending $p, you slip and tumble down.", FALSE, ch, obj, 0, TO_CHAR);
-              act("$n starts descending $p but slips and tumbles down, head over heals.\r\nThat's got to hurt.", FALSE, ch, obj, 0, TO_ROOM);
+              act("$n starts descending $p but slips and tumbles down, head over heels.\r\nThat's got to hurt.", FALSE, ch, obj, 0, TO_ROOM);
               damage(ch, ch, (GET_HIT(ch) / 4), TYPE_UNDEFINED);
             }
             char_from_room ( ch );
