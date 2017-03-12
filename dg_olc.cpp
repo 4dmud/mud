@@ -1003,7 +1003,8 @@ int format_script(Descriptor *d) {
     while (t) {
         line_num++;
         skip_spaces(&t);
-        error = error_check ( t, nullptr, line_num, d );
+        if ( error_check ( t, nullptr, line_num, d ) )
+            error = TRUE;
 
         if (!strncasecmp(t, "if ", 3))
             indent_next = TRUE;
