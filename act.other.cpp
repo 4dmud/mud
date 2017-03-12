@@ -1953,27 +1953,26 @@ ACMD ( do_file )
     }
 
     /* strip the tags from the entries and page them */
-    int len = 0;
     char buf2[MAX_STRING_LENGTH];
-    *buf2 = '\0';
+    DYN_DEFINE;
+    DYN_CREATE;
+
     for ( int i = entries_to_show.size() - 1; i >= 0; --i )
     {
-        if ( entries[ entries_to_show[i] ].length() + 10 >= ( sizeof buf2 ) - len ) // prevent buffer overflow
-            break;
-
         strlcpy ( buf, entries[ entries_to_show[i] ].c_str(), sizeof ( buf ) );
 
         if ( has_tags )
             remove_tags ( buf );
 
         if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "syslog" )
-            len += snprintf ( buf2 + len, ( sizeof buf2 ) - len, "%d. %s\r\n{c0", entries_to_show[i] + 1, buf );
+            snprintf ( buf2, sizeof buf2, "%d. %s\r\n{c0", entries_to_show[i] + 1, buf );
         else
-            len += snprintf ( buf2 + len, ( sizeof buf2 ) - len, "%s\r\n{c0", buf );
+            snprintf ( buf2, sizeof buf2, "%s\r\n{c0", buf );
+
+        DYN_RESIZE ( buf2 );
     }
 
-    page_string ( ch->desc, buf2, 1 );
-
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
 
 

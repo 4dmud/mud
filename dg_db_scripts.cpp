@@ -64,6 +64,32 @@ int char_count ( const char* s, const char c )
     return count;
 }
 
+bool has_percentage ( char *line )
+{
+    char *p = strchr ( line, '%' );
+    if ( !p )
+        return FALSE;
+
+    do
+    {
+        for ( char *s = p-1; s >= line; --s )
+        {
+            if ( *s == ' ' )
+            {
+                if ( s < p-1 )
+                    return TRUE;
+                break;
+            }
+            if ( *s < '0' || *s > '9' )
+                break;
+            if ( s == line )
+                return TRUE;
+        }
+    } while ( ( p = strchr ( p+1, '%' ) ) != nullptr );
+
+    return FALSE;
+}
+
 /* check a trigger line for errors when it's parsed or entered in trigedit */
 bool error_check ( char *line, trig_data *trig, int line_nr, Descriptor *d )
 {
@@ -75,7 +101,7 @@ bool error_check ( char *line, trig_data *trig, int line_nr, Descriptor *d )
         return error;
 
     // check for uneven number of %
-    if ( char_count ( line, '%' ) % 2 == 1 )
+    if ( char_count ( line, '%' ) % 2 == 1 && !has_percentage ( line ) )
     {
         if ( d )
             d->Output ( "Uneven number of %% in line %d: %s\r\n", line_nr, line );
@@ -102,6 +128,10 @@ bool error_check ( char *line, trig_data *trig, int line_nr, Descriptor *d )
     }
 
     // check for '=' which possibly should be '=='
+    if ( !strn_cmp ( line, "say", 3 ) || !strn_cmp ( line, "emote", 5 ) ||
+            !strn_cmp ( line+1, "echo", 4 ) || !strn_cmp ( line+1, "send", 4 ) )
+        return error;
+
     char *c = line;
     while ( TRUE )
     {
