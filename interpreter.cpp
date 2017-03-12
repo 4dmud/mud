@@ -1925,7 +1925,7 @@ int perform_dupe_check ( Descriptor *d )
      * duplicates, though theoretically none should be able to exist).
      */
 
-    for ( ch = character_list; ch; ch = next_ch )
+    for ( ch = character_list; d->character && ch; ch = next_ch )
     {
         next_ch = ch->next;
 
@@ -1934,12 +1934,10 @@ int perform_dupe_check ( Descriptor *d )
         /* ignore chars with descriptors (already handled by above step) */
         if ( ch->desc && target == ch )
             continue;
-        if ( !d->character )
-            continue;
         if ( GET_ACC ( ch ) != GET_ACC ( d->character ) )
             continue;
 
-        /* don't extract the target char we've found one already */
+        /* don't extract the target char we've found already */
         if ( ch == target )
             continue;
 
@@ -2202,14 +2200,6 @@ int enter_player_game ( Descriptor *d )
     // if (!valid_id_num( GET_ID(ch)))
     //    log("Error %s id being assigned already exists(%ld)!", GET_NAME(ch), GET_IDNUM(ch));
     GET_ID ( ch ) = GET_IDNUM ( ch );
-    auto it_old_ch = ch_lookup_table.find ( GET_ID ( ch ) );
-    if ( it_old_ch != ch_lookup_table.end() && it_old_ch->second != ch )
-    {
-        // there's an old character that wasn't deleted
-        log ( "SYSERR: Deleting %s's old char that was still in the game.", GET_NAME ( ch ) );
-        delete it_old_ch->second;
-        removeFromChLookupTable ( GET_ID ( ch ) );
-    }
     addChToLookupTable ( GET_IDNUM ( ch ), ch );
 
     if ( PLR_FLAGGED ( ch, PLR_INVSTART ) )
@@ -2864,7 +2854,8 @@ void nanny ( Descriptor *d, char *arg )
                 case '1':
 
                     line_sep ( d );
-
+                    if ( perform_dupe_check ( d ) )
+                        break;
                     load_result = enter_player_game ( d );
 
                     greet_mtrigger ( d->character, -1 );
