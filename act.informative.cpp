@@ -3998,7 +3998,7 @@ if (!readout_who) {
                 len += snprintf ( buf + len, sizeof ( buf ) - len, " (Buildwalking)" );
         }
         len += snprintf ( buf + len, sizeof ( buf ) - len, "\r\n" );
-} else if (readout_who) {
+    } else if (readout_who) {
 
           if ( GET_LEVEL ( wch ) >= LVL_HERO ) {
             if (tWizards > 1 && (tWizards-1) == Wizards)
@@ -4059,27 +4059,32 @@ if (!readout_who) {
         boot_high = Wizards + Mortals;
     len += snprintf ( buf + len, sizeof ( buf ) - len, "There is a boot time high of %d player%s.\r\n",
                       boot_high, ( boot_high == 1 ? "" : "s" ) );
-    if (!readout_who) {
-    len += snprintf ( buf + len, sizeof (buf) - len, "The latest PK champion is {cR%s{cn.\r\n",
+
+    if (!readout_who)
+    {
+        len += snprintf ( buf + len, sizeof (buf) - len, "The latest PK champion is {cR%s{cn.\r\n",
                           CHAMPION  <= 0 ? "Nobody yet" :  LAST_PK); // Name of the Champion
 
-            struct clan_deed_type *cl;
-                        int clan_num, deeds_amt = 0, winner_amt = 0, highest_clan = 0;
-                        clan_num = 0;
-                        while ((clan_num >= 0) &&  (clan_num <= num_of_clans)) {
-                              for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
-                                deeds_amt += 1;
-                        }
-            if (deeds_amt > winner_amt) {
-            highest_clan = clan_num;
-            winner_amt = deeds_amt;
+        struct clan_deed_type *cl;
+        int clan_num, deeds_amt = 0, winner_amt = 0, highest_clan = 0;
+        clan_num = 0;
+        while ((clan_num >= 0) &&  (clan_num <= num_of_clans))
+        {
+            for (cl = clan[clan_num].deeds; cl; cl = cl->next)
+                deeds_amt += 1;
+
+            if (deeds_amt > winner_amt)
+            {
+                highest_clan = clan_num;
+                winner_amt = deeds_amt;
             }
             deeds_amt = 0;
             clan_num += 1;
-             }
-    len += snprintf ( buf + len, sizeof (buf) - len, "The best clan currently is {cR%s{cn with {cC%d{cn deeds. \r\n",
-            clan[highest_clan].name, winner_amt);
+        }
+        len += snprintf ( buf + len, sizeof (buf) - len, "The best clan currently is {cR%s{cn with {cC%d{cn deeds. \r\n",
+                            clan[highest_clan].name, winner_amt);
     }
+
     /** pass the last line buffer into the string - mord **/
     out << buf << endl;
     *ch << out.str();

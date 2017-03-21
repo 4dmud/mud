@@ -97,7 +97,7 @@ bool error_check ( char *line, trig_data *trig, int line_nr, Descriptor *d )
     skip_spaces ( &line );
 
     // skip comments
-    if ( *line == '*' )
+    if ( !*line || *line == '*' )
         return error;
 
     // check for uneven number of %
@@ -127,13 +127,15 @@ bool error_check ( char *line, trig_data *trig, int line_nr, Descriptor *d )
         error = TRUE;
     }
 
-    // check for '=' which possibly should be '=='
-    if ( !strn_cmp ( line, "say", 3 ) || !strn_cmp ( line, "emote", 5 ) ||
-            !strn_cmp ( line+1, "echo", 4 ) || !strn_cmp ( line+1, "send", 4 ) )
+    if ( !strn_cmp ( line, "say", 3 ) || !strn_cmp ( line, "emote", 5 ) )
         return error;
 
+    if ( *(line+1) && ( !strn_cmp ( line+1, "echo", 4 ) || !strn_cmp ( line+1, "send", 4 ) ) )
+        return error;
+
+    // check for '=' which possibly should be '=='
     char *c = line;
-    while ( TRUE )
+    while ( *c )
     {
         c = strchr ( c, '=' );
         if ( !c )

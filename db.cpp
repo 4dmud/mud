@@ -1841,6 +1841,7 @@ void index_boot ( int mode )
                 exit ( 1 );
             }
             load_help ( db_file );
+            top_of_helpt--;
             fclose ( db_file );
             fscanf ( findex, "%s\n", buf1 );
 
@@ -4049,7 +4050,6 @@ void load_help ( FILE *fl )
         el.keywords = str_dup ( key );
         el.duplicate = 0; //redundant call
         help_table[top_of_helpt++] = el;
-
 
         /* get next keyword line (or $) */
         get_one_line ( fl, key );

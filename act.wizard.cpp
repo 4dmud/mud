@@ -4580,7 +4580,6 @@ ACMD ( do_hostfind )
 /* single zone printing fn used by "show zone" so it's not repeated in the
    code 3 times ... -je, 4/6/93 */
 
-/* FIXME: overflow possible */
 size_t print_zone_to_buf ( char *bufptr, size_t left, zone_rnum zone, int listall )
 {
     size_t tmp;
@@ -4600,6 +4599,9 @@ size_t print_zone_to_buf ( char *bufptr, size_t left, zone_rnum zone, int listal
                          zone_table[zone].reset_mode,
                          zone_table[zone].bot, zone_table[zone].top,
                          zflags );
+        if ( tmp >= left )
+            return tmp;
+
         i = j = k = l = m = n = 0;
 
         for ( i = 0; i < top_of_world; i++ )
@@ -7636,16 +7638,16 @@ int hilite ( const char *regex, const char *str, char *buf, size_t buflen )
 
 int search_one_trig ( int stype, struct trig_data *trig, char *buf, size_t len, int vnum, const char *phrase )
 {
-
     size_t nlen = 0;
     int found = 0, count = 0;
     char strtmp2[MAX_STRING_LENGTH], trty[100], trIS[100];
-    if ( trig->attach_type==OBJ_TRIGGER )
+
+    if ( trig->attach_type == OBJ_TRIGGER )
     {
         snprintf ( trIS, sizeof ( trIS ), "Objects" );
         new_sprintbit ( GET_TRIG_TYPE ( trig ), otrig_types, trty, sizeof ( trty ) );
     }
-    else if ( trig->attach_type==WLD_TRIGGER )
+    else if ( trig->attach_type == WLD_TRIGGER )
     {
         snprintf ( trIS, sizeof ( trIS ), "Rooms  " );
         new_sprintbit ( GET_TRIG_TYPE ( trig ), wtrig_types, trty, sizeof ( trty ) );
@@ -7655,6 +7657,7 @@ int search_one_trig ( int stype, struct trig_data *trig, char *buf, size_t len, 
         snprintf ( trIS, sizeof ( trIS ), "Mobiles" );
         new_sprintbit ( GET_TRIG_TYPE ( trig ), trig_types, trty, sizeof ( trty ) );
     }
+
     count = snprintf ( buf + nlen, len - nlen, "\r\n%sVnum: %-7d - %s%s - %s%s - Name: %-50s%s\r\n",GRN, vnum, CYN, trIS, trty,REM , trig->name, REM );
     if ( count > 0 )
         nlen += count;
@@ -7690,21 +7693,21 @@ int search_one_trig ( int stype, struct trig_data *trig, char *buf, size_t len, 
             n++;
             if ( hilite ( phrase, c->cmd, strtmp2, sizeof ( strtmp2 ) ) )
             {
-                if ( strlen ( strtmp2 ) >= len - nlen - 100 )
-                    return found; // prevent possible buffer overflow
-
                 count = snprintf ( buf + nlen, len - nlen, "      %s[BODY]%s Line %3d: %s%s\r\n",YEL, REM, n, strtmp2, REM );
                 if ( count >= 0 )
+                {
+                    if ( count >= len - nlen )
+                        return found; // buf is full
                     nlen += count;
+                }
                 found++;
             }
         }
 
     }
-
-
     return found;
 }
+
 ACMD ( do_search_triggers )
 {
     unsigned int i;
@@ -7751,11 +7754,11 @@ ACMD ( do_search_triggers )
             if ( search_one_trig ( stype, trig_index[i]->proto, buf, sizeof ( buf ), trig_index[i]->vnum, ( const char* ) argument ) )
             {
                 DYN_RESIZE ( buf );
-                found ++;
+                found++;
             }
         }
-
     }
+
     if ( !found )
         sprintf ( buf, "No triggers found!\r\n" );
     else

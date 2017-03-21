@@ -1131,7 +1131,7 @@ void do_stat_trigger ( Character *ch, trig_data *trig )
 
         if ( len>MAX_STRING_LENGTH-80 )
         {
-            len += snprintf ( sb + len, sizeof ( sb )-len, "*** Overflow - script too long! ***\r\n" );
+            snprintf ( sb + MAX_STRING_LENGTH - 50, 50, "*** Overflow - script too long! ***\r\n" );
             break;
         }
         cmd_list = cmd_list->next;
@@ -3944,7 +3944,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
         for ( p = cl->cmd; *p && isspace ( *p ); p++ )
             ;
 
-        if ( *p == '*' )		/* comment */
+        if ( !*p || *p == '*' )		/* comment */
             continue;
 
         if ( !strn_cmp ( p, "if ", 3 ) )
