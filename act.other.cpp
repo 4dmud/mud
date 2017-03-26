@@ -178,6 +178,7 @@
 #include "constants.h"
 #include "dg_scripts.h"
 #include "descriptor.h"
+#include <regex>
 
 /* extern variables */
 extern Descriptor *descriptor_list;
@@ -1809,10 +1810,12 @@ ACMD ( do_file )
     char buf[MAX_STRING_LENGTH];
     if ( !strcmp ( arg2, "search" ) )
     {
+        // case insensitive pattern matching, skip the leading space
+        regex re ( *arg3 == ' ' ? arg3+1 : arg3, regex::icase );
         string text = "";
-        int len = strlen ( arg3 ), i = 1;
-        for ( auto &e : entries )
-            if ( search ( e.begin(), e.end(), arg3, arg3 + len, [](char c1, char c2) { return toupper ( c1 ) == toupper ( c2 ); } ) != e.end() )
+        int i = 1;
+        for ( const auto &e : entries )
+            if ( regex_search ( e, re ) )
             {
                 if ( fields[l].cmd == "syslog" )
                     text += "\r\n" + to_string ( i++ ) + ". " + e;
