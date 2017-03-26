@@ -2018,7 +2018,7 @@ void oedit_parse ( Descriptor *d, char *arg )
             break;
 
         case OEDIT_CRAFTING_COLOUR:
-            GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, colour_names.size() - 1 );
+            GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, (int) colour_names.size() - 1 );
             oedit_disp_crafting_max_quality_menu ( d );
             return;
 
@@ -2033,7 +2033,7 @@ void oedit_parse ( Descriptor *d, char *arg )
             return;
 
         case OEDIT_CRAFTING_MATERIAL:
-            GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, material_names.size() - 1 );
+            GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, (int) material_names.size() - 1 );
             oedit_disp_crafting_dyecount_menu ( d );
             return;
 
