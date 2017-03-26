@@ -4382,9 +4382,11 @@ void compare_weapons ( Character *ch,struct obj_data *item, struct obj_data *com
     value1 = FTOI ( ( ( item->obj_flags.value[1]+1 ) * item->obj_flags.value[2] * wep_multi[0] ) /2 );
     value2 = FTOI ( ( ( comp->obj_flags.value[1]+1 ) * comp->obj_flags.value[2] * wep_multi[1] ) /2 );
 
-    ch->Send ( "      {cgYou would do %s damage with ({cRB{cg) %s ({cGA{cg).{c0\r\n",
-               value2 > value1 ? "more" : value2 == value1 ? "the same" : "less", value2 == value1 ? "as" : "than" );
+    ch->Send ( "You would do %s damage with {cg%s{c0 %s {cc%s{c0.\r\n",
+        value2 > value1 ? "more" : value2 == value1 ? "the same" : "less", comp->short_description,
+        value2 == value1 ? "as" : "than", item->short_description );
 }
+
 void compare_staves ( Character *ch,struct obj_data *item, struct obj_data *comp )
 {
     float staff_multi ( Character *ch, struct obj_data *staff );
@@ -4392,17 +4394,21 @@ void compare_staves ( Character *ch,struct obj_data *item, struct obj_data *comp
         return;
     if ( staff_multi ( ch, comp ) > staff_multi ( ch, item ) )
     {
-        ch->Send ( "      {cgYou would get a higher multiplyer from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
+        ch->Send ( "You would get a higher multiplyer from {cg%s{c0 than {cc%s{c0.\r\n",
+            comp->short_description, item->short_description );
     }
     else if ( staff_multi ( ch, comp ) == staff_multi ( ch, item ) )
     {
-        ch->Send ( "      {cgYou would get the same multiplyer from ({cRB{cg) as from ({cGA{cg).{c0\r\n" );
+        ch->Send ( "You would get the same multiplyer from {cg%s{c0 than {cc%s{c0.\r\n",
+            comp->short_description, item->short_description );
     }
     else
     {
-        ch->Send ( "      {cgYou would get a lower multiplyer from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
+        ch->Send ( "You would get a lower multiplyer from {cg%s{c0 than {cc%s{c0.\r\n",
+            comp->short_description, item->short_description );
     }
 }
+
 void compare_armor ( Character *ch,struct obj_data *item, struct obj_data *comp )
 {
     if ( !item || !comp )
@@ -4410,18 +4416,22 @@ void compare_armor ( Character *ch,struct obj_data *item, struct obj_data *comp 
 
     if ( GET_OBJ_VAL ( comp, 0 ) > GET_OBJ_VAL ( item, 0 ) )
     {
-        ch->Send ( "      {cgYou would get more armor from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
+        ch->Send ( "You would get more armor from {cg%s{c0 than {cc%s{c0.\r\n",
+            comp->short_description, item->short_description );
     }
     else if ( GET_OBJ_VAL ( comp, 0 ) == GET_OBJ_VAL ( item, 0 ) )
     {
-        ch->Send ( "      {cgYou would get the same from ({cRB{cg) as from ({cGA{cg).{c0\r\n" );
+        ch->Send ( "You would get the same from {cg%s{c0 as from {cc%s{c0.\r\n",
+            comp->short_description, item->short_description );
     }
     else
     {
-        ch->Send ( "      {cgYou would get less armor from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
+        ch->Send ( "You would get less armor from {cg%s{c0 than {cc%s{c0.\r\n",
+            comp->short_description, item->short_description);
     }
 
 }
+
 void compare_food ( Character *ch,struct obj_data *item, struct obj_data *comp )
 {
     if ( !item || !comp )
@@ -4429,18 +4439,22 @@ void compare_food ( Character *ch,struct obj_data *item, struct obj_data *comp )
 
     if ( GET_OBJ_VAL ( comp, 0 ) > GET_OBJ_VAL ( item, 0 ) )
     {
-        ch->Send ( "      {cgYou would get more food from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
+        ch->Send ( "You would get more food from {cg%s{c0 than {cc%s{c0.\r\n",
+            comp->short_description, item->short_description );
     }
     else if ( GET_OBJ_VAL ( comp, 0 ) == GET_OBJ_VAL ( item, 0 ) )
     {
-        ch->Send ( "      {cgYou would get the same food from ({cRB{cg) as from ({cGA{cg).{c0\r\n" );
+        ch->Send ( "You would get the same food from {cg%s{c0 as from {cc%s{c0.\r\n",
+            comp->short_description, item->short_description );
     }
     else
     {
-        ch->Send ( "      {cgYou would get less food from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
+        ch->Send ( "You would get less food from {cg%s{c0 than {cc%s{c0.\r\n",
+            comp->short_description, item->short_description );
     }
 
 }
+
 void compare_affects ( Character *ch, struct obj_data *item, struct obj_data *comp )
 {
     int i;
@@ -4489,8 +4503,9 @@ void compare_affects ( Character *ch, struct obj_data *item, struct obj_data *co
                 break;
         }
 
-    ch->Send ( "      {cg({cRB{cg) has %s beneficial affects %s ({cGA{cg) with a difference score of %d.{c0\r\n",
-               points > 0 ? "more" : points ==  0 ? "the same" : "less",  points ==  0 ? "as" : "than", points );
+    ch->Send ( "{cg%s{c0 has %s beneficial affects %s {cc%s{c0 with a difference score of %d.\r\n",
+        comp->short_description, points > 0 ? "more" : points ==  0 ? "the same" : "less",
+        points ==  0 ? "as" : "than", item->short_description, points );
 
 }
 
@@ -4535,8 +4550,6 @@ ACMD ( do_compare )
                 continue;
             if ( CAN_SEE_OBJ ( ch, obj2 ) && GET_OBJ_TYPE ( obj2 ) == GET_OBJ_TYPE ( obj1 ) && CAN_GET_OBJ ( ch, obj2 ) )
             {
-                ch->Send ( "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[inventory]{c0\r\n",
-                           obj1->short_description, obj2->short_description );
                 switch ( GET_OBJ_TYPE ( obj1 ) )
                 {
                     case ITEM_WEAPON:
@@ -4566,7 +4579,6 @@ ACMD ( do_compare )
                 continue;
             if ( CAN_WEAR ( obj1, where_to_worn ( it ) ) )
             {
-                ch->Send ( "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[equipment: %s]{c0\r\n", obj1->short_description,obj2->short_description, body[it] );
                 if ( GET_OBJ_TYPE ( obj2 ) == GET_OBJ_TYPE ( obj1 ) )
                 {
                     switch ( GET_OBJ_TYPE ( obj1 ) )
@@ -4607,7 +4619,7 @@ ACMD ( do_compare )
                 return;
             }
         }
-        ch->Send ( "{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy):\r\n", obj1->short_description, obj2->short_description );
+
         if ( GET_OBJ_TYPE ( obj2 ) == GET_OBJ_TYPE ( obj1 ) )
         {
             switch ( GET_OBJ_TYPE ( obj1 ) )
