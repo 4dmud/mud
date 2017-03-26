@@ -56,8 +56,8 @@ ACTION(thing_tunneling);
 void set_tree_origin ( struct obj_data *obj, struct obj_data *tree )
 {
     string s = tolower ( string ( tree->short_description ) );
-    for ( size_t i = 1; i < origin_names.size(); ++i )
-        for ( auto origin : origin_names[i] )
+    for ( size_t i = 1; i < ORIGIN_LARGE_ANIMAL; ++i )
+        for ( const auto &origin : origin_names[i] )
             if ( s.find ( origin ) != string::npos )
             {
                 GET_OBJ_ORIGIN ( obj ) = i;

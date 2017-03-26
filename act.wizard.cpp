@@ -368,6 +368,9 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
+bool crafted ( obj_data *obj );
+const char* max_quality_name ( obj_data *obj );
+const char* quality_name ( obj_data *obj );
 void save_explored ( const Character *ch );
 script_data* create_script();
 bool is_abbrev3 ( const string &s1, const string &s2 );
@@ -1914,24 +1917,25 @@ void do_stat_object ( Character *ch, struct obj_data *j )
     for ( i = 0; i < 8; ++i )
         if ( GET_OBJ_VAL ( j, i ) != 0 )
             ch->Send ( " [%d]:%d", i, GET_OBJ_VAL ( j, i ) );
-    if ( GET_OBJ_MAX_QUALITY ( j ) > 0 )
+    if ( crafted ( j ) )
             ch->Send ( " [8]:%.3f", GET_OBJ_QUALITY ( j ) );
     for ( i = 8; i < 13; ++i )
         if ( GET_OBJ_VAL ( j, i ) != 0 )
             ch->Send ( " [%d]:%d", i + 1, GET_OBJ_VAL ( j, i ) );
-    if ( GET_OBJ_MAX_QUALITY ( j ) > 0 )
+    if ( crafted ( j ) )
             ch->Send ( " [14]:%.3f", GET_OBJ_MAX_QUALITY ( j ) );
     ch->Send ( "\r\n" );
 
-    if ( GET_OBJ_COLOUR ( j ) != 0 )
+    if ( GET_OBJ_COLOUR ( j ) < 0 || GET_OBJ_COLOUR ( j ) >= colour_names.size() )
     {
-        if ( GET_OBJ_COLOUR ( j ) > 0 && GET_OBJ_COLOUR ( j ) < NUM_COLOUR_NAMES )
-            ch->Send ( "Colour: %s\r\n", colour_names[ GET_OBJ_COLOUR ( j )] );
-        else ch->Send ( "Colour: out of range\r\n" );
+        log ( "SYSERR: colour of [%d]. %s was out of range", GET_OBJ_VNUM ( j ), j->short_description );
+        GET_OBJ_COLOUR ( j ) = 0;
     }
+    else if ( GET_OBJ_COLOUR ( j ) != 0 )
+        ch->Send ( "Colour: %s\r\n", colour_names[ GET_OBJ_COLOUR ( j )] );
 
-    if ( GET_OBJ_MAX_QUALITY ( j ) > 0 )
-        ch->Send ( "Quality: %s (%.3f)\r\n", QUALITY_NAME ( j ), GET_OBJ_QUALITY ( j ) );
+    if ( crafted ( j ) )
+        ch->Send ( "Quality: %s (%.3f)\r\n", quality_name ( j ), GET_OBJ_QUALITY ( j ) );
 
     if ( GET_OBJ_DYECOUNT ( j ) != 0 )
         ch->Send ( "Dyecount: %d\r\n", GET_OBJ_DYECOUNT ( j ) );
@@ -1953,8 +1957,8 @@ void do_stat_object ( Character *ch, struct obj_data *j )
     if ( GET_OBJ_REPAIRS ( j ) != 0 )
         ch->Send ( "Repairs: %d\r\n", GET_OBJ_REPAIRS ( j ) );
 
-    if ( GET_OBJ_MAX_QUALITY ( j ) > 0 )
-        ch->Send ( "Max. quality: %s (%.3f)\r\n", MAX_QUALITY_NAME ( j ), GET_OBJ_MAX_QUALITY ( j ) );
+    if ( crafted ( j ) )
+        ch->Send ( "Max. quality: %s (%.3f)\r\n", max_quality_name ( j ), GET_OBJ_MAX_QUALITY ( j ) );
 
     /*
      * I deleted the "equipment status" code from here because it seemed

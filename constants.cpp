@@ -260,7 +260,7 @@ const  char *random_desc[] =
     "\n"
 };
 
-const char *material_names[] =
+const vector<const char*> material_names =
 {
     "base-material", // 0, default
     "glass",
@@ -282,7 +282,7 @@ const char *material_names[] =
     "hair",
     "wool",
     "wood",
-    "magic-wood",	 // 20
+    "magic-wood",// 20
     "mithril",
     "steel",
     "brass",
@@ -318,11 +318,10 @@ const char *material_names[] =
     "nylon",
     "paper",
     "currency",
-    "energy",	 // 56
-    "\n"
+    "energy"	 // 56
 };
 
-const char *material_group_names[] =
+const vector<const char*> material_group_names =
 {
     "base-material", //0
     "metal",
@@ -334,8 +333,9 @@ const char *material_group_names[] =
 };
 
 /* material_group_names [ material_groups[i] ] corresponds to material_names[i] */
-const int material_groups[] =
+const vector<int> material_groups =
 {
+        // <material name>, <material group name>
     0, 	// base-material, base-material
     2,	// glass, stone
     1,	// iron, metal
@@ -395,7 +395,7 @@ const int material_groups[] =
     6	// energy, other
 };
 
-const char *colour_names[] =
+const vector<const char*> colour_names =
 {
     "none",
     "white",
@@ -411,7 +411,7 @@ const char *colour_names[] =
     "purple"         // 11
 };
 
-const char *quality_names[] =
+const vector<const char*> quality_names =
 {
     "horrible",
     "crappy",
@@ -437,7 +437,7 @@ const char *origins[] =
     "furry_animal"
 };
 
-const vector< vector<string> > origin_names =
+const vector< vector<const char*> > origin_names =
 {
     { "none" },
     // 1 ORIGIN_HARDWOOD
@@ -671,9 +671,9 @@ const char *rp_group_names[] =
     "{cYOrsini{c0",
     "{cpLolthite{c0",
     "{cGCthulyte{c0",
-        "{cWAlderisio{c0",
-        "{cWFearless{c0",
-        "{cLGalliano{c0",
+    "{cWAlderisio{c0",
+    "{cWFearless{c0",
+    "{cLGalliano{c0",
     "{cRS{cra{cRv{cra{cRg{cre{cRs{c0",
     "\n"
 };

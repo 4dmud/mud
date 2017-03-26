@@ -50,6 +50,7 @@ void update_char_objects ( Character *ch );
 
 
 /* external functions */
+bool crafted ( obj_data *obj );
 void resume_trigger ( trig_data *trig, void *thing, int type );
 EVENTFUNC ( trig_wait_event );
 void save_player_shop (string owner );
@@ -3196,13 +3197,13 @@ int positive_affect ( struct obj_affected_type *af )
 
 void update_affects ( struct obj_data *obj )
 {
+    if ( !crafted ( obj ) )
+        return;
+
     int statcount = 0, orig_statcount = 0, new_statcount = 0, i, j;
     vector<int> choose_from;
 
     // You can only lose (or gain) positive stats, or negative AC. Every -1 AC counts as one stat.
-
-    if ( GET_OBJ_MAX_QUALITY ( obj ) < 0.1 )
-        return;
 
     for ( i = 0; i < MAX_OBJ_AFFECT; ++i )
     {

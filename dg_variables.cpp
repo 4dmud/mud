@@ -32,6 +32,8 @@
 
 /* External variables and functions */
 
+const char* quality_name ( obj_data *obj );
+const char *material_name ( int type );
 char *str_udup(const char *txt);
 long long gold_data ( int type, long long amount );
 int genpreg ( void );
@@ -443,6 +445,12 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                 case MOB_TRIGGER:
                     ch = ( Character * ) go;
 
+#ifndef ACTOR_ROOM_IS_UID
+                    // treat numbers as room vnums
+                    if ( is_number ( name ) && ( r = get_room ( name ) ) )
+                        break;
+#endif
+
                     if ( *name == UID_CHAR )
                     {
                         if ( ( c = get_char ( name ) ) )
@@ -475,8 +483,27 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                 case OBJ_TRIGGER:
                     obj = ( obj_data * ) go;
 
+#ifndef ACTOR_ROOM_IS_UID
+                    // treat numbers as room vnums
+                    if ( is_number ( name ) && ( r = get_room ( name ) ) )
+                        break;
+#endif
 
-                    if ( ( c = get_char_by_obj ( obj, name ) ) )
+                    if ( *name == UID_CHAR )
+                    {
+                        if ( ( c = get_char ( name ) ) )
+                            ;
+                        else if ( ( o = get_obj ( name ) ) )
+                            ;
+                        else if ( ( r = get_room ( name ) ) )
+                            ;
+                        else
+                        {
+                            *str = '\0';
+                            return;
+                        }
+                    }
+                    else if ( ( c = get_char_by_obj ( obj, name ) ) )
                         ;
                     else if ( ( o = get_obj_by_obj ( obj, name ) ) )
                         ;
@@ -492,7 +519,21 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         break;
 #endif
 
-                    if ( ( c = get_char_by_room ( room, name ) ) )
+                    if ( *name == UID_CHAR )
+                    {
+                        if ( ( c = get_char ( name ) ) )
+                            ;
+                        else if ( ( o = get_obj ( name ) ) )
+                            ;
+                        else if ( ( r = get_room ( name ) ) )
+                            ;
+                        else
+                        {
+                            *str = '\0';
+                            return;
+                        }
+                    }
+                    else if ( ( c = get_char_by_room ( room, name ) ) )
                         ;
                     else if ( ( o = get_obj_by_room ( room, name ) ) )
                         ;
@@ -2859,21 +2900,29 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         else
                             strcpy ( str, "" );
                     }
-                    else if ( !strcasecmp ( field, "colour_value" ) )
+                    else if ( !strcasecmp ( field, "colour" ) )
                     {
                         if ( !subfield || !*subfield )
-                            snprintf ( str, slen, "%d", GET_OBJ_COLOUR ( o ) );
+                        {
+                            if ( GET_OBJ_COLOUR ( o ) < 0 || GET_OBJ_COLOUR ( o ) >= colour_names.size() )
+                            {
+                                script_log ( "Trigger %d: colour of [%d] %s was out of range",
+                                    GET_TRIG_VNUM ( trig ), GET_OBJ_VNUM ( o ), o->short_description );
+                                GET_OBJ_COLOUR ( o ) = 0;
+                            }
+                            snprintf ( str, slen, "%s", colour_names[ GET_OBJ_COLOUR ( o ) ] );
+                        }
                         else
                         {
-                            num = atoi ( subfield );
-                            if ( num < 0 || num >= NUM_COLOUR_NAMES )
-                            {
-                                if ( trig->curr_state )
-                                    script_log ( "Trigger %d: colour value out of range. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
-                            }
-                            else
-                                GET_OBJ_COLOUR ( o ) = num;
-                            strcpy ( str, "" );
+                            *str = '\0';
+                            for ( int i = 0; i < colour_names.size(); ++i )
+                                if ( !strcasecmp ( colour_names[i], subfield ) )
+                                {
+                                    GET_OBJ_COLOUR ( o ) = i;
+                                    return;
+                                }
+                            script_log ( "Trigger %d: unknown colour '%s'. Line %d: %s", GET_TRIG_VNUM ( trig ),
+                                subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                         }
                     }
 
@@ -3089,14 +3138,16 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     }
                     else if ( !strcasecmp ( field, "in_material_group" ) )
                     {
-                        for ( int i = 0; i < NUM_MATERIAL_GROUPS; i++ )
-                            if ( !strcasecmp ( subfield, material_group_names [ material_groups [ GET_OBJ_MATERIAL ( o ) ] ] ) )
-                            {
-                                strcpy ( str, "1" );
-                                break;
-                            }
-                            else if ( i == NUM_MATERIAL_GROUPS - 1 )
-                                strcpy ( str, "0" );
+                        if ( GET_OBJ_MATERIAL ( o ) < 0 || GET_OBJ_MATERIAL ( o ) >= material_names.size() )
+                        {
+                            script_log ( "Trigger %d: material was out of range, setting to zero. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            GET_OBJ_MATERIAL ( o ) = 0;
+                        }
+
+                        if ( !strcasecmp ( subfield, material_group_names [ material_groups [ GET_OBJ_MATERIAL ( o ) ] ] ) )
+                            strcpy ( str, "1" );
+                        else
+                            strcpy ( str, "0" );
                     }
                     else if (!strcasecmp ( field, "innate" ) )
                     {
@@ -3116,30 +3167,28 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
                     break;
                 case 'm':
-                    if ( !strcasecmp ( field, "material_value" ) )
+                    if ( !strcasecmp ( field, "material" ) )
                     {
+                        if ( GET_OBJ_MATERIAL ( o ) < 0 || GET_OBJ_MATERIAL ( o ) >= material_names.size() )
+                        {
+                            script_log ( "Trigger %d: material was out of range, setting to zero. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            GET_OBJ_MATERIAL ( o ) = 0;
+                        }
+
                         if ( !subfield || !*subfield )
-                            snprintf ( str, slen, "%d", GET_OBJ_MATERIAL ( o ) );
+                            snprintf ( str, slen, "%s", material_name ( GET_OBJ_MATERIAL ( o ) ) );
                         else
                         {
-                            num = atoi ( subfield );
-                            if ( !is_number ( subfield ) || num < 0 || num >= NUM_MATERIAL_TYPES )
-                            {
-                                if ( trig->curr_state )
-                                    script_log ( "Trigger %d: material type out of range. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
-                            }
-                            else
-                                GET_OBJ_MATERIAL ( o ) = num;
-                            strcpy ( str, "" );
+                            *str = '\0';
+                            for ( int i = 0; i < material_names.size(); ++i )
+                                if ( !strcasecmp ( material_names[i], subfield ) )
+                                {
+                                    GET_OBJ_MATERIAL ( o ) = i;
+                                    return;
+                                }
+                            script_log ( "Trigger %d: tried to set unknown material '%s'. Line %d: %s", GET_TRIG_VNUM ( trig ), subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                         }
                     }
-                    else if ( !strcasecmp ( field, "material_name" ) )
-                    {
-                        if ( GET_OBJ_MATERIAL ( o ) < 0 || GET_OBJ_MATERIAL ( o ) >= NUM_MATERIAL_TYPES )
-                            GET_OBJ_MATERIAL ( o ) = 0;
-                        snprintf ( str, slen, "%s", material_names[ GET_OBJ_MATERIAL ( o )] );
-                    }
-
                     else if ( !strcasecmp ( field, "max_quality_value" ) )
                     {
                         if ( subfield && *subfield )
@@ -3168,20 +3217,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
                     else if (!strcasecmp  (field, "num_of_repairs" ) )
                     {
-                        if ( !subfield || !*subfield )
-                            snprintf ( str, slen, "%d", GET_OBJ_REPAIRS ( o ) );
-                        else
-                        {
-                            num = atoi ( subfield );
-                            if ( num < 0 )
-                            {
-                                if ( trig->curr_state )
-                                    script_log ( "Trigger %d: trying to set a negative number of repairs. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
-                            }
-                            else
-                                GET_OBJ_REPAIRS ( o ) = num;
-                            *str = '\0';
-                        }
+                        snprintf ( str, slen, "%d", GET_OBJ_REPAIRS ( o ) );
                     }
 
                     break;
@@ -3276,6 +3312,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             GET_OBJ_QUALITY ( o ) = GET_OBJ_MAX_QUALITY ( o );
                             if ( GET_OBJ_TYPE ( o ) == ITEM_BODYBAG && GET_OBJ_QUALITY ( o ) >= 10 )
                             {
+                                // remove "is torn from use" from the shortdesc
                                 string shortdesc = string ( o->short_description );
                                 size_t pos = shortdesc.find ( " is torn from use" );
                                 if ( pos != string::npos )
@@ -3317,22 +3354,33 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
                     else if ( !strcasecmp ( field, "set_colour_name" ) )
                     {
+                        if ( GET_OBJ_COLOUR ( o ) < 0 || GET_OBJ_COLOUR ( o ) >= colour_names.size() )
+                        {
+                            script_log ( "Trigger %d: the colour value of [%d] %s was out of range, setting to zero",
+                                GET_TRIG_VNUM ( trig ), GET_OBJ_VNUM ( o ), o->short_description );
+                            GET_OBJ_COLOUR ( o ) = 0;
+                        }
+                        if ( GET_OBJ_COLOUR ( o ) == 0 )
+                            break;
+
                         bool colour_set = FALSE;
                         string desc = string ( o->short_description );
                         string new_colour = string ( colour_names [ GET_OBJ_COLOUR ( o ) ] );
-                        size_t pos = 0;
+                        char *p = nullptr;
 
-                        for ( int i = 1; i < NUM_COLOUR_NAMES; i++ )
-                            if ( ( pos = desc.find ( colour_names[i] ) ) != string::npos )
+                        for ( int i = 1; i < colour_names.size(); ++i )
+                            if ( ( p = strstr ( o->short_description, colour_names[i] ) ) != NULL )
                             {
-                                if ( pos > 0 && desc[ pos - 1 ] != ' ' )
+                                if ( p > o->short_description && *(p-1) != ' ' )
                                     continue;
-                                if ( i != GET_OBJ_COLOUR ( o ) )
-                                    desc.replace ( pos, strlen ( colour_names[i] ), new_colour );
+                                if ( i == GET_OBJ_COLOUR ( o ) )
+                                    return;
+                                desc.replace ( p - o->short_description, strlen ( colour_names[i] ), new_colour );
                                 colour_set = TRUE;
                                 break;
                             }
 
+                        int pos = p - o->short_description;
                         if ( colour_set )
                         {
                             if ( pos < 4 )
@@ -3372,34 +3420,42 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             desc.insert ( pos, new_colour + " " );
                         }
 
-                        if ( GET_OBJ_COLOUR ( o ) > 0 && GET_OBJ_COLOUR ( o ) < NUM_COLOUR_NAMES )
-                        {
-                            SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SHORTDESC );
-                            if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
-                                free ( o->short_description );
-                            o->short_description = str_udup ( desc.c_str() );
-                        }
+                        SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SHORTDESC );
+                        if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
+                            free ( o->short_description );
+                        o->short_description = str_udup ( desc.c_str() );
                         strcpy ( str, "" );
                     }
 
                     else if ( !strcasecmp ( field, "set_material_name" ) )
                     {
+                        if ( GET_OBJ_MATERIAL ( o ) < 0 || GET_OBJ_MATERIAL ( o ) >= material_names.size() )
+                        {
+                            script_log ( "Trigger %d: the material value of [%d] %s was out of range, setting to zero",
+                                GET_TRIG_VNUM ( trig ), GET_OBJ_VNUM ( o ), o->short_description );
+                            GET_OBJ_MATERIAL ( o ) = 0;
+                        }
+                        if ( GET_OBJ_MATERIAL ( o ) == 0 )
+                            break;
+
                         bool material_set = FALSE;
                         string desc = string ( o->short_description );
-                        string new_material = string ( material_names [ GET_OBJ_MATERIAL ( o ) ] );
-                        size_t pos = 0;
+                        string new_material = material_names [ GET_OBJ_MATERIAL ( o ) ];
+                        char *p = nullptr;
 
-                        for ( int i = 0; i < NUM_MATERIAL_TYPES; i++ )
-                            if ( ( pos = desc.find ( material_names[i] ) ) != string::npos )
+                        for ( int i = 0; i < material_names.size(); i++ )
+                            if ( ( p = strstr ( o->short_description, material_names[i] ) ) != NULL )
                             {
-                                if ( pos > 0 && desc[ pos - 1 ] != ' ' )
+                                if ( p > o->short_description && *(p-1) != ' ' )
                                     continue;
-                                if ( i != GET_OBJ_MATERIAL ( o ) )
-                                    desc.replace ( pos, strlen ( material_names[i] ), new_material );
+                                if ( i == GET_OBJ_MATERIAL ( o ) )
+                                    return;
+                                desc.replace ( p - o->short_description, strlen ( material_names[i] ), new_material );
                                 material_set = TRUE;
                                 break;
                             }
 
+                        int pos = p - o->short_description;
                         if ( material_set )
                         {
                             if ( pos < 4 )
@@ -3452,19 +3508,20 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     {
                         bool quality_set = FALSE;
                         string desc = string ( o->short_description );
-                        string new_quality = string ( QUALITY_NAME ( o ) );
-                        size_t pos = 0;
+                        string new_quality = string ( quality_name ( o ) );
+                        char *p = nullptr;
 
-                        for ( int i = 1; i < NUM_QUALITY_NAMES; i++ )
-                            if ( ( pos = desc.find ( quality_names[i] ) ) != string::npos )
+                        for ( int i = 1; i < quality_names.size(); i++ )
+                            if ( ( p = strstr ( o->short_description, quality_names[i] ) ) != NULL )
                             {
-                                if ( pos > 0 && desc[ pos - 1 ] != ' ' )
+                                if ( p > o->short_description && *(p-1) != ' ' )
                                     continue;
-                                desc.replace ( pos, strlen ( quality_names[i] ), new_quality );
+                                desc.replace ( p - o->short_description, strlen ( quality_names[i] ), new_quality );
                                 quality_set = TRUE;
                                 break;
                             }
 
+                        int pos = p - o->short_description;
                         if ( quality_set )
                         {
                             if ( pos < 4 )

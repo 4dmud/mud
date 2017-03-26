@@ -20,6 +20,7 @@
 
 static int copy_object_main(struct obj_data *to, struct obj_data *from, int free_object);
 void purge_qic(int rnum);
+bool crafted ( obj_data *obj );
 
 extern struct board_info_type board_info[];
 
@@ -148,7 +149,7 @@ void update_objects ( obj_data *old_proto, obj_data *old_proto_descs, obj_data *
          * don't update if the obj was crafted
          * only update if the affects were equal to the old prototype
          */
-        if ( GET_OBJ_MAX_QUALITY ( obj ) < 0.001 )
+        if ( !crafted ( obj ) )
         {
             bool equal_to_old = TRUE;
             for ( int i = 0; i < MAX_OBJ_AFFECT; ++i )
@@ -577,10 +578,10 @@ static int copy_object_main(struct obj_data *to, struct obj_data *from, int free
 }
 
 const char *material_name(int type) {
-    if (type < 0 || type > NUM_MATERIAL_TYPES)
+    if (type < 0 || type >= material_names.size())
         return "Ethereal";
 
-    return material_names[type];
+    return material_names[ type ];
 }
 
 

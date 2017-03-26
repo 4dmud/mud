@@ -42,7 +42,7 @@ void add_owner(int nr, long id);
 extern const int xap_objs;
 int save_new_style = 1;
 /* Extern functions */
-//ACMD(do_action);
+bool crafted ( obj_data *obj );
 ACMD(do_tell);
 SPECIAL(receptionist);
 SPECIAL(cryogenicist);
@@ -1327,7 +1327,7 @@ int save_one_item ( OBJ_DATA *obj, FILE *fl, int locate )
                 }
                 fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i - 1 ) );
             }
-        if ( GET_OBJ_MAX_QUALITY ( obj ) > 0 )
+        if ( crafted ( obj ) )
         {
             if ( !wrote_header )
             {
@@ -1419,7 +1419,7 @@ int save_one_item ( OBJ_DATA *obj, FILE *fl, int locate )
                 }
                 fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i - 1 ) );
             }
-        if ( GET_OBJ_MAX_QUALITY ( obj ) > 0 )
+        if ( crafted ( obj ) )
         {
             if ( !wrote_header )
             {

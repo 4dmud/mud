@@ -84,7 +84,7 @@ const char * prof_name(int pro)
   if (pro < 0 || pro >= PROF_MAX)
     return "<none>";
 
-  return  profession_names[pro];
+  return profession_names[pro];
 }
 const char * prof_group_name(int pro)
 {
@@ -99,7 +99,7 @@ int prof_group(int pro)
   if (pro < 0 || pro >= PROF_MAX)
     return PGRP_MISC;
 
-  return prof_group_data[pro];
+  return  prof_group_data[pro];
 }
 
 ACMD(do_professions)

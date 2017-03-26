@@ -938,7 +938,7 @@ void oedit_disp_crafting_colour_menu ( Descriptor *d )
     OLC_MODE ( d ) = OEDIT_CRAFTING_COLOUR;
     get_char_colours ( d->character );
 
-    for ( i = 0; i < NUM_COLOUR_NAMES; i++ )
+    for ( i = 0; i < colour_names.size(); i++ )
     {
         d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
                     colour_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
@@ -964,7 +964,7 @@ void oedit_disp_crafting_material_menu ( Descriptor *d )
     OLC_MODE ( d ) = OEDIT_CRAFTING_MATERIAL;
     get_char_colours ( d->character );
 
-    for ( i = 0; i < NUM_MATERIAL_TYPES; i++ )
+    for ( i = 0; i < material_names.size(); i++ )
     {
         d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
                     material_name ( i ), ! ( ++col % 3 ) ? "\r\n" : "" );
@@ -1085,6 +1085,11 @@ void oedit_disp_wear_menu ( Descriptor *d )
                 "Enter wear flag, 0 to quit : ", cyn, bits, nrm );
 }
 
+bool crafted ( obj_data *obj )
+{
+    return GET_OBJ_MAX_QUALITY ( obj ) > 0.001;
+}
+
 /*
  * Display main menu.
  */
@@ -1170,7 +1175,7 @@ void oedit_disp_menu ( Descriptor *d )
     for ( i = 9; i < 14; i++ )
         if ( GET_OBJ_VAL ( obj, i - 1 ) != 0 )
             d->Output ( "[%d]:%s%d%s ", i, cyn, GET_OBJ_VAL ( obj, i - 1 ), nrm );
-    if ( GET_OBJ_MAX_QUALITY ( obj ) > 0 )
+    if ( crafted ( obj ) )
         d->Output ( "[14]:%s%.3f%s ", cyn, GET_OBJ_MAX_QUALITY ( obj ), nrm );
 
     d->Output (
@@ -1198,6 +1203,22 @@ void oedit_disp_menu ( Descriptor *d )
         grn, nrm
     );
     OLC_MODE ( d ) = OEDIT_MAIN_MENU;
+}
+
+const char* max_quality_name ( obj_data *obj )
+{
+    if ( !crafted ( obj ) )
+        return "none";
+    else
+        return quality_names[ (int) ceil( GET_OBJ_MAX_QUALITY ( obj )/100 * (quality_names.size() - 1) ) ];
+}
+
+const char* quality_name ( obj_data *obj )
+{
+    if ( !crafted ( obj ) )
+        return "none";
+    else
+        return quality_names[ (int) ceil( GET_OBJ_QUALITY ( obj )/100 * (quality_names.size() - 1) ) ];
 }
 
 /***************************************************************************
@@ -1997,7 +2018,7 @@ void oedit_parse ( Descriptor *d, char *arg )
             break;
 
         case OEDIT_CRAFTING_COLOUR:
-            GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_COLOUR_NAMES - 1 );
+            GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, colour_names.size() - 1 );
             oedit_disp_crafting_max_quality_menu ( d );
             return;
 
@@ -2012,7 +2033,7 @@ void oedit_parse ( Descriptor *d, char *arg )
             return;
 
         case OEDIT_CRAFTING_MATERIAL:
-            GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_MATERIAL_TYPES - 1 );
+            GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, material_names.size() - 1 );
             oedit_disp_crafting_dyecount_menu ( d );
             return;
 
@@ -2038,8 +2059,8 @@ void oedit_parse ( Descriptor *d, char *arg )
                     "Dyecount: %s%d%s   Origin: %s%s%s\r\n"
                     "Stage: %s%d%s Repairs: %s%d%s\r\n\r\n",
                     nrm, cyn, colour_names [ GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) ], nrm,
-                    cyn, GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ) > 0 ? MAX_QUALITY_NAME ( OLC_OBJ ( d ) ) : "none", GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ), nrm,
-                    cyn, GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) > 0 ? QUALITY_NAME ( OLC_OBJ ( d ) ) : "none", GET_OBJ_QUALITY ( OLC_OBJ ( d ) ), nrm,
+                    cyn, max_quality_name ( OLC_OBJ ( d ) ), GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ), nrm,
+                    cyn, quality_name ( OLC_OBJ ( d ) ), GET_OBJ_QUALITY ( OLC_OBJ ( d ) ), nrm,
                     cyn, material_name ( GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) ), nrm,
                     cyn, GET_OBJ_DYECOUNT ( OLC_OBJ ( d ) ), nrm,
                     cyn, origins [ GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) ], nrm,

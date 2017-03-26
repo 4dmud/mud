@@ -7,8 +7,8 @@ extern const char *vial_types[];
 extern const char *newbie_status[];
 extern const char *creation_state_types[];
 extern const char * dimension_types[];
-extern const char *material_names[];
-extern const char *material_group_names[];
+extern const vector<const char*> material_names;
+extern const vector<const char*> material_group_names;
 extern const char *fourdimensions_version;
 extern const char *circlemud_version;
 extern const char *oasisolc_version;
@@ -74,7 +74,7 @@ extern const struct eq_pos_list eq_pos[];
 extern const int rev_dir[];
 extern const int movement_loss[];
 extern const int drink_aff[][3];
-extern const int material_groups[];
+extern const vector<int> material_groups;
 extern const char *magic_types[];
 extern const char *cast_types[];
 extern const char *target_types[];
@@ -90,10 +90,10 @@ extern const char *AssemblyTypes[];
 extern const char *unused_spellname;
 extern const char *unused_spellmessage;
 
-extern const char *colour_names[];
-extern const char *quality_names[];
+extern const vector<const char*> colour_names;
+extern const vector<const char*> quality_names;
 extern const char *origins[];
-extern const vector< vector<string> > origin_names;
+extern const vector< vector<const char*> > origin_names;
 
 extern const vector<string> qc_difficulties;
 #endif

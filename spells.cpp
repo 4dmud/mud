@@ -32,6 +32,8 @@ extern int mini_mud;
 ACMD(do_flee);
 EVENTFUNC(message_event);
 
+bool crafted ( obj_data *obj );
+const char* quality_name ( obj_data *obj );
 void update_MSDP_map ( Room* room );
 void check_timer(obj_data *obj);
 int wep_hands(OBJ_DATA *wep);
@@ -1151,11 +1153,11 @@ ASPELL(spell_minor_identify) {
     }
 
     ch->Send ( "\r\n" );
-    if ( GET_OBJ_MAX_QUALITY ( obj ) == 0 )
+    if ( !crafted ( obj ) )
         ch->Send ( "Max. Quality: 0\r\n" );
     else
     {
-        ch->Send ( "Quality: %s (%.2f%%)\r\n", QUALITY_NAME ( obj ), GET_OBJ_QUALITY ( obj ) );
+        ch->Send ( "Quality: %s (%.2f%%)\r\n", quality_name ( obj ), GET_OBJ_QUALITY ( obj ) );
         ch->Send ( "Max. Quality: %.2f%%\r\n", GET_OBJ_MAX_QUALITY ( obj ) );
         ch->Send ( "Number of repairs: %d\r\n", GET_OBJ_REPAIRS ( obj ) );
     }
@@ -1163,19 +1165,23 @@ ASPELL(spell_minor_identify) {
     ch->Send ( "Material: %s\r\n", material_name ( GET_OBJ_MATERIAL ( obj ) ) );
     ch->Send ( "Material group: %s\r\n", material_group_names [ material_groups [ GET_OBJ_MATERIAL ( obj ) ] ] );
 
-    if ( GET_OBJ_ORIGIN ( obj ) < 0 ||  GET_OBJ_ORIGIN ( obj ) >= origin_names.size() )
+    if ( GET_OBJ_ORIGIN ( obj ) < 0 || GET_OBJ_ORIGIN ( obj ) >= origin_names.size() )
     {
         new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: obj origin of [%d] %s was %d", GET_OBJ_VNUM ( obj ), obj->short_description, GET_OBJ_ORIGIN ( obj ) );
         GET_OBJ_ORIGIN ( obj ) = 0;
     }
     ch->Send ( "Origin: %s\r\n", origins[ GET_OBJ_ORIGIN ( obj ) ] );
 
-    if ( GET_OBJ_COLOUR ( obj ) > 0 && GET_OBJ_COLOUR ( obj ) < NUM_COLOUR_NAMES )
+    if ( GET_OBJ_COLOUR ( obj ) > 0 && GET_OBJ_COLOUR ( obj ) < colour_names.size() )
         ch->Send ( "Colour: %s\r\n", colour_names[ GET_OBJ_COLOUR ( obj )] );
     else if ( GET_OBJ_COLOUR ( obj ) == 0 )
         ch->Send ( "Colour: none\r\n" );
     else
-        ch->Send ( "Colour: out of range\r\n" );
+    {
+        log ( "SYSERR: colour of [%d]. %s was out of range", GET_OBJ_VNUM ( obj ), obj->short_description );
+        GET_OBJ_COLOUR ( obj ) = 0;
+        ch->Send ( "Colour: none\r\n" );
+    }
 
     ch->Send ( "Dyecount: %d\r\n", GET_OBJ_DYECOUNT ( obj ) );
     ch->Send ( "Stage: %d\r\n", GET_OBJ_STAGE ( obj ) );

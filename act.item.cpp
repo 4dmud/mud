@@ -4816,9 +4816,9 @@ void set_animal_origin ( struct obj_data *obj, const struct obj_data *corpse )
     // Exception: [1101] the antelope squirrel is a squirrel
     if ( strstr ( corpse->short_description, "antelope squirrel" ) != NULL )
     {
-        for ( size_t i = 1; i < origin_names.size(); i++ )
-            for ( string origin : origin_names[i] )
-                if ( origin == "squirrel" )
+        for ( size_t i = 6; i < origin_names.size(); i++ ) // skip tree origins
+            for ( const auto &origin : origin_names[i] )
+                if ( !strcmp ( origin, "squirrel" ) )
                 {
                     GET_OBJ_ORIGIN ( obj ) = i;
                     return;
@@ -4828,9 +4828,9 @@ void set_animal_origin ( struct obj_data *obj, const struct obj_data *corpse )
     // Exception: [1128] the kangaroo rat is a rat
     if ( strstr ( corpse->short_description, "kangaroo rat" ) != NULL )
     {
-        for ( size_t i = 1; i < origin_names.size(); i++ )
-            for ( string origin : origin_names[i] )
-                if ( origin == "rat" )
+        for ( size_t i = 6; i < origin_names.size(); i++ ) // skip tree origins
+            for ( const auto &origin : origin_names[i] )
+                if ( !strcmp ( origin, "rat" ) )
                 {
                     GET_OBJ_ORIGIN ( obj ) = i;
                     return;
@@ -4843,12 +4843,11 @@ void set_animal_origin ( struct obj_data *obj, const struct obj_data *corpse )
     if ( !mob )
         return;
 
-    string s = tolower ( string ( GET_NAME ( mob ) ) );
     for ( size_t i = 6; i < origin_names.size(); i++ ) // skip tree origins
-        for ( string origin : origin_names.at(i) )
+        for ( const auto &origin : origin_names[i] )
         {
-            size_t pos = s.find ( origin );
-            if ( pos != string::npos && ( pos == 0 || s[pos - 1] == ' ' ) )
+            char *pos = strstr ( GET_NAME ( mob ), origin );
+            if ( pos && ( pos == GET_NAME ( mob ) || *(pos - 1) == ' ' ) )
             {
                 GET_OBJ_ORIGIN ( obj ) = i;
                 return;
@@ -4857,12 +4856,11 @@ void set_animal_origin ( struct obj_data *obj, const struct obj_data *corpse )
 
     // No match, try the mob's aliases
 
-    s = tolower ( string ( mob->player.name ) );
     for ( size_t i = 6; i < origin_names.size(); i++ ) // skip tree origins
-        for ( string origin : origin_names[i] )
+        for ( const auto &origin : origin_names[i] )
         {
-            size_t pos = s.find( origin );
-            if ( pos != string::npos && ( pos == 0 || s[pos - 1] == ' ' ) )
+            char *pos = strstr ( mob->player.name, origin );
+            if ( pos && ( pos == mob->player.name || *(pos - 1) == ' ' ) )
                 {
                     GET_OBJ_ORIGIN ( obj ) = i;
                     return;

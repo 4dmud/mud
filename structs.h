@@ -1176,16 +1176,9 @@ class Room;
 #define MAX_CMD_LENGTH          32768 /* 32k */
 #define NUM_NOTE_TYPES          5
 #define TOP_FUSE_LOCATION       6
-#define NUM_MATERIAL_TYPES      57
-#define NUM_MATERIAL_GROUPS     7
 #define NUM_ELEM_TYPES          12
 #define MAX_HELPS               10000
 #define MAX_MAGIC_ITEMS         45
-#define NUM_COLOUR_NAMES        12
-#define NUM_QUALITY_NAMES       7
-#define QUALITY_NAME(obj)       quality_names[ (int) ceil( GET_OBJ_QUALITY(obj)/100 * (NUM_QUALITY_NAMES - 1) ) ]
-#define MAX_QUALITY_NAME(obj)   quality_names[ (int) ceil( GET_OBJ_MAX_QUALITY(obj)/100 * (NUM_QUALITY_NAMES - 1) ) ]
-
 
 /*
  * A MAX_PWD_LENGTH of 10 will cause BSD-derived systems with MD5 passwords
