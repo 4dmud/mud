@@ -1967,7 +1967,7 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 
     if ( j->contains )
     {
-        ch->Send ( "\r\nContents:%s", CCGRN ( ch, C_NRM ) );
+        ch->Send ( "Contents:%s", CCGRN ( ch, C_NRM ) );
         for ( found = 0, j2 = j->contains; j2; j2 = j2->next_content )
         {
             ch->Send ( "%s %s", found++ ? "," : "",
@@ -2142,14 +2142,13 @@ void do_stat_character ( Character *ch, Character *k, char* var )
             /*. Display OLC zone for immorts .*/
             if ( GET_LEVEL ( k ) >= LVL_BUILDER )
             {
-                if ( GET_OLC_ZONE ( k ) ==AEDIT_PERMISSION )
-                    ch->Send ( ", OLC[%sActions%s]", CCCYN ( ch, C_NRM ), CCNRM ( ch, C_NRM ) );
-                else if ( GET_OLC_ZONE ( k ) ==NOWHERE )
-                    ch->Send ( ", OLC[%sOFF%s]", CCCYN ( ch, C_NRM ), CCNRM ( ch, C_NRM ) );
+                if ( GET_OLC_ZONE ( k ) == AEDIT_PERMISSION )
+                    ch->Send ( ", OLC[%sActions%s]\r\n", CCCYN ( ch, C_NRM ), CCNRM ( ch, C_NRM ) );
+                else if ( GET_OLC_ZONE ( k ) == NOWHERE )
+                    ch->Send ( ", OLC[%sOFF%s]\r\n", CCCYN ( ch, C_NRM ), CCNRM ( ch, C_NRM ) );
                 else
-                    ch->Send ( ", OLC[%s%d%s]", CCCYN ( ch, C_NRM ), GET_OLC_ZONE ( k ), CCNRM ( ch, C_NRM ) );
+                    ch->Send ( ", OLC[%s%d%s]\r\n", CCCYN ( ch, C_NRM ), GET_OLC_ZONE ( k ), CCNRM ( ch, C_NRM ) );
             }
-            ch->Send ( "\r\n" );
         }
         else
         {

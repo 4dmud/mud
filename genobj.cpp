@@ -100,7 +100,8 @@ void update_objects ( obj_data *old_proto, obj_data *old_proto_descs, obj_data *
             if ( GET_OBJ_EXTRA ( obj )[i] == GET_OBJ_EXTRA ( old_proto )[i] )
                 GET_OBJ_EXTRA ( obj )[i] = GET_OBJ_EXTRA ( new_proto )[i];
 
-        /* weight */
+        /* weight: get weight difference */
+        int weight_diff = 0;
         if ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER )
         {
             weight = GET_OBJ_WEIGHT ( obj );
@@ -108,16 +109,33 @@ void update_objects ( obj_data *old_proto, obj_data *old_proto_descs, obj_data *
                 weight -= GET_OBJ_WEIGHT ( o );
 
             if ( weight == GET_OBJ_WEIGHT ( old_proto ) )
-                GET_OBJ_WEIGHT ( obj ) += GET_OBJ_WEIGHT ( new_proto ) - weight;
+                weight_diff = GET_OBJ_WEIGHT ( new_proto ) - weight;
         }
         else if ( GET_OBJ_TYPE ( obj ) == ITEM_DRINKCON || GET_OBJ_TYPE ( obj ) == ITEM_FOUNTAIN )
         {
             // weight_container = weight - weight_contents
             if ( GET_OBJ_WEIGHT ( obj ) - GET_OBJ_VAL ( obj, 1 ) == GET_OBJ_WEIGHT ( old_proto ) - GET_OBJ_VAL ( old_proto, 1 ) )
-                GET_OBJ_WEIGHT ( obj ) = GET_OBJ_WEIGHT ( new_proto ) - GET_OBJ_VAL ( new_proto, 1) + GET_OBJ_VAL ( obj, 1);
+                weight_diff = ( GET_OBJ_WEIGHT ( new_proto ) - GET_OBJ_VAL ( new_proto, 1 ) ) -
+                    ( GET_OBJ_WEIGHT ( obj ) - GET_OBJ_VAL ( obj, 1 ) );
         }
         else if ( GET_OBJ_WEIGHT ( obj ) == GET_OBJ_WEIGHT ( old_proto ) )
-            GET_OBJ_WEIGHT ( obj ) = GET_OBJ_WEIGHT ( new_proto );
+            weight_diff = GET_OBJ_WEIGHT ( new_proto ) - GET_OBJ_WEIGHT ( obj );
+
+        /* weight: adjust obj weight, weight of containers it's in, and weight of carried objects */
+        if ( weight_diff != 0 )
+        {
+            GET_OBJ_WEIGHT ( obj ) += weight_diff;
+
+            for ( obj_data *o = obj->in_obj; o; o = o->in_obj )
+            {
+                GET_OBJ_WEIGHT ( o ) += weight_diff;
+                if ( o->carried_by )
+                    IS_CARRYING_W ( o->carried_by ) += weight_diff;
+            }
+
+            if ( obj->carried_by )
+                IS_CARRYING_W ( obj->carried_by ) += weight_diff;
+        }
 
         /* obj values, keep the crafting ones */
         for ( int i = 0; i <= 6; ++i )
