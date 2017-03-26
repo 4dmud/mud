@@ -888,7 +888,7 @@ ACMD(do_mpurge) {
 
         for (victim = IN_ROOM(ch)->people; victim; victim = vnext) {
             vnext = victim->next_in_room;
-            if (IS_NPC(victim) && victim != ch)
+            if (IS_NPC(victim) && victim != ch && !DEAD(victim))
                 extract_char(victim);
         }
 
@@ -942,7 +942,8 @@ ACMD(do_mpurge) {
     if (victim==ch)
         dg_owner_purged = 1;
 
-    extract_char(victim);
+    if (!DEAD(victim))
+        extract_char(victim);
 }
 
 

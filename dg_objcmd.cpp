@@ -463,7 +463,7 @@ OCMD ( do_opurge )
             for ( ch = rm->people; ch; ch = next_ch )
             {
                 next_ch = ch->next_in_room;
-                if ( IS_NPC ( ch ) )
+                if ( IS_NPC ( ch ) && !DEAD ( ch ) )
                     extract_char ( ch );
             }
 
@@ -513,7 +513,8 @@ OCMD ( do_opurge )
         return;
     }
 
-    extract_char ( ch );
+    if ( !DEAD ( ch ) )
+        extract_char ( ch );
 }
 
 OCMD ( do_oteleport )
