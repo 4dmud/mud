@@ -211,10 +211,10 @@ void trigedit_disp_menu(Descriptor *d) {
 
     get_char_colours(d->character);
 
-    if (trig->attach_type==OBJ_TRIGGER) {
+    if (trig->attach_type == OBJ_TRIGGER) {
         attach_type = "Objects";
         new_sprintbit(GET_TRIG_TYPE(trig), otrig_types, trgtypes, sizeof(trgtypes));
-    } else if (trig->attach_type==WLD_TRIGGER) {
+    } else if (trig->attach_type == WLD_TRIGGER) {
         attach_type = "Rooms";
         new_sprintbit(GET_TRIG_TYPE(trig), wtrig_types, trgtypes, sizeof(trgtypes));
     } else {
@@ -224,26 +224,163 @@ void trigedit_disp_menu(Descriptor *d) {
 
     clear_screen(d);
 
+    /*
+     * Show what the numerical argument does.
+     * Remove Globlal from the trigger type and match for equality
+     * because a trigger like "Command Speech" can't be explained.
+     */
+    string narg;
+    int type = GET_TRIG_TYPE ( trig );
+    if ( trig->attach_type == OBJ_TRIGGER )
+    {
+        type &= ~OTRIG_GLOBAL; // remove Global
+        switch ( type )
+        {
+            case OTRIG_SPEECH:
+                if ( !GET_TRIG_NARG ( trig ) )
+                    narg = "(complete match)";
+                else
+                    narg = "(match one word)";
+                break;
+            case OTRIG_TIME:
+                narg = "(fires at this hour)";
+                break;
+            case OTRIG_ASSEMBLE: // fallthrough
+            case OTRIG_CONSUME:  // fallthrough
+            case OTRIG_GET_OUT:  // fallthrough
+            case OTRIG_PUT_IN:   // fallthrough
+            case OTRIG_TIMER:    // fallthrough
+            case OTRIG_FUNCTION:
+                narg = "(not used)";
+                break;
+            case OTRIG_COMMAND:
+            {
+                narg = "(obj in ";
+                bool got_one = FALSE;
+                if ( IS_SET ( GET_TRIG_NARG ( trig ), OCMD_EQUIP ) )
+                {
+                    narg += "eq";
+                    got_one = TRUE;
+                }
+                if ( IS_SET ( GET_TRIG_NARG ( trig ), OCMD_INVEN ) )
+                {
+                    if ( got_one )
+                        narg += "/";
+                    narg += "inv";
+                    got_one = TRUE;
+                }
+                if ( IS_SET ( GET_TRIG_NARG ( trig ), OCMD_ROOM ) )
+                {
+                    if ( got_one )
+                        narg += "/";
+                    narg += "room";
+                    got_one = TRUE;
+                }
+                if ( !got_one )
+                    narg += "<none>";
+                narg += ")";
+                break;
+            }
+            case OTRIG_GET:    // fallthrough
+            case OTRIG_WEAR:   // fallthrough
+            case OTRIG_DROP:   // fallthrough
+            case OTRIG_REMOVE: // fallthrough
+            case OTRIG_GIVE:   // fallthrough
+            case OTRIG_LOAD:   // fallthrough
+            case OTRIG_CAST:   // fallthrough
+            case OTRIG_LEAVE:  // fallthrough
+            case OTRIG_ENTER:  // fallthrough
+            case OTRIG_RANDOM:
+                narg = "(chance of firing)";
+        }
+    }
+    else if ( trig->attach_type == MOB_TRIGGER )
+    {
+        type &= ~MTRIG_GLOBAL; // remove Global
+        switch ( type )
+        {
+            case MTRIG_ACT: // fallthrough
+            case MTRIG_SPEECH:
+                if ( !GET_TRIG_NARG ( trig ) )
+                    narg = "(complete match)";
+                else
+                    narg = "(match one word)";
+                break;
+            case MTRIG_HITPRCNT:
+                narg = "(hp percentage threshold)";
+                break;
+            case MTRIG_TIME:
+                narg = "(fires at this hour)";
+                break;
+            case MTRIG_BRIBE:
+                narg = "(gold coins minimum)";
+                break;
+            case MTRIG_RECEIVE: // fallthrough
+            case MTRIG_COMMAND: // fallthrough
+            case MTRIG_FUNCTION:
+                narg = "(not used)";
+                break;
+            case MTRIG_DOOR:   // fallthrough
+            case MTRIG_LEAVE:  // fallthrough
+            case MTRIG_CAST:   // fallthrough
+            case MTRIG_LOAD:   // fallthrough
+            case MTRIG_DEATH:  // fallthrough
+            case MTRIG_FIGHT:  // fallthrough
+            case MTRIG_ENTRY:  // fallthrough
+            case MTRIG_MEMORY: // fallthrough
+            case MTRIG_GREET:  // fallthrough
+            case MTRIG_RANDOM:
+                narg = "(chance of firing)";
+        }
+    }
+    else if ( trig->attach_type == WLD_TRIGGER )
+    {
+        type &= ~WTRIG_GLOBAL; // remove Global
+        switch ( type )
+        {
+            case WTRIG_SPEECH:
+                if ( !GET_TRIG_NARG ( trig ) )
+                    narg = "(complete match)";
+                else
+                    narg = "(match one word)";
+                break;
+            case WTRIG_TIME:
+                narg = "(fires at this hour)";
+                break;
+            case WTRIG_COMMAND: // fallthrough
+            case WTRIG_FUNCTION:
+                narg = "(not used)";
+                break;
+            case WTRIG_RESET: // fallthrough
+            case WTRIG_ENTER: // fallthrough
+            case WTRIG_DROP:  // fallthrough
+            case WTRIG_CAST:  // fallthrough
+            case WTRIG_LEAVE: // fallthrough
+            case WTRIG_DOOR:  // fallthrough
+            case WTRIG_RANDOM:
+                narg = "(chance of firing)";
+        }
+    }
+
     d->Output ( "{cyDon't forget to turn colourcode on when you're going to copy-paste.{c0\r\n\r\n" );
     d->Output(
         "Trigger Editor [%s%d%s]\r\n\r\n"
         "%s1)%s Name         : %s%s\r\n"
         "%s2)%s Intended for : %s%s\r\n"
         "%s3)%s Trigger types: %s%s\r\n"
-        "%s4)%s Numeric Arg  : %s%d\r\n"
+        "%s4)%s Numeric Arg  : %s%d %s%s\r\n"
         "%s5)%s Arguments    : %s%s\r\n"
-        "%s6)%s Commands:\r\n%s%s\r\n"
-        "%sQ)%s Quit\r\n"
-        "Enter Choice :",
+        "%s6)%s Commands\r\n"
+        "%sQ)%s Quit\r\n\r\n",
 
-        grn, OLC_NUM(d), nrm, 			/* vnum on the title line */
-        grn, nrm, yel, GET_TRIG_NAME(trig),		/* name                   */
-        grn, nrm, yel, attach_type.c_str(),			/* attach type            */
-        grn, nrm, yel, trgtypes,			/* greet/drop/etc         */
-        grn, nrm, yel, trig->narg,			/* numeric arg            */
-        grn, nrm, yel, trig->arglist?trig->arglist:"",/* strict arg             */
-        grn, nrm, cyn, OLC_STORAGE(d),		/* the command list       */
-        grn, nrm);                                    /* quit colours            */
+        grn, OLC_NUM(d), nrm,               /* vnum on the title line */
+        grn, nrm, yel, GET_TRIG_NAME(trig), /* name                   */
+        grn, nrm, yel, attach_type.c_str(), /* attach type            */
+        grn, nrm, yel, trgtypes,            /* greet/drop/etc         */
+        grn, nrm, yel, trig->narg, nrm, narg.c_str(), /* numeric arg  */
+        grn, nrm, yel, trig->arglist ? trig->arglist : "", /* strict arg */
+        grn, nrm,                           /* commands colours       */
+        grn, nrm);                          /* quit colours           */
 
     OLC_MODE(d) = TRIGEDIT_MAIN_MENU;
 }
@@ -324,7 +461,7 @@ void trigedit_parse(Descriptor *d, char *arg) {
             }
             //d->backstr.erase();
             if (OLC_STORAGE(d)) {
-                d->Output( "%s", OLC_STORAGE(d));
+                page_string ( d, OLC_STORAGE ( d ), 1 );
                 d->backstr = strdup(OLC_STORAGE(d));
             }
             d->str = &OLC_STORAGE(d);

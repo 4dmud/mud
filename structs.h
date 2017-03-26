@@ -1138,7 +1138,7 @@ class Room;
 
 
 /* Variables for the output buffering system */
-#define MAX_SOCK_BUF            (12 * 1024)  /* Size of kernel's sock buf   */
+#define MAX_SOCK_BUF            (26 * 1024)  /* Size of kernel's sock buf   */
 #define MAX_PROMPT_LENGTH       256     /* Max length of prompt        */
 #define MAX_MXP_STATUS          1024
 #define GARBAGE_SPACE           32   /* Space for **OVERFLOW** etc  */

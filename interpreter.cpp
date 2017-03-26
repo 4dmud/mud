@@ -1174,23 +1174,20 @@ void command_interpreter ( Character *ch, char *argument, trig_data *trig )
      * here has been removed.
      */
     {
-        int cont;                                            /* continue the command checks */
-        cont = command_wtrigger ( ch, arg, line ); /* any world triggers ? */
-        if ( !cont )
-            cont = command_mtrigger ( ch, arg, line );   /* any mobile triggers ? */
-        if ( !cont )
-            cont = command_otrigger ( ch, arg, line );   /* any object triggers ? */
+        int count = 0;                               /* command trigger count */
+        count += command_wtrigger ( ch, arg, line ); /* any world triggers ? */
+        count += command_mtrigger ( ch, arg, line ); /* any mobile triggers ? */
+        count += command_otrigger ( ch, arg, line ); /* any object triggers ? */
 #if ECL
 
-        if ( !cont )
-                cont = fix(cl_funcall(4,
-                          c_string_to_object("4D::COMMAND-TRIGGER"),
-                          ecl_make_pointer(ch),
-                          ecl_cstring_to_base_string_or_nil(arg),
-                          ecl_cstring_to_base_string_or_nil(line)));
+        count += fix(cl_funcall(4,
+                      c_string_to_object("4D::COMMAND-TRIGGER"),
+                      ecl_make_pointer(ch),
+                      ecl_cstring_to_base_string_or_nil(arg),
+                      ecl_cstring_to_base_string_or_nil(line)));
 #endif
-        if ( cont )
-            return;                                    /* yes, command trigger took over */
+        if ( count > 0 )
+            return;      /* yes, command trigger took over */
     }
 
 

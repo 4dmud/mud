@@ -178,17 +178,17 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
 
     /** too big for buffer! Overflow! lets reallocate! - Mord **/
     while (size == -1 || size >= (int)len) {
-    args=args_bak;
+        args=args_bak;
         // Try a bigger size
-    if(size >= (int)len){
-        txt = (char *)realloc(txt, size+1);
-        len = size+1;
-    }
-    //backwards compatibility. vsnprintf doesn't return -1 in C99
-    else {
+        if(size >= (int)len) {
+            txt = (char *)realloc(txt, size+1);
+            len = size+1;
+        }
+        //backwards compatibility. vsnprintf doesn't return -1 in C99
+        else {
             len *= 2;
             txt = (char *)realloc(txt, len);
-    }
+        }
         //strlcpy(tmp, txt, len);
         //free( txt );
         //txt = tmp;
