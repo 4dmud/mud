@@ -1867,15 +1867,25 @@ ACMD ( do_file )
         if ( using_syslog )
         {
             // toggle (fixed) in all lines with the same content, apart from the date, which has length 19
+            // not all entries have a date however
             for ( int i = 0; i < entries.size(); ++i )
-                if ( i != line_number-1 && entries[i].substr ( 19 ) == entries[ line_number-1 ].substr ( 19 ) )
+            {
+                if ( i == line_number-1 )
+                    continue;
+                if ( entries[ line_number-1 ].size() > 19 && entries[i].size() > 19 )
                 {
-                    if ( add_fixed )
-                        entries[i] += "(fixed)";
-                    else
-                        entries[i] = entries[i].substr ( 0, entries[i].size() - 7 );
-                    syslog_lines_changed++;
+                    if ( entries[i].substr ( 19 ) != entries[ line_number-1 ].substr ( 19 ) )
+                        continue;
                 }
+                else if ( entries[i] != entries[ line_number-1 ] )
+                    continue;
+
+                if ( add_fixed )
+                    entries[i] += "(fixed)";
+                else
+                    entries[i] = entries[i].substr ( 0, entries[i].size() - 7 );
+                syslog_lines_changed++;
+            }
         }
 
         if ( add_fixed )
