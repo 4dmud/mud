@@ -788,11 +788,11 @@ ACMD ( do_put )
         if ( processed_put_counter > 1 ||
                 ( processed_put_counter == 1 && failed_put_counter > 0 ) )
         {
-            snprintf ( buf, sizeof ( buf ), "You put %d %s%s into $p.", processed_put_counter, arg2, ( processed_put_counter > 1 ) ? "s" : "" );
+            snprintf ( buf, sizeof ( buf ), "You put %d %s into $p.", processed_put_counter, arg1 );
             act ( buf, FALSE, ch, cont_data, 0, TO_CHAR );
             if ( !slipping )
             {
-                snprintf ( buf, sizeof ( buf ), "$n puts some %s into $p.", arg2 );
+                snprintf ( buf, sizeof ( buf ), "$n puts %s %s into $p.", processed_put_counter > 1 ? "some" : AN ( arg1 ), arg1 );
                 act ( buf, FALSE, ch, cont_data, 0, TO_ROOM );
             }
         }
@@ -840,11 +840,11 @@ ACMD ( do_put )
             }
             else
             {
-                snprintf ( buf, sizeof ( buf ), "You put %d %s%s into $p.", processed_put_counter, obj_desc, ( processed_put_counter > 1 ) ? "s" : "" );
+                snprintf ( buf, sizeof ( buf ), "You put %d %s into $p.", processed_put_counter, obj_desc );
                 act ( buf, FALSE, ch, cont_data, 0, TO_CHAR );
                 if ( !slipping && *arg2 )
                 {
-                    snprintf ( buf, sizeof ( buf ), "$n puts all the %ss $e can into $p.", arg2 );
+                    snprintf ( buf, sizeof ( buf ), "$n puts all the %s $e can into $p.", arg1 );
                     act ( buf, FALSE, ch, cont_data, 0, TO_ROOM );
                 }
             }
@@ -1193,11 +1193,11 @@ void get_from_container ( Character *ch, struct obj_data *cont,
 
         if ( processed_get_counter > 1 || ( processed_get_counter == 1 && failed_get_counter > 0 ) )
         {
-            snprintf ( buf, sizeof ( buf ), "You get %d %s%s from $p.", processed_get_counter, obj_desc, ( processed_get_counter > 1 ) ? "s" : "" );
+            snprintf ( buf, sizeof ( buf ), "You get %d %s from $p.", processed_get_counter, obj_desc );
             act ( buf, FALSE, ch, cont, 0, TO_CHAR );
             if ( !slipping )
             {
-                snprintf ( buf, sizeof ( buf ), "$n gets some %s from $p.", obj_desc );
+                snprintf ( buf, sizeof ( buf ), "$n gets %d %s from $p.", processed_get_counter, obj_desc );
                 act ( buf, FALSE, ch, cont, 0, TO_ROOM );
             }
         }
@@ -1226,7 +1226,7 @@ void get_from_container ( Character *ch, struct obj_data *cont,
                 act ( "$p seems to be empty.", FALSE, ch, cont, 0, TO_CHAR );
             else
             {
-                snprintf ( buf, sizeof ( buf ), "You can't seem to find any %ss in $p.", obj_desc );
+                snprintf ( buf, sizeof ( buf ), "You can't seem to find any %s in $p.", obj_desc );
                 act ( buf, FALSE, ch, cont, 0, TO_CHAR );
             }
         }
@@ -1242,11 +1242,11 @@ void get_from_container ( Character *ch, struct obj_data *cont,
             }
             else
             {
-                snprintf ( buf, sizeof ( buf ), "You get %d %s%s out of $p.", processed_get_counter, obj_desc, ( processed_get_counter > 1 ) ? "s" : "" );
+                snprintf ( buf, sizeof ( buf ), "You get %d %s out of $p.", processed_get_counter, obj_desc );
                 act ( buf, FALSE, ch, cont, 0, TO_CHAR );
                 if ( !slipping )
                 {
-                    snprintf ( buf, sizeof ( buf ), "$n gets all the %ss $e can out of $p.", obj_desc );
+                    snprintf ( buf, sizeof ( buf ), "$n gets all the %s $e can out of $p.", obj_desc );
                     act ( buf, FALSE, ch, cont, 0, TO_ROOM );
                 }
             }
