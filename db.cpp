@@ -5341,11 +5341,7 @@ int store_to_char ( const char *name, Character *ch )
                 else if ( !strcmp ( tag, "Alin" ) )
                     GET_ALIGNMENT ( ch ) = num;
                 else if ( !strcmp ( tag, "Awrd" ) )
-                {
-                    if ( num > 1000 )
-                        num = 0;
                     GET_AWARD ( ch ) = num;
-                }
                 else if ( !strcmp ( tag, "Aff " ) )
                     sscanf ( line, "%u %u %u %u",
                              & ( ch->char_specials.saved.affected_by[0] ),
@@ -5367,23 +5363,9 @@ int store_to_char ( const char *name, Character *ch )
                 else if ( !strcmp ( tag, "Brth" ) )
                     ch->player.time.birth = num6;
                 else if ( !strcmp ( tag, "BraT" ) )
-                {
-                    if ( num > 100 )
-                    {
-                        new_mudlog ( NRM, LVL_GOD, TRUE, "%s has more than 100 brass tokens. Correcting to 0.", GET_NAME ( ch ) );
-                        num = 0;
-                    }
                     GET_BRASS_TOKEN_COUNT ( ch ) = num;
-                }
                 else if ( !strcmp ( tag, "BroT" ) )
-                {
-                    if ( num > 100 )
-                    {
-                        new_mudlog ( NRM, LVL_GOD, TRUE, "%s has more than 100 bronze tokens. Correcting to 0.", GET_NAME ( ch ) );
-                        num = 0;
-                    }
                     GET_BRONZE_TOKEN_COUNT ( ch ) = num;
-                }
                 else if ( !strcmp ( tag, "BetO" ) )
                     GET_BETTED_ON ( ch ) = num;
                 else if ( !strcmp ( tag, "Body" ) )
@@ -5422,19 +5404,11 @@ int store_to_char ( const char *name, Character *ch )
                     }
                 }
                 else if ( !strcmp ( tag, "Clns" ) )
-                {
-                    if ( num > 100 )
-                        num = 0;
                     GET_COOLNESS ( ch ) = num;
-                }
                 else if ( !strcmp ( tag, "Conv" ) )
                     GET_CONVERSIONS ( ch ) = num;
                 else if ( !strcmp ( tag, "CrPt" ) )
-                {
-                    if ( num > 100 )
-                        num = 0;
                     CREATE_POINTS ( ch ) = num;
-                }
                 else if ( !strcmp ( tag, "Csnp" ) )
                     GET_CSNP_LVL ( ch ) = num;
                 break;
@@ -5458,11 +5432,7 @@ int store_to_char ( const char *name, Character *ch )
                 else if ( !strcmp ( tag, "Deed" ) )
                     GET_DEED_COUNT ( ch) = num;
                 else if ( !strcmp ( tag, "DTC " ) )
-                {
-                    if ( num > 100 )
-                        num = 0;
                     GET_DT_CNT ( ch ) = num;
-                }
                 break;
 
             case 'E':
@@ -5477,8 +5447,8 @@ int store_to_char ( const char *name, Character *ch )
                     if ( ( GET_EMAIL ( ch ) = fread_string ( fl, buf2 ) ) == NULL )
                         GET_EMAIL ( ch ) = strdup ( "Undefined" );
                 }
-                                else if ( !strcmp ( tag, "Etho"))
-                                        GET_ETHOS(ch) = num;
+                else if ( !strcmp ( tag, "Etho"))
+                    GET_ETHOS ( ch ) = num;
                 break;
 
             case 'F':
@@ -5492,9 +5462,7 @@ int store_to_char ( const char *name, Character *ch )
                 if ( !strcmp ( tag, "Gold" ) )
                     GET_GOLD ( ch ) = num6;
                 if ( !strcmp ( tag, "GolT" ) )
-                {
                     GET_GOLD_TOKEN_COUNT ( ch ) = num;
-                }
                 break;
 
             case 'H':
@@ -5521,10 +5489,7 @@ int store_to_char ( const char *name, Character *ch )
 
             case 'I':
                 if ( !strcmp ( tag, "Id  " ) )
-                {
-
                     GET_IDNUM ( ch ) = num6;
-                }
                 else if ( !strcmp ( tag, "Int " ) )
                     ch->real_abils.intel = num;
                 else if ( !strcmp ( tag, "Invs" ) )
@@ -5535,11 +5500,7 @@ int store_to_char ( const char *name, Character *ch )
 
             case 'K':
                 if ( !strcmp ( tag, "KilC" ) )
-                {
-                    if ( num > 2000000 )
-                        num = 0;
                     GET_KILL_CNT ( ch ) = num;
-                }
                 break;
 
             case 'L':
@@ -5567,10 +5528,7 @@ int store_to_char ( const char *name, Character *ch )
                 else if ( !strcmp ( tag, "LdRm" ) )
                     GET_LOADROOM ( ch ) = num;
                 else if ( !strcmp ( tag, "LocE" ) )
-                {
                     LOCKER_EXPIRE ( ch ) = ( time_t ) num6;
-
-                }
                 else if ( !strcmp ( tag, "LocL" ) )
                     LOCKER_LIMIT ( ch ) = num;
                 /*A little something by Thotter */
@@ -5664,17 +5622,9 @@ int store_to_char ( const char *name, Character *ch )
                         break;
                     case 'n':
                         if ( !strcmp ( tag, "Ppnt" ) )
-                        {
-                            if ( num > 1000 )
-                                num = 0;
                             GET_PK_POINTS ( ch ) = num;
-                        }
                         else if ( !strcmp ( tag, "Pcnt" ) )
-                        {
-                            if ( num > 1000 )
-                                num = 0;
                             GET_PK_CNT ( ch ) = num;
-                        }
                         break;
                     case 'o':
                         if ( !strcmp ( tag, "PfOt" ) )
@@ -5728,11 +5678,7 @@ int store_to_char ( const char *name, Character *ch )
                         break;
                     case 'c':
                         if ( !strcmp ( tag, "RipC" ) )
-                        {
-                            if ( num > 10000 )
-                                num = 0;
                             GET_RIP_CNT ( ch ) = num;
-                        }
                         break;
                     case 'd':
                         if ( !strcmp ( tag, "Rwrd" ) )
@@ -5831,14 +5777,7 @@ int store_to_char ( const char *name, Character *ch )
                     ch->real_abils.str_add = num2;
                 }
                 else if ( !strcmp ( tag, "SilT" ) )
-                {
-                    if ( num > 100 )
-                    {
-                        new_mudlog ( NRM, LVL_GOD, TRUE, "%s has more than 100 silver tokens. Correcting to 0.", GET_NAME ( ch ) );
-                        num = 0;
-                    }
                     GET_SILVER_TOKEN_COUNT ( ch ) = num;
-                }
                 break;
 
             case 'T':
