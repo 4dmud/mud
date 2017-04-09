@@ -1146,91 +1146,79 @@ void extract_tokens(Character *ch)
 void hit_death_trap ( Character *ch )
 {
     obj_data *obj, *next_o, *tobj, *tobj_next;
-        int i;
+    int i;
+
     if ( !ch )
         return;
+
     if ( ( GET_LEVEL ( ch ) < LVL_IMMORT ) || IS_NPC ( ch ) )
     {
         log_death_trap ( ch );
 
-                /* Lets get rid of all tokens, regardless of protection */
-                extract_tokens(ch);
+        /* Lets get rid of all tokens, regardless of protection */
+        extract_tokens ( ch );
 
-                /* Player has full protection */
-                if (PLR_FLAGGED(ch, PLR_ANTI_DT)) {
+        /* Player has full protection */
+        if ( PLR_FLAGGED ( ch, PLR_ANTI_DT ) )
+        {
             REMOVE_BIT_AR ( PLR_FLAGS ( ch ), PLR_ANTI_DT );
-                    raw_kill(ch, NULL);
-                    return;
-                }
-
-                /* Player has no full protection, check for item protection */
-                /* Checking for what the character is carrying */
-                /* If container is not anti_dt, then all contents go as well */
-                for (obj = ch->carrying; obj; obj = next_o) {
-                    next_o = obj->next_content;
-                    /* Lets check if the object is a container */
-                    for (tobj = obj->contains; tobj; tobj = tobj_next) {
-                        tobj_next = tobj->next_content;
-                        if (IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT) && tobj->owner == GET_IDNUM(ch))
-                            REMOVE_BIT_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT);
-                        else {
-                            obj_from_obj(tobj);
-                            extract_obj(tobj);
-                        }
-                    }
-                    if (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT) && obj->owner == GET_IDNUM(ch))
-                        REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
-                    else {
-                        obj_from_char(obj);
-                        extract_obj(obj);
-                    }
-                }
-
-                /* Now check for equipped items */
-                for (i = 0; i < NUM_WEARS; i++)
-                    if ((obj =GET_EQ(ch, i))) {
-                        if (IN_ROOM(ch) == NULL) {
-                            unequip_char(ch, i);
-                            obj_from_char(obj);
-                            extract_obj(obj);
-                        }
-                        else {
-                            for (tobj = obj->contains; tobj; tobj = tobj_next) {
-                                tobj_next = tobj->next_content;
-                                if (IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT) && tobj->owner == GET_IDNUM(ch))
-                                    REMOVE_BIT_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT);
-                                else {
-                                    obj_from_obj(tobj);
-                                    obj_from_char(tobj);
-                                    extract_obj(tobj);
-                                }
-                            }
-                            if (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT) && obj->owner == GET_IDNUM(ch))
-                                REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
-                            else {
-                                obj_from_obj(obj);
-                                obj_from_char(obj);
-                                extract_obj(obj);
-                            }
-                        }
-                    }
-
-
-
-    // 	eq_to_room ( ch );
-/*		for ( obj = IN_ROOM ( ch )->contents; obj; obj = next_o )
-        {
-            next_o = obj->next_content;
-            extract_obj ( obj );
-        } */
-        /* Purge twice to clear the room */
-                /* Really becomes redundant since obj is already extracted
-        for ( obj = IN_ROOM ( ch )->contents; obj; obj = next_o )
-        {
-            next_o = obj->next_content;
-            extract_obj ( obj );
+            raw_kill ( ch, NULL );
+            return;
         }
-                */
+
+        /* Player has no full protection, check for item protection */
+        /* Checking for what the character is carrying */
+        /* If container is not anti_dt, then all contents go as well */
+        for ( obj = ch->carrying; obj; obj = next_o )
+        {
+            next_o = obj->next_content;
+
+            if ( IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_ANTI_DT ) && obj->owner == GET_IDNUM ( ch ) )
+                REMOVE_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_ANTI_DT );
+            else
+            {
+                extract_obj ( obj );
+                continue;
+            }
+
+            /* Purge unprotected contents if the object is a container */
+            for ( tobj = obj->contains; tobj; tobj = tobj_next )
+            {
+                tobj_next = tobj->next_content;
+                if ( IS_SET_AR ( GET_OBJ_EXTRA ( tobj ), ITEM_ANTI_DT ) && tobj->owner == GET_IDNUM ( ch ) )
+                    REMOVE_BIT_AR ( GET_OBJ_EXTRA ( tobj ), ITEM_ANTI_DT );
+                else
+                    extract_obj ( tobj );
+            }
+        }
+
+        /* Now check for equipped items */
+        for ( i = 0; i < NUM_WEARS; i++ )
+            if ( ( obj = GET_EQ ( ch, i ) ) )
+            {
+                if ( IN_ROOM ( ch ) == NULL )
+                    extract_obj ( obj );
+                else
+                {
+                    if ( IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_ANTI_DT ) && obj->owner == GET_IDNUM ( ch ) )
+                        REMOVE_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_ANTI_DT );
+                    else
+                    {
+                        extract_obj ( obj );
+                        continue;
+                    }
+
+                    for ( tobj = obj->contains; tobj; tobj = tobj_next )
+                    {
+                        tobj_next = tobj->next_content;
+                        if ( IS_SET_AR ( GET_OBJ_EXTRA ( tobj ), ITEM_ANTI_DT ) && tobj->owner == GET_IDNUM ( ch ) )
+                            REMOVE_BIT_AR ( GET_OBJ_EXTRA ( tobj ), ITEM_ANTI_DT );
+                        else
+                            extract_obj ( tobj );
+                    }
+                }
+            }
+
         raw_kill ( ch, NULL );
         if ( !IS_NPC ( ch ) )
             GET_DT_CNT ( ch ) += 1;
