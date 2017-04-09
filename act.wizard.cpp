@@ -368,6 +368,7 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
+const char* spec_proc_name ( int (*func) (Character*, void*, int, char*, char*) );
 bool crafted ( obj_data *obj );
 const char* max_quality_name ( obj_data *obj );
 const char* quality_name ( obj_data *obj );
@@ -1580,8 +1581,7 @@ void do_stat_room ( Character *ch )
         ch->Send ( "{cy[MINE: %3d LEVEL: %d Tool: %s]{c0\r\n", rm->mine.num, rm->mine.dif, rm->mine.num == -1 ? "None" : rm->mine.tool == TOOL_SHOVEL ? "Shovel" : "Pickaxe" );
 
     sprintbitarray ( rm->room_flags, room_bits, RF_ARRAY_MAX, buf2, sizeof ( buf2 ) );
-    ch->Send ( "SpecProc: %s, Flags: %s\r\n",
-               ( rm->func == NULL ) ? "None" : "Exists", buf2 );
+    ch->Send ( "SpecProc: %s, Flags: %s\r\n", spec_proc_name ( rm->func ), buf2 );
 
     if (rm->func == playershop )
         ch->Send ( "Playershop owned by %s.\r\n", pi.NameById ( player_shop[ rm->number ]->owner_id ) );
@@ -1713,8 +1713,8 @@ void do_stat_object ( Character *ch, struct obj_data *j )
         "Material: [%s%10s%s] VNum: [%s%5d%s], RNum: [%5d], Type: %s, IDNum: %ld, SpecProc: %s\r\n",
         CCGRN ( ch, C_NRM ), material_name ( GET_OBJ_MATERIAL ( j ) ),
         CCNRM ( ch, C_NRM ), CCGRN ( ch, C_NRM ), vnum, CCNRM ( ch, C_NRM ), GET_OBJ_RNUM ( j ),
-        buf1, GET_ID ( j )  ,
-        ( GET_OBJ_RNUM ( j ) != NOTHING ? ( obj_index[GET_OBJ_RNUM ( j ) ].func ? "Exists" : "None" ) : "None" ) );
+        buf1, GET_ID ( j ),
+        GET_OBJ_RNUM ( j ) != NOTHING ? spec_proc_name ( obj_index[GET_OBJ_RNUM ( j ) ].func ) : "None" );
 
     if ( GET_OBJ_RNUM ( j ) != NOTHING && obj_index[GET_OBJ_RNUM ( j ) ].qic != NULL && ( GET_LEVEL ( ch ) >= LVL_SEN ) )
     {
@@ -2062,10 +2062,7 @@ void do_stat_character ( Character *ch, Character *k, char* var )
         else
             ch->Send ( " (Tier: %d)", current_class_is_tier_num ( k ) );
 
-
         ch->Send ( ", Race: %s\r\n", race_name ( k ) );
-
-
 
         ch->Send ( "Lev: [%s%2d%s], XP: [%s%15lld%s], Align: [%4d], Speed: [%5d]\r\n",
                    CCYEL ( ch, C_NRM ), GET_LEVEL ( k ), CCNRM ( ch, C_NRM ),
@@ -2087,7 +2084,6 @@ void do_stat_character ( Character *ch, Character *k, char* var )
             {
                 ch->Send ( "Telopt Prompts: %d    ", k->desc->eor );
                 ch->Send ( "MXP: %d    ", k->desc->mxp );
-
                 ch->Send ( "Wordwrap: %s - %d\r\n", ONOFF ( PRF_FLAGGED ( k->desc->character, PRF_PAGEWRAP ) ), PAGEWIDTH ( k->desc->character ) );
             }
             ch->Send ( "Total Remorts: %d", REMORTS ( k ) );
@@ -2251,11 +2247,9 @@ void do_stat_character ( Character *ch, Character *k, char* var )
         if ( !IS_NPC ( k ) && PREG ( k ) > 0 )
             ch->Send ( "%d hours away from giving birth.\r\n", PREG ( k ) );
         if ( IS_MOB ( k ) && MobIndexExists ( GET_MOB_VNUM ( k ) ) )
-            ch->Send ( "Mob Spec-Proc: %s",
-                       ( GetMobIndex ( GET_MOB_VNUM ( k ) )->func != NULL ? "Exists" : "None" ) );
+            ch->Send ( "Mob Spec-Proc: %s", spec_proc_name ( GetMobIndex ( GET_MOB_VNUM ( k ) )->func ) );
         if ( IS_MOB ( k ) ) {
-            ch->Send ( ", NPC Bare Hand Dam: %dd%d\r\n",
-                       k->mob_specials.damnodice, k->mob_specials.damsizedice );
+            ch->Send ( ", NPC Bare Hand Dam: %dd%d\r\n", k->mob_specials.damnodice, k->mob_specials.damsizedice );
         if (!k->mob_specials.teaches_skills.empty())
             ch->Send ("It can teach these skills and spells:\r\n");
         for ( i = 0; i < k->mob_specials.teaches_skills.size();i++ )

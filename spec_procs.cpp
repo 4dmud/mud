@@ -223,6 +223,43 @@ SPECIAL ( thief );
 SPECIAL ( triples );
 void sort_sub_data ( void );
 
+const vector< pair<int (*) (Character*, void*, int, char*, char*), const char*> > spec_proc_names =
+{
+    { antidt, "antidt" },
+    { bank, "bank" },
+    { bottle, "bottle" },
+    { cityguard, "cityguard" },
+    { clan_deeds, "clan_deeds" },
+    { cleric, "cleric" },
+    { craps, "craps" },
+    { door_down, "door_down" },
+    { door_down_7377, "door_down_7377" },
+    { dragon_acid, "dragon_acid" },
+    { dragon_fire, "dragon_fire" },
+    { dragon_frost, "dragon_frost" },
+    { dragon_gas, "dragon_gas" },
+    { dragon_lightning, "dragon_lightning" },
+    { dump, "dump" },
+    { fido, "fido" },
+    { fire, "fire" },
+    { guard_black, "guard_black" },
+    { guard_white, "guard_white" },
+    { guild_guard, "guild_guard" },
+    { high_dice, "high_dice" },
+    { janitor, "janitor" },
+    { magic_user, "magic_user" },
+    { mayor, "mayor" },
+    { pet_shops, "pet_shops" },
+    { puff, "puff" },
+    { scorpion, "scorpion" },
+    { seven, "seven" },
+    { slots, "slots" },
+    { snake, "snake" },
+    { spider, "spider" },
+    { thief, "thief" },
+    { triples, "triples" }
+};
+
 /* ********************************************************************
 *  Special procedures for mobiles                                     *
 ******************************************************************** */
@@ -361,6 +398,18 @@ bool check_owner(Character *ch, struct obj_data *obj)
         return TRUE;
 
     return FALSE;
+}
+
+const char* spec_proc_name ( int (*func) (Character*, void*, int, char*, char*) )
+{
+    if ( func == nullptr )
+        return "none";
+
+    for ( const auto &proc : spec_proc_names )
+        if ( proc.first == func )
+            return proc.second;
+
+    return "yes";
 }
 
 SPECIAL(antidt)
