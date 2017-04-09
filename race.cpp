@@ -173,7 +173,7 @@ void set_race(Character *ch, int race) {
     struct obj_data *obj;
     extern const char *body[];
     void obj_to_char(struct obj_data *object, Character *ch);
-    struct obj_data *unequip_char(Character *ch, int pos);
+    struct obj_data *unequip_char(Character *ch, int pos, bool show_wear_off_msg = true);
     char buf[MAX_INPUT_LENGTH];
 
     rem = GET_BODY(ch);

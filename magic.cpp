@@ -129,21 +129,19 @@ void affect_update ( void )
       for ( af = i->affected; af; af = next )
       {
           next = af->next;
-      if ( af->expire > t ) /* hasnt reached "time" yet.*/
-          continue;
-      if ( af->expire == -2 ) /* No action */
-          continue;
-      else
-      {
-          if ( af->type > 0 ) {
-          if ( !af->next || ( af->next->type != af->type ) ||
-                            ( af->next->expire > t ) )
-                  if (spell_info[af->type].wear_off_msg && spell_info[af->type].wear_off_msg[0] != '\0')
+          if ( af->expire > t ) /* hasnt reached "time" yet.*/
+              continue;
+          if ( af->expire == -2 ) /* No action */
+              continue;
+          else
+          {
+              if ( af->type > 0 ) {
+                  if ( !af->next || ( af->next->type != af->type ) || ( af->next->expire > t ) )
+                      if (spell_info[af->type].wear_off_msg && spell_info[af->type].wear_off_msg[0] != '\0')
                           i->Send("%s\r\n", spell_info[af->type].wear_off_msg);
-          i->affect_remove ( af );
+                  i->affect_remove ( af );
               }
-
-      }
+          }
       }
 }
 
@@ -689,14 +687,14 @@ void mag_affects ( int level, Character *ch, Character *victim,
             break;
 
         case SPELL_DETECT_INVIS:
-                    if ( OBJ_INNATE )
-                                af[0].expire = -2;
-                        else
-                                af[0].expire = HOURS_TO_EXPIRE ( 12 + level );
-                        af[0].bitvector = AFF_DETECT_INVIS;
-                        accum_duration =FALSE;
-                        to_vict = "You start to see things that never used to be there.";
-                        break;
+            if ( OBJ_INNATE )
+                af[0].expire = -2;
+            else
+                af[0].expire = HOURS_TO_EXPIRE ( 12 + level );
+            af[0].bitvector = AFF_DETECT_INVIS;
+            accum_duration =FALSE;
+            to_vict = "You start to see things that never used to be there.";
+            break;
 
             case SPELL_DETECT_INVIS_OTHER:
             if ( OBJ_INNATE )

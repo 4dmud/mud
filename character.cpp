@@ -1410,7 +1410,7 @@ void Character::MakeNaked()
     {
         if ( GET_EQ ( this, k ) )
         {
-            char_eq[k] = unequip_char ( this, k );
+            char_eq[k] = unequip_char ( this, k, FALSE );
 #ifndef NO_EXTRANEOUS_TRIGGERS
             if ( remove_otrigger ( char_eq[k], this ) == -1 )
                 char_eq[k] = NULL;

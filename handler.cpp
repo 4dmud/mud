@@ -1293,7 +1293,7 @@ int equip_char ( Character *ch, struct obj_data *obj, int pos )
 
 }
 
-struct obj_data *unequip_char ( Character *ch, int pos )
+struct obj_data *unequip_char ( Character *ch, int pos, bool show_wear_off_msg )
 {
     int j;
     struct obj_data *obj = NULL;
@@ -1344,7 +1344,11 @@ struct obj_data *unequip_char ( Character *ch, int pos )
         {
             anext = aff->next;
             if ( aff->type == obj->obj_flags.obj_innate )
+            {
+                if ( show_wear_off_msg && spell_info[aff->type].wear_off_msg && *spell_info[aff->type].wear_off_msg )
+                    ch->Send ( "%s\r\n", spell_info[aff->type].wear_off_msg );
                 ch->affect_remove ( aff );
+            }
         }
     }
     ch->affect_total();

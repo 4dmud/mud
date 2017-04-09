@@ -42,7 +42,7 @@ void obj_to_char_no_weight(struct obj_data *object, Character *ch);
 int obj_from_char(struct obj_data *object);
 
 int equip_char(Character *ch, struct obj_data *obj, int pos);
-struct obj_data *unequip_char(Character *ch, int pos);
+struct obj_data *unequip_char(Character *ch, int pos, bool show_wear_off_msg = true);
 int invalid_align(Character *ch, struct obj_data *obj);
 
 
