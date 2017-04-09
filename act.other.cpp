@@ -1776,7 +1776,7 @@ ACMD ( do_file )
     }
 
     bool has_tags = ( fields[l].cmd == "bug" || fields[l].cmd == "typo" );
-    char line[READ_SIZE];
+    char line[MAX_STRING_LENGTH];
     string entry;
     vector<string> entries;
 

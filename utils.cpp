@@ -941,13 +941,13 @@ int even_group ( Character *ch );
 /** BUG: This command should also be passed the size of the buffer it will be filling - mord */
 int get_line ( FILE *fl, char *buf )
 {
-    char temp[READ_SIZE];
+    char temp[MAX_STRING_LENGTH];
     int lines = 0;
     int sl;
     /** This do while loop skips over any blank lines or comments starting with * **/
     do
     {
-        if ( !fgets ( temp, READ_SIZE, fl ) )
+        if ( !fgets ( temp, MAX_STRING_LENGTH, fl ) )
             return ( 0 );
         lines++;
     }
