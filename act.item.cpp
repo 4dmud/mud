@@ -3456,7 +3456,7 @@ void perform_wear ( Character *ch, struct obj_data *obj, int where )
     */
     if ( obj->owner != 0 && !IS_NPC ( ch ) && GET_IDNUM ( ch ) != obj->owner )
     {
-        ch->Send ( "You can't wear that! It is owned by %s\r\n", pi.NameById ( obj->owner ) );
+        ch->Send ( "You can't wear that! It is owned by %s.\r\n", CAP ( pi.NameById ( obj->owner ) ) );
         return;
     }
 

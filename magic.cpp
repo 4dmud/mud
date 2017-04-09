@@ -784,7 +784,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             break;
 
         case SPELL_POISON:
-            if ( !IS_NPC ( victim ) && mag_savingthrow ( victim, savetype, 2 ) )
+            if ( !IS_NPC ( victim ) && mag_savingthrow ( victim, savetype, 5 ) )
             {
                 if ( ch )
                     ch->Send ( "%s", CONFIG_NOEFFECT );
@@ -801,7 +801,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             break;
 
         case SPELL_POISON_2:
-            if ( ch && mag_savingthrow ( victim, savetype, 3 ) )
+            if ( ch && mag_savingthrow ( victim, savetype, 4 ) )
             {
                 ch->Send ( "%s", CONFIG_NOEFFECT );
                 return;
@@ -817,7 +817,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             break;
 
         case SPELL_POISON_3:
-            if ( ch && mag_savingthrow ( victim, savetype, 4 ) )
+            if ( ch && mag_savingthrow ( victim, savetype, 3 ) )
             {
                 ch->Send ( "%s", CONFIG_NOEFFECT );
                 return;
@@ -833,7 +833,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             break;
 
         case SPELL_POISON_4:
-            if ( ch && mag_savingthrow ( victim, savetype, 5 ) )
+            if ( ch && mag_savingthrow ( victim, savetype, 2 ) )
             {
                 ch->Send ( "%s", CONFIG_NOEFFECT );
                 return;
