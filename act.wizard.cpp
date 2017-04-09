@@ -3024,10 +3024,42 @@ ACMD ( do_purge )
     int num = 0;
 
     one_argument ( argument, buf );
+    int dotmode = find_all_dots ( buf );
     num = get_number ( &arg );
 
-    if ( *buf ) {            /* argument supplied. destroy single object or char */
-        if ( ( vict = get_char_vis ( ch, buf, &num, FIND_CHAR_ROOM ) ) )
+    if ( *buf )
+    {
+        if ( dotmode == FIND_ALLDOT && IN_ROOM ( ch ) )
+        {
+            /* destroy all targets with a matching name */
+            bool purged = FALSE;
+            for ( obj = IN_ROOM ( ch )->contents; obj; obj = next_o )
+            {
+                next_o = obj->next_content;
+                if ( CAN_SEE_OBJ ( ch, obj ) && isname_full ( buf, obj->name ) )
+                {
+                    extract_obj ( obj );
+                    purged = TRUE;
+                }
+            }
+
+            for ( vict = IN_ROOM ( ch )->people; vict; vict = next_v )
+            {
+                next_v = vict->next_in_room;
+                if ( IS_NPC ( vict ) && CAN_SEE ( ch, vict ) && isname_full ( buf, vict->player.name ) )
+                {
+                    extract_char ( vict );
+                    purged = TRUE;
+                }
+            }
+
+            if ( purged )
+                ch->Send ( "%s", CONFIG_OK );
+            else
+                ch->Send ( "Nothing here by that name.\r\n" );
+        }
+        /* destroy a single object or char */
+        else if ( ( vict = get_char_vis ( ch, buf, &num, FIND_CHAR_ROOM ) ) )
         {
             if ( !IS_NPC ( vict ) )
             {
@@ -3038,23 +3070,22 @@ ACMD ( do_purge )
             extract_char ( vict );
             ch->Send ( "%s", CONFIG_OK );
         }
-        else
-            if ( ( obj = get_obj_in_list_vis ( ch, buf, &num, IN_ROOM ( ch )->contents ) ) != NULL )
-            {
-                if ( OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
-                    ch->Send ( "You can't purge player corpses.\r\n" );
-                else
-                {
-                    act ( "$n destroys $p.", FALSE, ch, obj, 0, TO_ROOM );
-                    extract_obj ( obj );
-                    ch->Send ( "%s", CONFIG_OK );
-                }
-            }
+        else if ( ( obj = get_obj_in_list_vis ( ch, buf, &num, IN_ROOM ( ch )->contents ) ) != NULL )
+        {
+            if ( OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
+                ch->Send ( "You can't purge player corpses.\r\n" );
             else
             {
-                send_to_char ( "Nothing here by that name.\r\n", ch );
-                return;
+                act ( "$n destroys $p.", FALSE, ch, obj, 0, TO_ROOM );
+                extract_obj ( obj );
+                ch->Send ( "%s", CONFIG_OK );
             }
+        }
+        else
+        {
+            ch->Send ( "Nothing here by that name.\r\n" );
+            return;
+        }
     }
     else              /* no argument. clean out the room */
     {
