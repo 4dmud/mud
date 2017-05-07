@@ -670,8 +670,8 @@ SPECIAL(clan_deeds)
   }
   for (cl = clan[i].deeds; cl; cl = cl_next) {
       cl_next = cl->next;
-      if ((is_same_zone(cl->zone, GET_OBJ_VAL(deed, 0))) && (REMORTS(ch) > 0)) {
-          ch->Send("Your clan already has claimed this deed.\r\n");
+      if ((is_same_zone(cl->zone, GET_OBJ_VAL(deed, 0)))) {
+          ch->Send("Your clan has already claimed this deed.\r\n");
           return TRUE;
       }
   }
