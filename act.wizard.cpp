@@ -6018,7 +6018,7 @@ ACMD ( do_set )
 
     if ( !*name || !*field )
     {
-        ch->Send ( "Usage: set <victim> <field> <value>\r\n"
+        ch->Send ( "Usage: set [file] <victim> <field> <value>\r\n"
                     "Fields available to you:\r\n" );
         for ( i = 0, n = 0; set_fields[ i ].cmd[ 0 ] != '\n'; ++i )
             if ( GET_LEVEL ( ch ) >= set_fields[ i ].level )

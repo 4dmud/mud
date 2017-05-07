@@ -2396,7 +2396,17 @@ ASKILL ( skill_push )
                   stren )
         {
             /* You can balance the check above, this works fine for me */
-            if ( perform_push ( victim, to, TRUE, ch ) )
+            if ( RIDING ( victim ) )
+            {
+                victim->Send ( "You fall off %s unceremoniously.\r\n", GET_NAME ( RIDING ( victim ) ) );
+                if ( RIDING ( victim ) == ch )
+                    ch->Send ( "You manage to push %s off of you.\r\n", GET_NAME ( victim ) );
+                act ( "$N falls off $n unceremoniously.", FALSE, ch, nullptr, victim, TO_NOTVICT );
+                dismount_char ( victim );
+            }
+            else if ( RIDING ( ch ) == victim )
+                ch->Send ( "Try using your spurs instead!\r\n" );
+            else if ( perform_push ( victim, to, TRUE, ch ) )
             {
                 *ch << "Ciao, ciao!\r\n";
                 victim->Send ( "%s has pushed you!", GET_NAME ( ch ) );
@@ -2405,9 +2415,13 @@ ASKILL ( skill_push )
         }
         else
         {
-            *ch << "Oops... you fail.";
-            victim->Send ( "%s fails.\r\n", GET_NAME ( ch ) );
-
+            if ( RIDING ( ch ) == victim )
+                ch->Send ( "Try using your spurs instead!\r\n" );
+            else
+            {
+                ch->Send ( "Oops... you fail." );
+                victim->Send ( "%s fails.\r\n", GET_NAME ( ch ) );
+            }
         }
     }
     return 0;

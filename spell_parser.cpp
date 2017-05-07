@@ -2368,11 +2368,11 @@ void mag_assign_spells ( void )
 
     spello ( SPELL_RADIATED, "radiation sickness", 100 , 80 , 2,
                  POS_STANDING, TAR_IGNORE | TAR_CHAR_ROOM, TRUE, MAG_DAMAGE | MAG_ROOM_AFFECTS,
-                 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 51, 1, "Your radiation sickness has passed." );
+                 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, LVL_IMMORT, 1, "Your radiation sickness has passed." );
 
         spello ( SPELL_MUTATED, "mutated", 100 , 80 , 2,
                  POS_STANDING, TAR_IGNORE | TAR_CHAR_ROOM, TRUE, MAG_DAMAGE | MAG_ROOM_AFFECTS,
-                 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 51, 1, "You lose your mutations." );
+                 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, LVL_IMMORT, 1, "You lose your mutations." );
 
     /* NON-castable spells should appear here */
     spello_system ( SPELL_IDENTIFY, "identify", 0, 0, 0, POS_RESTING,

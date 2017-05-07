@@ -3072,8 +3072,7 @@ const obj_data *random_obj ()
         if ( rnum == NOTHING || OBJ_FLAGGED ( &obj_proto[ rnum ], ITEM_NODISPLAY ) )
             continue;
 
-        string shortdesc = string ( obj_proto[ rnum ].short_description );
-        if ( shortdesc.find ( "{c" ) != string::npos )
+        if ( strstr ( obj_proto[ rnum ].short_description, "{c" ) )
             continue;
 
         return &obj_proto[ rnum ];
