@@ -1113,7 +1113,7 @@ void do_stat_trigger ( Character *ch, trig_data *trig )
     else
     {
         len += snprintf ( sb + len, sizeof ( sb )-len, "Trigger Intended Assignment: Mobiles\r\n" );
-        new_sprintbit ( GET_TRIG_TYPE ( trig ), trig_types, buf, sizeof ( buf ) );
+        new_sprintbit ( GET_TRIG_TYPE ( trig ), mtrig_types, buf, sizeof ( buf ) );
     }
 
     len += snprintf ( sb + len, sizeof ( sb )-len, "Trigger Type: %s, Numeric Arg: %d, Arg list: %s\r\n",
@@ -1219,7 +1219,7 @@ void script_stat ( Character *ch, struct script_data *sc )
         else
         {
             ch->Send ( "  Trigger Intended Assignment: Mobiles\r\n" );
-            new_sprintbit ( GET_TRIG_TYPE ( t ), trig_types, buf1, sizeof ( buf1 ) );
+            new_sprintbit ( GET_TRIG_TYPE ( t ), mtrig_types, buf1, sizeof ( buf1 ) );
         }
 
         ch->Send ( "  Trigger Type: %s, Numeric Arg: %d, Arg list: %s\r\n",
@@ -4318,7 +4318,7 @@ ACMD ( do_tlist )
             }
             else
             {
-                new_sprintbit ( GET_TRIG_TYPE ( trig_index[i]->proto ), trig_types, trgtypes, sizeof ( trgtypes ) );
+                new_sprintbit ( GET_TRIG_TYPE ( trig_index[i]->proto ), mtrig_types, trgtypes, sizeof ( trgtypes ) );
                 snprintf ( buf, sizeof ( buf ), "mob %s%s%s\r\n", QYEL, trgtypes, QNRM );
             }
             DYN_RESIZE ( buf );

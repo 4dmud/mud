@@ -2954,23 +2954,50 @@ ACMD ( do_vstat )
                        "       vstat player <name> <var> (shows matches only)\r\n", ch );
         return;
     }
+
     if ( is_abbrev ( buf, "player" ) )
     {
+        show_vars = TRUE;
         if ( ( mob = get_player_vis ( ch, buf2, NULL, FIND_CHAR_WORLD ) ) != NULL )
-        {
-            show_vars = TRUE;
             do_stat_character ( ch, mob, arg );
-            show_vars = FALSE;
-        }
         else
-            ch->Send ( "No such player around.\r\n" );
+        {
+            try
+            {
+                int idx = pi.TableIndexByName ( buf2 );
+                long uid = pi.IdByIndex ( idx );
+                mob = find_char ( uid );
+                if ( !mob )
+                {
+                    mob = new Character ( FALSE );
+                    mob->loader = uid;
+                    if ( pi.LoadChar ( buf2, mob ) > -1 )
+                    {
+                        read_saved_vars ( mob );
+                        do_stat_character ( ch, mob, arg );
+                    }
+                    else
+                        ch->Send ( "Error: couldn't load offline player %s.\r\n", buf2 );
+                    delete mob;
+                }
+                else
+                    do_stat_character ( ch, mob, arg );
+            }
+            catch ( MudException &e )
+            {
+                ch->Send ( "Player %s doesn't exist.\r\n", buf2 );
+            }
+        }
+        show_vars = FALSE;
         return;
     }
+
     if ( ( num = atoi ( buf2 ) ) < 0 )
     {
         ch->Send ( "A NEGATIVE number??\r\n" );
         return;
     }
+
     if ( is_abbrev ( buf, "mob" ) )
     {
         if ( !MobProtoExists ( num ) )
@@ -7683,7 +7710,7 @@ int search_one_trig ( int stype, struct trig_data *trig, char *buf, size_t len, 
     else
     {
         snprintf ( trIS, sizeof ( trIS ), "Mobiles" );
-        new_sprintbit ( GET_TRIG_TYPE ( trig ), trig_types, trty, sizeof ( trty ) );
+        new_sprintbit ( GET_TRIG_TYPE ( trig ), mtrig_types, trty, sizeof ( trty ) );
     }
 
     count = snprintf ( buf + nlen, len - nlen, "\r\n%sVnum: %-7d - %s%s - %s%s - Name: %-50s%s\r\n",GRN, vnum, CYN, trIS, trty,REM , trig->name, REM );

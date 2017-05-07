@@ -2717,7 +2717,7 @@ const char *month_name[] =
 };
 
 /* mob trigger types */
-const char *trig_types[] =
+const char *mtrig_types[] =
 {
     "Global",
     "Random",
@@ -2793,7 +2793,7 @@ const char *wtrig_types[] =
     "Cast",
     "Leave",
     "Door",
-    "FUNCTION"
+    "FUNCTION",
     "\n"
 };
 

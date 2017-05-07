@@ -219,7 +219,7 @@ void trigedit_disp_menu(Descriptor *d) {
         new_sprintbit(GET_TRIG_TYPE(trig), wtrig_types, trgtypes, sizeof(trgtypes));
     } else {
         attach_type = "Mobiles";
-        new_sprintbit(GET_TRIG_TYPE(trig), trig_types, trgtypes, sizeof(trgtypes));
+        new_sprintbit(GET_TRIG_TYPE(trig), mtrig_types, trgtypes, sizeof(trgtypes));
     }
 
     clear_screen(d);
@@ -399,7 +399,7 @@ void trigedit_disp_types(Descriptor *d) {
         break;
     case MOB_TRIGGER:
     default:
-        types = trig_types;
+        types = mtrig_types;
         break;
     }
 

@@ -431,7 +431,7 @@ void script_stat_dump ( Character * ch, struct script_data *sc )
         else
         {
             fprintf ( fp, "  Trigger Intended Assignment: Mobiles\n" );
-            sprintbit ( GET_TRIG_TYPE ( t ), trig_types, buf1, sizeof ( buf1 ) );
+            sprintbit ( GET_TRIG_TYPE ( t ), mtrig_types, buf1, sizeof ( buf1 ) );
         }
 
         sprintf ( buf, "  Trigger Type: %s, Numeric Arg: %d, Arg list: %s\n",

@@ -57,7 +57,7 @@ extern const char *zone_bits[];
 extern const char *elemental_types[];
 extern const char *tunnel_msgs[];
 
-extern const char *trig_types[];
+extern const char *mtrig_types[];
 extern const char *otrig_types[];
 extern const char *wtrig_types[];
 #if defined(CONFIG_OASIS_MPROG)

@@ -590,7 +590,7 @@ void list_triggers ( Character *ch, zone_rnum rnum, trig_vnum vmin, trig_vnum vm
             }
             else
             {
-                new_sprintbit ( GET_TRIG_TYPE ( trig_index[i]->proto ), trig_types, trgtypes, sizeof ( trgtypes ) );
+                new_sprintbit ( GET_TRIG_TYPE ( trig_index[i]->proto ), mtrig_types, trgtypes, sizeof ( trgtypes ) );
                 snprintf ( buf, sizeof buf, "mob %s%s%s\r\n", QYEL, trgtypes, QNRM );
             }
             DYN_RESIZE ( buf );

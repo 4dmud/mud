@@ -6330,6 +6330,15 @@ ACMD ( do_qcheck )
 
     if ( command == "debug" && ( IS_IMM ( ch ) || GET_ORIG_LEV ( ch ) > 0 ) )
     {
+        trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[6] ) );
+        if ( !t )
+        {
+            new_mudlog ( BRF, LVL_IMMORT, TRUE, "Questcard %d: debug tried to call a non-existing trigger", num );
+            extract_obj ( obj );
+            return;
+        }
+        add_trigger ( SCRIPT ( obj ), t, -1 );
+
         bool atleved;
         if ( GET_ORIG_LEV ( ch ) > 0 )
             atleved = TRUE;
@@ -6347,29 +6356,38 @@ ACMD ( do_qcheck )
             ch->Send ( "Usage: qcheck <number> debug <player>\r\n" );
         else
         {
-            long int uid = pi.IdByName ( player.c_str() );
-            if ( uid == -1 )
-                ch->Send ( "Player %s doesn't exist.\r\n", player.c_str() );
-            else
+            try
             {
+                int idx = pi.TableIndexByName ( player.c_str() );
+                long uid = pi.IdByIndex ( idx );
+
+                snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, uid );
+                add_var ( &( SCRIPT ( obj )->global_vars ), "player", buf, 0 );
+                snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, GET_ID ( ch ) );
+                add_var ( &( SCRIPT ( obj )->global_vars ), "debugger", buf, 0 );
+
                 Character *victim = find_char ( uid );
-                if ( victim )
+                if ( !victim )
                 {
-                    trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[6] ) );
-                    if ( t )
+                    victim = new Character ( FALSE );
+                    victim->loader = uid;
+                    if ( pi.LoadChar ( player.c_str(), victim ) > -1 )
                     {
-                        snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, uid );
-                        add_var ( &( SCRIPT ( obj )->global_vars ), "player", buf, 0 );
-                        snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, GET_ID ( ch ) );
-                        add_var ( &( SCRIPT ( obj )->global_vars ), "debugger", buf, 0 );
-                        add_trigger ( SCRIPT ( obj ), t, -1 );
+                        read_saved_vars ( victim );
+                        addChToLookupTable ( uid, victim );
                         script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
+                        removeFromChLookupTable ( uid );
                     }
                     else
-                        new_mudlog ( BRF, LVL_IMMORT, TRUE, "Questcard %d: debug tried to call a non-existing trigger", num );
+                        ch->Send ( "Error: couldn't load offline player %s.\r\n", player.c_str() );
+                    delete victim;
                 }
                 else
-                   ch->Send ( "Player %s is offline.\r\n", player.c_str() );
+                    script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
+            }
+            catch ( MudException &e )
+            {
+                ch->Send ( "Player %s doesn't exist.\r\n", player.c_str() );
             }
         }
 
