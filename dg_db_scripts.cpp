@@ -381,61 +381,66 @@ void assign_triggers(void *i, int type) {
     struct obj_data *obj = NULL;
     Room *room = NULL;
     int rnum;
-    int tr = 0;
 
     switch (type) {
     case MOB_TRIGGER:
         mob = (Character *)i;
         if (!mob->proto_script)
-        break;
-        for (tr = 0; tr < mob->proto_script->size(); tr++) {
-            rnum = real_trigger((*mob->proto_script)[tr]);
-            if (rnum==NOTHING) {
-                new_mudlog(BRF, LVL_BUILDER, TRUE,
+            break;
+        for ( auto it = mob->proto_script->begin(); it != mob->proto_script->end(); ) {
+            rnum = real_trigger ( *it );
+            if ( rnum == NOTHING ) {
+                new_mudlog ( BRF, LVL_BUILDER, TRUE,
                            "SYSERR: trigger #%d non-existant, for mob #%d",
-                           (*mob->proto_script)[tr], mob->vnum);
+                           *it, mob->vnum);
+                it = mob->proto_script->erase ( it );
             } else {
-                if (!SCRIPT(mob))
-                    SCRIPT(mob) = create_script();
-                add_trigger(SCRIPT(mob), read_trigger(rnum), -1);
+                if ( !SCRIPT ( mob ) )
+                    SCRIPT ( mob ) = create_script();
+                add_trigger ( SCRIPT ( mob ), read_trigger ( rnum ), -1 );
+                it++;
             }
         }
         break;
     case OBJ_TRIGGER:
         obj = (obj_data *)i;
         if (!obj->proto_script)
-        break;
-        for (tr = 0; tr < obj->proto_script->size(); tr++) {
-            rnum = real_trigger((*obj->proto_script)[tr]);
-            if (rnum==NOTHING) {
-                log("SYSERR: trigger #%d non-existant, for obj #%d",
-                    (*obj->proto_script)[tr], obj_index[obj->item_number].vnum);
+            break;
+        for ( auto it = obj->proto_script->begin(); it != obj->proto_script->end(); ) {
+            rnum = real_trigger ( *it );
+            if ( rnum == NOTHING ) {
+                new_mudlog ( BRF, LVL_BUILDER, TRUE, "SYSERR: trigger #%d non-existant, for obj #%d",
+                    *it, obj_index[obj->item_number].vnum );
+                it = obj->proto_script->erase ( it );
             } else {
-                if (!SCRIPT(obj))
-                    SCRIPT(obj) = create_script();
-                add_trigger(SCRIPT(obj), read_trigger(rnum), -1);
+                if ( !SCRIPT ( obj ) )
+                    SCRIPT ( obj ) = create_script();
+                add_trigger ( SCRIPT ( obj ), read_trigger ( rnum ), -1 );
+                it++;
             }
         }
         break;
     case WLD_TRIGGER:
         room = (Room *)i;
         if (!room->proto_script)
-        break;
-        for (tr = 0; tr < room->proto_script->size(); tr++) {
-            rnum = real_trigger((*room->proto_script)[tr]);
-            if (rnum==NOTHING) {
-                new_mudlog(BRF, LVL_BUILDER, TRUE,
+            break;
+        for ( auto it = room->proto_script->begin(); it != room->proto_script->end(); ) {
+            rnum = real_trigger ( *it );
+            if ( rnum == NOTHING ) {
+                new_mudlog ( BRF, LVL_BUILDER, TRUE,
                            "SYSERR: trigger #%d non-existant, for room #%d",
-                           (*room->proto_script)[tr], room->number);
+                           *it, room->number );
+                it = room->proto_script->erase ( it );
             } else {
-                if (!SCRIPT(room))
-                    SCRIPT(room) = create_script();
-                add_trigger(SCRIPT(room), read_trigger(rnum), -1);
+                if ( !SCRIPT ( room ) )
+                    SCRIPT ( room ) = create_script();
+                add_trigger ( SCRIPT ( room ), read_trigger ( rnum ), -1 );
+                it++;
             }
         }
         break;
     default:
-        new_mudlog(BRF, LVL_BUILDER, TRUE, "SYSERR: unknown type %d for assign_triggers()", type);
+        new_mudlog ( BRF, LVL_BUILDER, TRUE, "SYSERR: unknown type %d for assign_triggers()", type );
         break;
     }
 }

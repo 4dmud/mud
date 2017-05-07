@@ -947,19 +947,25 @@ void dg_script_menu(Descriptor *d) {
     d->Output( "     Script Editor\r\n\r\n     Trigger List:\r\n");
 
     if (OLC_SCRIPT(d)) {
-        for (i = 0; i < OLC_SCRIPT(d)->size();i++) {
-            d->Output( "     %2d) [%s%d%s] %s%s%s", i, cyn,
-                       (*OLC_SCRIPT(d))[i], nrm, cyn,
-                       trig_index[real_trigger((*OLC_SCRIPT(d))[i])]->proto->name, nrm);
-            if (trig_index[real_trigger((*OLC_SCRIPT(d))[i])]->proto->attach_type !=
-                    OLC_ITEM_TYPE(d))
-                d->Output( "   %s** Mis-matched Trigger Type **%s\r\n",grn,nrm);
+        for ( auto it = OLC_SCRIPT ( d )->begin(); it != OLC_SCRIPT ( d )->end(); ) {
+            int rnum = real_trigger ( *it );
+            if ( rnum == NOTHING )
+            {
+                it = OLC_SCRIPT ( d )->erase ( it );
+                continue;
+            }
+            i++;
+            it++;
+            d->Output ( "     %2d) [%s%d%s] %s%s%s", i, cyn, *it, nrm, cyn,
+                trig_index[ rnum ]->proto->name, nrm);
+            if (trig_index[ rnum ]->proto->attach_type != OLC_ITEM_TYPE(d))
+                d->Output( "   %s** Mis-matched Trigger Type **%s\r\n", grn, nrm );
             else
                 d->Output( "\r\n");
-
         }
     }
-    if (i==0)
+
+    if ( i == 0 )
         d->Output( "     <none>\r\n");
 
     d->Output(  "\r\n"
