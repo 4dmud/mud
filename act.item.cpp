@@ -756,8 +756,9 @@ ACMD ( do_put )
         else
         {
             /** dual argument mode **/
-            obj_desc = str_until ( argument, "in", arg1, sizeof ( arg1 ) );
-            cont_desc = arg1;
+            cont_desc = str_until ( argument, "in", arg1, sizeof ( arg1 ) );
+            skip_spaces ( &cont_desc );
+            obj_desc = arg1;
         }
     }
 

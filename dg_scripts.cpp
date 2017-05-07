@@ -3573,6 +3573,80 @@ void process_purgemob ( void *thing, int type, trig_data *trig, char *cmd )
     }
 }
 
+/* syntax: target <uid of actor> <var> inv|eq|room|char <args>
+ * sets var to the uid of the obj or ch args refers to
+ */
+void process_target ( trig_data *trig, char *cmd )
+{
+    char actor[MAX_INPUT_LENGTH];
+    char var[MAX_INPUT_LENGTH];
+    char loc[MAX_INPUT_LENGTH];
+    char *args;
+
+    args = any_one_arg ( cmd, actor ); // skip "target"
+    args = any_one_arg ( args, actor );
+    args = any_one_arg ( args, var );
+    args = any_one_arg ( args, loc );
+    skip_spaces ( &args );
+
+    if ( !*args )
+    {
+        script_log ( "Trigger [%d] %s, target didn't get enough arguments. Line %d: %s",
+            GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
+
+    Character *ch = get_char ( actor );
+    if ( !ch )
+    {
+        script_log ( "Trigger [%d] %s, target didn't get an actor. Line %d: %s",
+            GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
+
+    bitvector_t location;
+    if ( !strcmp ( loc, "inv" ) )
+        location = FIND_OBJ_INV;
+    else if ( !strcmp ( loc, "eq" ) )
+        location = FIND_OBJ_EQUIP;
+    else if ( !strcmp ( loc, "room" ) )
+        location = FIND_OBJ_ROOM;
+    else if ( !strcmp ( loc, "char" ) )
+        location = FIND_CHAR_ROOM;
+    else
+    {
+        script_log ( "Trigger [%d] %s, target got an invalid search location. Line %d: %s",
+            GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
+
+    Character *tch;
+    obj_data *tobj;
+    generic_find ( args, location, ch, &tch, &tobj );
+    if ( location == FIND_CHAR_ROOM )
+    {
+        if ( tch )
+        {
+            char value[MAX_INPUT_LENGTH];
+            sprintf ( value, "%c%ld", UID_CHAR, GET_ID ( tch ) );
+            add_var ( &GET_TRIG_VARS ( trig ), var, value, 0 );
+        }
+        else
+            add_var ( &GET_TRIG_VARS ( trig ), var, "", 0 );
+    }
+    else
+    {
+        if ( tobj )
+        {
+            char value[MAX_INPUT_LENGTH];
+            sprintf ( value, "%c%ld", UID_CHAR, GET_ID ( tobj ) );
+            add_var ( &GET_TRIG_VARS ( trig ), var, value, 0 );
+        }
+        else
+            add_var ( &GET_TRIG_VARS ( trig ), var, "", 0 );
+    }
+}
+
 void extract_value ( struct script_data *sc, trig_data * trig, char *cmd )
 {
     char buf[MAX_INPUT_LENGTH];
@@ -4149,6 +4223,9 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 
             else if ( !strn_cmp ( cmd, "purgemob", 8 ) )
                 process_purgemob ( go, type, trig, cmd );
+
+            else if ( !strn_cmp ( cmd, "target", 6 ) )
+                process_target ( trig, cmd );
 
             else
             {
