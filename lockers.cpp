@@ -60,9 +60,9 @@ int add_item_to_locker(Character *ch, OBJ_DATA *obj)
     ch->Send( "Your locker is full.\r\n");
     return 0;
   }
-  if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
+  if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && obj->contains)
   {
-    ch->Send( "Containers cannot be stored.\r\n");
+    ch->Send( "You need to empty %s first.\r\n", obj->short_description );
     return 0;
   }
 
@@ -74,6 +74,7 @@ int add_item_to_locker(Character *ch, OBJ_DATA *obj)
   Crash_crashsave(ch);
   return 1;
 }
+
 OBJ_DATA *item_from_locker(Character *ch, OBJ_DATA *obj)
 {
   OBJ_DATA *temp = NULL;
@@ -87,13 +88,19 @@ int remove_item_from_locker(Character *ch, int num)
 {
   OBJ_DATA *obj;
   int count = 1, found = FALSE;
+
   if (!LOCKER_EXPIRE(ch))
   {
-    ch->Send( "{cRYour locker has expired, you have %d items in it.\r\n"
-                     "To regain access to these items, please purchase a new locker.\r\n\r\n", count_locker(ch));
     send_policy(ch);
     return 0;
   }
+  else if (LOCKER_EXPIRE(ch) < time(0))
+  {
+    ch->Send( "{cRYour locker has expired, you have %d items in it.\r\n"
+              "To regain access to these items, please purchase a new locker.\r\n\r\n", count_locker(ch));
+    return 0;
+  }
+
   for (obj = LOCKER(ch); obj; obj = obj->next_content)
   {
     if (count == num)
@@ -125,11 +132,10 @@ int remove_item_from_locker(Character *ch, int num)
 void send_policy(Character *ch)
 {
   ch->Send( "You aren't currently renting a locker.\r\n"
-                   "To rent a locker type: rent <number of items> <number of months>\r\n"
-                   "Where <number of items is the space for items in your locker.\r\n"
-                   "It's 1 bronze per 10 items per month.\r\n"
-                   "You can't rerent a locker until your current lease has expired.\r\n"
-                   "Any items left in the locker when the lease expires will be incinerated.\r\n");
+            "To rent a locker type: rent <number of items> <number of months>\r\n"
+            "Where <number of items> is the space for items in your locker.\r\n"
+            "It's 1 bronze per %d items per month.\r\n"
+            "Containers are allowed, as long as they're empty.\r\n", ITEMS_PER_BRONZE );
 }
 
 void save_locker(Character *ch)
@@ -196,20 +202,12 @@ void list_locker_to_char(Character *ch)
   char buf[MAX_INPUT_LENGTH];
   DYN_DEFINE;
 
-  if (LOCKER_EXPIRE(ch) < time(0))
+  if (!LOCKER_EXPIRE(ch))
   {
-    ch->Send( "{cRSorry but your locker has expired. \r\n"
-                     "To access these items, rent a new locker of any size.{c0\r\n");
+    send_policy(ch);
+    return;
   }
-  else
-  {
-    days = (LOCKER_EXPIRE(ch) - time(0))/SECS_PER_REAL_DAY;
-    ch->Send( "You have %d days left on this locker.\r\n", days);
-    hours = (LOCKER_EXPIRE(ch) - time(0))/SECS_PER_REAL_HOUR;
-    ch->Send( "You have %d hours left on this locker.\r\n", hours);
-    mins = (LOCKER_EXPIRE(ch) - time(0))/SECS_PER_REAL_MIN;
-    ch->Send( "You have %d mins left on this locker.\r\n", mins);
-  }
+
   if (LOCKER(ch))
   {
     DYN_CREATE;
@@ -232,7 +230,25 @@ void list_locker_to_char(Character *ch)
     page_string(ch->desc, dynbuf, DYN_BUFFER);
   }
   else
+  {
     ch->Send( "\r\nYour locker is empty.\r\n");
+    return;
+  }
+
+  if (LOCKER_EXPIRE(ch) < time(0))
+  {
+    ch->Send( "{cRSorry but your locker has expired. \r\n"
+              "To access these items, rent a new locker of any size.{c0\r\n");
+  }
+  else
+  {
+    days = (LOCKER_EXPIRE(ch) - time(0))/SECS_PER_REAL_DAY;
+    ch->Send( "You have %d days left on this locker.\r\n", days);
+    hours = (LOCKER_EXPIRE(ch) - time(0))/SECS_PER_REAL_HOUR;
+    ch->Send( "You have %d hours left on this locker.\r\n", hours);
+    mins = (LOCKER_EXPIRE(ch) - time(0))/SECS_PER_REAL_MIN;
+    ch->Send( "You have %d mins left on this locker.\r\n", mins);
+  }
 }
 
 ACMD(do_locker)
@@ -246,7 +262,8 @@ ACMD(do_locker)
   if (!*arg)
   {
     ch->Send(
-                     "{cCLocker commands: - cost: %d items per bronze per 4 weeks{cy\r\n"
+                     "{cCLocker commands: - cost: %d items per bronze per month\r\n"
+                     "Lockers may have containers, as long as they're empty{cy\r\n"
                      "locker list                 - lists the content of your locker\r\n"
                      "locker put <item>           - puts an item from your inventory into the locker\r\n"
                      "locker get <list number>    - takes an item from a locker\r\n"
@@ -261,7 +278,8 @@ ACMD(do_locker)
   {
   default:
     ch->Send(
-                     "{cCLocker commands: - cost: %d items per bronze per 4 weeks{cy\r\n"
+                     "{cCLocker commands: - cost: %d items per bronze per month\r\n"
+                     "Lockers may have containers, as long as they're empty{cy\r\n"
                      "locker list                 - lists the content of your locker\r\n"
                      "locker put <item>           - puts an item from your inventory into the locker\r\n"
                      "locker get <list number>    - takes an item from a locker\r\n"
@@ -390,7 +408,7 @@ void rent_locker(Character *ch, int size,int months)
   int payment = 0;
   time_t adding = 0;
 
-  if (size%ITEMS_PER_BRONZE)
+  if (size % ITEMS_PER_BRONZE)
   {
     ch->Send( "The size of the locker needs to be a multiple of %d.\r\n", ITEMS_PER_BRONZE);
     return;
@@ -401,8 +419,8 @@ void rent_locker(Character *ch, int size,int months)
 
   if (payment < cost)
   {
-    ch->Send( "You can't afford something of that size and length\r\n"
-                     "It's cost would be %d bronze. You have %d bronze.\r\n", cost, payment);
+    ch->Send( "You can't afford something of that size and length.\r\n"
+              "It's cost would be %d bronze. You have %d bronze.\r\n", cost, payment);
     return;
 
   }

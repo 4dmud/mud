@@ -1648,7 +1648,10 @@ ACMD ( do_gen_door )
     skip_spaces ( &argument );
     if ( !*argument )
     {
-        ch->Send ( "%s what?\r\n", cmd_door[subcmd] );
+        char buf[MAX_INPUT_LENGTH];
+        strcpy ( buf, cmd_door[subcmd] );
+        CAP ( buf );
+        ch->Send ( "%s what?\r\n", buf );
         return;
     }
     two_arguments ( argument, type, dir );
