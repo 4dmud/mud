@@ -339,9 +339,7 @@ void zedit_new_zone(Character *ch, zone_vnum vzone_num, room_vnum bottom, room_v
  */
 void zedit_save_internally(Descriptor *d)
 {
-  int	mobloaded = FALSE,
-    objloaded = FALSE,
-    subcmd;
+  int mobloaded = FALSE, objloaded = FALSE, subcmd;
   room_rnum room_num = real_room(OLC_NUM(d));
 
   if (room_num == NULL) {
@@ -369,9 +367,9 @@ void zedit_save_internally(Descriptor *d)
       case 'G':
       case 'E':
         if (mobloaded) {
-    objloaded = TRUE;
+          objloaded = TRUE;
           break;
-      }
+        }
         d->Output( "Equip/Give command not saved since no mob was loaded first.\r\n");
         continue;
       case 'P':

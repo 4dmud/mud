@@ -2443,12 +2443,17 @@ void renum_zone_table ( void )
             {
                 case 'M':
                     a = ZCMD.arg1;
+                    if ( !MobProtoExists ( a ) )
+                        a = NOWHERE;
                     c = ZCMD.arg3;
+                    if ( !real_room ( c ) )
+                        c = NOWHERE;
                     break;
                 case 'O':
                     a = ZCMD.arg1 = real_object ( ZCMD.arg1 );
-                    if ( ZCMD.arg3 != NOWHERE )
-                        c = ZCMD.arg3;
+                    c = ZCMD.arg3;
+                    if ( !real_room ( c ) )
+                        c = NOWHERE;
                     break;
                 case 'G':
                     a = ZCMD.arg1 = real_object ( ZCMD.arg1 );
@@ -2462,22 +2467,34 @@ void renum_zone_table ( void )
                     break;
                 case 'D':
                     a = ZCMD.arg1;
+                    if ( !real_room ( a ) )
+                        a = NOWHERE;
                     break;
                 case 'R':          /* rem obj from room */
                     a = ZCMD.arg1;
+                    if ( !real_room ( a ) )
+                        a = NOWHERE;
                     b = ZCMD.arg2 = real_object ( ZCMD.arg2 );
                     break;
                 case 'T':          /* a trigger */
                     b = ZCMD.arg2 = real_trigger ( ZCMD.arg2 );  // added by mord
-                    c = ZCMD.arg3;   // added by mord
+                    if ( ZCMD.arg1 == WLD_TRIGGER )
+                    {
+                        c = ZCMD.arg3;   // added by mord
+                        if ( !real_room ( c ) )
+                            c = NOWHERE;
+                    }
                     break;
                 case 'V':          /* trigger variable assignment */
                     b = ZCMD.arg3;   //added by mord
+                    if ( !real_room ( b ) )
+                        b = NOWHERE;
                     break;
                 case 'B':
                     a = ZCMD.arg1 = real_object ( ZCMD.arg1 );
-                    if ( ZCMD.arg3 != NOWHERE )
-                        c = ZCMD.arg3 = real_object ( ZCMD.arg3 );
+                    c = ZCMD.arg3;
+                    if ( !real_room ( c ) )
+                        c = NOWHERE;
                     break;
             }
             if ( a == NOWHERE || b == NOWHERE || c == NOWHERE )
@@ -5073,7 +5090,7 @@ void reset_zone ( zone_rnum zone )
                 }
                 if ( ( obj_index[ZCMD.arg1].number < ZCMD.arg2 ) )
                 {
-                    if ( ZCMD.arg3 >= 0 )
+                    if ( real_room ( ZCMD.arg3 ) )
                     {
                         if ( !get_obj_in_list_num
                                 ( ZCMD.arg1, world_vnum[ZCMD.arg3]->contents ) )

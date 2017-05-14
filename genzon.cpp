@@ -490,10 +490,10 @@ void add_cmd_to_list(vector<reset_com> &list, reset_com &newcmd, int pos) {
     vector< vector<string> > sargs( list.size() + 1, vector<string> (2) );
 
     if (pos == list.size()) {
-    reset_com rc = reset_com();
-    rc.command = 'S';
-    (*(list.end() -1)) = newcmd;
-    list.push_back(rc);
+        reset_com rc = reset_com();
+        rc.command = 'S';
+        (*(list.end() -1)) = newcmd;
+        list.push_back(rc);
     } else {
     // list.insert calls ~reset_com which frees the strings
     for ( int i = 0; i < list.size(); ++i ) {
