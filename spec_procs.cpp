@@ -668,16 +668,21 @@ SPECIAL(clan_deeds)
       ch->Send("You are not in any clan!\r\n");
       return TRUE;
   }
+
   for (cl = clan[i].deeds; cl; cl = cl_next) {
       cl_next = cl->next;
       if ((is_same_zone(cl->zone, GET_OBJ_VAL(deed, 0)))) {
-          ch->Send("Your clan has already claimed this deed.\r\n");
+          ch->Send ( "You claim the deed under your own name.\r\n" );
+          free ( cl->name );
+          cl->name = strdup ( GET_NAME ( ch ) );
+          extract_obj ( deed );
+          save_clans();
           return TRUE;
       }
   }
 
-  /* Assume the clan does not have this deed, lets put the deed */
-  /* in the box and give the clan the bonuses.                  */
+  /* The clan does not have this deed, lets put the deed */
+  /* in the box and give the clan the bonuses.           */
   CREATE(cd, struct clan_deed_type, 1);
   cd->zone = GET_OBJ_VAL(deed, 0);
   cd->name = strdup(GET_NAME(ch));
@@ -692,14 +697,14 @@ SPECIAL(clan_deeds)
               REMOVE_FROM_LIST(cl, clan[j].deeds, next);
               for ( Descriptor *d = descriptor_list; d; d = d->next )
                   if ( STATE ( d ) == CON_PLAYING && !PRF_FLAGGED ( d->character, PRF_NODEEDSPAM ) )
-                      d->character->Send("{cY%s just lost the '%s' to %s of the %s clan!\r\n{cn", clan[j].name, deed->short_description, GET_NAME(ch), clan[i].name);
+                      d->character->Send("{cY%s just lost the '%s' to %s of the %s clan!\r\n{cn",
+                          clan[j].name, deed->short_description, GET_NAME(ch), clan[i].name);
               free(cl->name);
               free(cl);
           }
       }
   }
 
-  obj_from_char(deed);
   extract_obj(deed);
   GET_DEED_COUNT(ch) += 1;
 
