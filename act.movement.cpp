@@ -1046,6 +1046,8 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
         }
         if (FOUND)
             act("A herd has arrived, following the leader.", TRUE, ch, 0, NULL, TO_ROOM);
+        else
+            act ( "$n has arrived.", TRUE, ch, 0, 0, TO_ROOM );
     }
 
 

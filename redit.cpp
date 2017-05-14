@@ -341,19 +341,33 @@ void redit_disp_extradesc_menu(Descriptor *d)
 {
   struct extra_descr_data *extra_desc = OLC_DESC(d);
 
+  string keywords;
+  for ( const extra_descr_data *ex_desc = OLC_ROOM(d)->ex_description; ex_desc; ex_desc = ex_desc->next )
+  {
+      keywords += "[{cc";
+      if ( ex_desc->keyword && *ex_desc->keyword )
+          keywords += string ( ex_desc->keyword );
+      else
+          keywords += "<none>";
+      keywords += "{c0] ";
+  }
+
   clear_screen(d);
   d->Output(
+                  "Keywords: %s\r\n"
                   "%s1%s) Keyword: %s%s\r\n"
                   "%s2%s) Description:\r\n%s%s\r\n"
-                  "%s3%s) Goto next description: ",
+                  "%s3%s) Goto next description: %s\r\n"
+                  "%s4%s) Goto keyword\r\n"
+                  "Enter choice (0 to quit) : ",
 
+                  keywords.c_str(),
                   grn, nrm, yel, extra_desc->keyword ? extra_desc->keyword : "<NONE>",
                   grn, nrm, yel, extra_desc->description ? extra_desc->description : "<NONE>",
+                  grn, nrm, !extra_desc->next ? "<NOT SET>" : "Set.",
                   grn, nrm
                  );
 
-  d->Output( !extra_desc->next ? "<NOT SET>\r\n" : "Set.\r\n");
-  d->Output( "Enter choice (0 to quit) : ");
   OLC_MODE(d) = REDIT_EXTRADESC_MENU;
 }
 
@@ -395,57 +409,101 @@ void redit_disp_look_above_menu(Descriptor *d)
 {
   struct extra_descr_data *extra_desc = OLC_LADESC(d);
 
+  string keywords;
+  for ( const extra_descr_data *ex_desc = OLC_ROOM(d)->look_above_description; ex_desc; ex_desc = ex_desc->next )
+  {
+      keywords += "[{cc";
+      if ( ex_desc->keyword && *ex_desc->keyword )
+          keywords += string ( ex_desc->keyword );
+      else
+          keywords += "<none>";
+      keywords += "{c0] ";
+  }
+
   clear_screen(d);
   d->Output(
+                  "Keywords: %s\r\n"
                   "%s1%s) Keyword: %s%s\r\n"
                   "%s2%s) Description:\r\n%s%s\r\n"
-                  "%s3%s) Goto next look above description: ",
+                  "%s3%s) Goto next look above description: %s\r\n"
+                  "%s4%s) Goto keyword\r\n"
+                  "Enter choice (0 to quit) : ",
 
+                  keywords.c_str(),
                   grn, nrm, yel, extra_desc->keyword ? extra_desc->keyword : "<NONE>",
                   grn, nrm, yel, extra_desc->description ? extra_desc->description : "<NONE>",
+                  grn, nrm, !extra_desc->next ? "<NOT SET>" : "Set.",
                   grn, nrm
                  );
 
-  d->Output( !extra_desc->next ? "<NOT SET>\r\n" : "Set.\r\n");
-  d->Output( "Enter choice (0 to quit) : ");
   OLC_MODE(d) = REDIT_LOOK_ABOVE_MENU;
 }
+
 void redit_disp_look_under_menu(Descriptor *d)
 {
   struct extra_descr_data *extra_desc = OLC_LUDESC(d);
 
+  string keywords;
+  for ( const extra_descr_data *ex_desc = OLC_ROOM(d)->look_under_description; ex_desc; ex_desc = ex_desc->next )
+  {
+      keywords += "[{cc";
+      if ( ex_desc->keyword && *ex_desc->keyword )
+          keywords += string ( ex_desc->keyword );
+      else
+          keywords += "<none>";
+      keywords += "{c0] ";
+  }
+
   clear_screen(d);
   d->Output(
+                  "Keywords: %s\r\n"
                   "%s1%s) Keyword: %s%s\r\n"
                   "%s2%s) Description:\r\n%s%s\r\n"
-                  "%s3%s) Goto next look under description: ",
+                  "%s3%s) Goto next look under description: %s\r\n"
+                  "%s4%s) Goto keyword\r\n"
+                  "Enter choice (0 to quit) : ",
 
+                  keywords.c_str(),
                   grn, nrm, yel, extra_desc->keyword ? extra_desc->keyword : "<NONE>",
                   grn, nrm, yel, extra_desc->description ? extra_desc->description : "<NONE>",
+                  grn, nrm, !extra_desc->next ? "<NOT SET>" : "Set.",
                   grn, nrm
                  );
 
-  d->Output( !extra_desc->next ? "<NOT SET>\r\n" : "Set.\r\n");
-  d->Output( "Enter choice (0 to quit) : ");
   OLC_MODE(d) = REDIT_LOOK_UNDER_MENU;
 }
+
 void redit_disp_look_behind_menu(Descriptor *d)
 {
   struct extra_descr_data *extra_desc = OLC_LBDESC(d);
 
+  string keywords;
+  for ( const extra_descr_data *ex_desc = OLC_ROOM(d)->look_behind_description; ex_desc; ex_desc = ex_desc->next )
+  {
+      keywords += "[{cc";
+      if ( ex_desc->keyword && *ex_desc->keyword )
+          keywords += string ( ex_desc->keyword );
+      else
+          keywords += "<none>";
+      keywords += "{c0] ";
+  }
+
   clear_screen(d);
   d->Output(
+                  "Keywords: %s\r\n"
                   "%s1%s) Keyword: %s%s\r\n"
                   "%s2%s) Description:\r\n%s%s\r\n"
-                  "%s3%s) Goto next look behind description: ",
+                  "%s3%s) Goto next look behind description: %s\r\n"
+                  "%s4%s) Goto keyword\r\n"
+                  "Enter choice (0 to quit) : ",
 
+                  keywords.c_str(),
                   grn, nrm, yel, extra_desc->keyword ? extra_desc->keyword : "<NONE>",
                   grn, nrm, yel, extra_desc->description ? extra_desc->description : "<NONE>",
+                  grn, nrm, !extra_desc->next ? "<NOT SET>" : "Set.",
                   grn, nrm
                  );
 
-  d->Output( !extra_desc->next ? "<NOT SET>\r\n" : "Set.\r\n");
-  d->Output( "Enter choice (0 to quit) : ");
   OLC_MODE(d) = REDIT_LOOK_BEHIND_MENU;
 }
 /*
@@ -1195,6 +1253,24 @@ void redit_parse(Descriptor *d, char *arg)
     redit_disp_extradesc_menu(d);
     return;
 
+  case REDIT_EXTRADESC_KEYWORD:
+  {
+      // jump to the first extra desc matching the keyword(s) completely
+      extra_descr_data *temp = OLC_ROOM ( d )->ex_description;
+      while ( temp )
+      {
+          if ( temp->keyword && *temp->keyword && !strcmp ( temp->keyword, arg ) )
+              break;
+          temp = temp->next;
+      }
+      if ( temp )
+          OLC_DESC ( d ) = temp;
+      else
+          d->Output ( "No match found.\r\n\r\n" );
+      redit_disp_extradesc_menu ( d );
+      return;
+  }
+
   case REDIT_EXTRADESC_MENU:
     switch ((num = atoi(arg)))
     {
@@ -1258,6 +1334,11 @@ void redit_parse(Descriptor *d, char *arg)
         redit_disp_extradesc_menu(d);
       }
       return;
+    case 4:
+       // Go to the first extra desc that matches the keyword that will be entered
+       d->Output ( "Enter keyword(s):\r\n" );
+       OLC_MODE ( d ) = REDIT_EXTRADESC_KEYWORD;
+       return;
     }
     break;
 
@@ -1268,6 +1349,24 @@ void redit_parse(Descriptor *d, char *arg)
       if (OLC_LUDESC(d)->keyword)
         free(OLC_LUDESC(d)->keyword);
       OLC_LUDESC(d)->keyword = str_udup(arg);
+    }
+    redit_disp_look_under_menu(d);
+    return;
+  case REDIT_LOOK_UNDER_KEYWORD:
+    if (genolc_checkstring(d, arg))
+    {
+        // jump to the first extra desc matching the keyword(s) completely
+        extra_descr_data *temp = OLC_ROOM ( d )->look_under_description;
+        while ( temp )
+        {
+            if ( temp->keyword && *temp->keyword && !strcmp ( temp->keyword, arg ) )
+                break;
+            temp = temp->next;
+        }
+        if ( temp )
+            OLC_LUDESC ( d ) = temp;
+        else
+            d->Output ( "No match found.\r\n\r\n" );
     }
     redit_disp_look_under_menu(d);
     return;
@@ -1334,6 +1433,11 @@ void redit_parse(Descriptor *d, char *arg)
         redit_disp_look_under_menu(d);
       }
       return;
+    case 4:
+       // Go to the first extra desc that matches the keyword that will be entered
+       d->Output ( "Enter keyword(s):\r\n" );
+       OLC_MODE ( d ) = REDIT_LOOK_UNDER_KEYWORD;
+       return;
     }
     break;
   case REDIT_LOOK_BEHIND_KEY:
@@ -1342,6 +1446,24 @@ void redit_parse(Descriptor *d, char *arg)
       if (OLC_LBDESC(d)->keyword)
         free(OLC_LBDESC(d)->keyword);
       OLC_LBDESC(d)->keyword = str_udup(arg);
+    }
+    redit_disp_look_behind_menu(d);
+    return;
+  case REDIT_LOOK_BEHIND_KEYWORD:
+    if (genolc_checkstring(d, arg))
+    {
+        // jump to the first extra desc matching the keyword(s) completely
+        extra_descr_data *temp = OLC_ROOM ( d )->look_behind_description;
+        while ( temp )
+        {
+            if ( temp->keyword && *temp->keyword && !strcmp ( temp->keyword, arg ) )
+                break;
+            temp = temp->next;
+        }
+        if ( temp )
+            OLC_LBDESC ( d ) = temp;
+        else
+            d->Output ( "No match found.\r\n\r\n" );
     }
     redit_disp_look_behind_menu(d);
     return;
@@ -1410,6 +1532,11 @@ void redit_parse(Descriptor *d, char *arg)
         redit_disp_look_behind_menu(d);
       }
       return;
+    case 4:
+       // Go to the first extra desc that matches the keyword that will be entered
+       d->Output ( "Enter keyword(s):\r\n" );
+       OLC_MODE ( d ) = REDIT_LOOK_BEHIND_KEYWORD;
+       return;
     }
     break;
   case REDIT_LOOK_ABOVE_KEY:
@@ -1418,6 +1545,24 @@ void redit_parse(Descriptor *d, char *arg)
       if (OLC_LADESC(d)->keyword)
         free(OLC_LADESC(d)->keyword);
       OLC_LADESC(d)->keyword = str_udup(arg);
+    }
+    redit_disp_look_above_menu(d);
+    return;
+  case REDIT_LOOK_ABOVE_KEYWORD:
+    if (genolc_checkstring(d, arg))
+    {
+        // jump to the first extra desc matching the keyword(s) completely
+        extra_descr_data *temp = OLC_ROOM ( d )->look_above_description;
+        while ( temp )
+        {
+            if ( temp->keyword && *temp->keyword && !strcmp ( temp->keyword, arg ) )
+                break;
+            temp = temp->next;
+        }
+        if ( temp )
+            OLC_LADESC ( d ) = temp;
+        else
+            d->Output ( "No match found.\r\n\r\n" );
     }
     redit_disp_look_above_menu(d);
     return;
@@ -1484,6 +1629,11 @@ void redit_parse(Descriptor *d, char *arg)
         redit_disp_look_above_menu(d);
       }
       return;
+    case 4:
+       // Go to the first extra desc that matches the keyword that will be entered
+       d->Output ( "Enter keyword(s):\r\n" );
+       OLC_MODE ( d ) = REDIT_LOOK_ABOVE_KEYWORD;
+       return;
     }
     break;
     /*-----end-----*/

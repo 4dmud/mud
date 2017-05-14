@@ -398,19 +398,36 @@ void oedit_disp_extradesc_menu ( Descriptor *d )
 {
     struct extra_descr_data *extra_desc = OLC_DESC ( d );
 
+    string keywords;
+    for ( const extra_descr_data *ex_desc = OLC_OBJ ( d )->ex_description; ex_desc; ex_desc = ex_desc->next )
+    {
+        keywords += "[{cc";
+        if ( ex_desc->keyword && *ex_desc->keyword )
+            keywords += string ( ex_desc->keyword );
+        else
+            keywords += "<none>";
+        keywords += "{c0] ";
+    }
+
     get_char_colours ( d->character );
     clear_screen ( d );
     d->Output (
         "Extra desc menu\r\n"
+        "Keywords: %s\r\n"
         "%s1%s) Keyword: %s%s\r\n"
         "%s2%s) Description:\r\n%s%s\r\n"
         "%s3%s) Goto next description: %s\r\n"
+        "%s4%s) Goto keyword\r\n"
         "%s0%s) Quit\r\n"
         "Enter choice : ",
 
+        keywords.c_str(),
         grn, nrm, yel, ( extra_desc->keyword && *extra_desc->keyword ) ? extra_desc->keyword : "<NONE>",
         grn, nrm, yel, ( extra_desc->description && *extra_desc->description ) ? extra_desc->description : "<NONE>",
-        grn, nrm, !extra_desc->next ? "<Not set>\r\n" : "Set.", grn, nrm );
+        grn, nrm, !extra_desc->next ? "<Not set>\r\n" : "Set.",
+        grn, nrm,
+        grn, nrm
+    );
     OLC_MODE ( d ) = OEDIT_EXTRADESC_MENU;
 }
 
@@ -1880,76 +1897,94 @@ void oedit_parse ( Descriptor *d, char *arg )
             oedit_disp_extradesc_menu ( d );
             return;
 
-                case OEDIT_ATTACHMENT_MENU:
-                        switch ((num = atoi(arg)))
-                        {
-                               case 0:
-                                   if (OLC_ATTACHMENT(d)->type == 0)
-                                   {
-                                       struct vehicle_attachment_data *temp;
-                                       REMOVE_FROM_LIST(OLC_ATTACHMENT(d), OLC_OBJ(d)->attachment, next);
-                                       free(OLC_ATTACHMENT(d));
-                                       OLC_ATTACHMENT(d) = NULL;
-                                   }
-                                   oedit_disp_menu(d);
-                                   break;
-                               case 1:
-                                   OLC_MODE(d) = OEDIT_ATTACHMENT_TYPE;
-                                   oedit_disp_attachment_type(d);
-                                   break;
-                               case 2:
-                                   d->Output("Enter value : ");
-                                   OLC_MODE(d) = OEDIT_ATTACHMENT_VALUE;
-                                   break;
-                               case 3:
-                                   d->Output("Enter value : ");
-                                   OLC_MODE(d) = OEDIT_ATTACHMENT_MAX_VALUE;
-                                   break;
-                               case 4:
-                                   if (OLC_ATTACHMENT(d)->type != 0) {
-                                       if (OLC_ATTACHMENT(d)->next)
-                                           OLC_ATTACHMENT(d) = OLC_ATTACHMENT(d)->next;
-                                       else {
-                                           struct vehicle_attachment_data *nv;
-                                           CREATE(nv, struct vehicle_attachment_data, 1);
-                                           OLC_ATTACHMENT(d)->next = nv;
-                                           OLC_ATTACHMENT(d) = OLC_ATTACHMENT(d)->next;
-                                       }
-                                    }
-                                      /* No break required here */
-                               default:
-                                   oedit_disp_attachment_menu(d);
-                                   break;
-                        }
-                        return;
-                        break;
-                case OEDIT_ATTACHMENT_TYPE:
-                    int i;
-                    for (i = 0; ; i++)
-                        if (attachment_types[i][0] == '\n') break;
-                    num = atoi(arg);
-                    if (num < 0 || num > i) {
-                        d->Output("Wrong choice.\r\n");
-                        oedit_disp_attachment_type(d);
-                        return;
+        case OEDIT_EXTRADESC_KEYWORD:
+        {
+            // jump to the first extra desc matching the keyword(s) completely
+            extra_descr_data *temp = OLC_OBJ ( d )->ex_description;
+            while ( temp )
+            {
+                if ( temp->keyword && *temp->keyword && !strcmp ( temp->keyword, arg ) )
+                    break;
+                temp = temp->next;
+            }
+            if ( temp )
+                OLC_DESC ( d ) = temp;
+            else
+                d->Output ( "No match found.\r\n\r\n" );
+            oedit_disp_extradesc_menu ( d );
+            return;
+        }
+        case OEDIT_ATTACHMENT_MENU:
+            switch ((num = atoi(arg)))
+            {
+                case 0:
+                    if (OLC_ATTACHMENT(d)->type == 0)
+                    {
+                        struct vehicle_attachment_data *temp;
+                        REMOVE_FROM_LIST(OLC_ATTACHMENT(d), OLC_OBJ(d)->attachment, next);
+                        free(OLC_ATTACHMENT(d));
+                        OLC_ATTACHMENT(d) = NULL;
                     }
-                    if (num)
-                        OLC_ATTACHMENT(d)->type = num;
-                    OLC_VAL(d) = 1;
+                    oedit_disp_menu(d);
+                    break;
+                case 1:
+                    OLC_MODE(d) = OEDIT_ATTACHMENT_TYPE;
+                    oedit_disp_attachment_type(d);
+                    break;
+                case 2:
+                    d->Output("Enter value : ");
+                    OLC_MODE(d) = OEDIT_ATTACHMENT_VALUE;
+                    break;
+                case 3:
+                    d->Output("Enter value : ");
+                    OLC_MODE(d) = OEDIT_ATTACHMENT_MAX_VALUE;
+                    break;
+                case 4:
+                    if (OLC_ATTACHMENT(d)->type != 0) {
+                        if (OLC_ATTACHMENT(d)->next)
+                            OLC_ATTACHMENT(d) = OLC_ATTACHMENT(d)->next;
+                        else {
+                            struct vehicle_attachment_data *nv;
+                            CREATE(nv, struct vehicle_attachment_data, 1);
+                            OLC_ATTACHMENT(d)->next = nv;
+                            OLC_ATTACHMENT(d) = OLC_ATTACHMENT(d)->next;
+                        }
+                    }
+                    /* No break required here */
+                default:
                     oedit_disp_attachment_menu(d);
+                    break;
+            }
+            return;
+            break;
+        case OEDIT_ATTACHMENT_TYPE:
+            int i;
+            for (i = 0; ; i++)
+                if (attachment_types[i][0] == '\n')
+                    break;
+                num = atoi(arg);
+                if (num < 0 || num > i) {
+                    d->Output("Wrong choice.\r\n");
+                    oedit_disp_attachment_type(d);
                     return;
+                }
+                if (num)
+                    OLC_ATTACHMENT(d)->type = num;
+                OLC_VAL(d) = 1;
+                oedit_disp_attachment_menu(d);
+                return;
 
-                case OEDIT_ATTACHMENT_VALUE:
-                    OLC_ATTACHMENT(d)->value = atoi(arg);
-                    OLC_VAL(d) = 1;
-                    oedit_disp_attachment_menu(d);
-                    return;
+        case OEDIT_ATTACHMENT_VALUE:
+            OLC_ATTACHMENT(d)->value = atoi(arg);
+            OLC_VAL(d) = 1;
+            oedit_disp_attachment_menu(d);
+            return;
 
-                case OEDIT_ATTACHMENT_MAX_VALUE:
-                    OLC_ATTACHMENT(d)->max_value = atoi(arg);
-                    OLC_VAL(d) = 1;
-                    oedit_disp_attachment_menu(d);
-                    return;
+        case OEDIT_ATTACHMENT_MAX_VALUE:
+            OLC_ATTACHMENT(d)->max_value = atoi(arg);
+            OLC_VAL(d) = 1;
+            oedit_disp_attachment_menu(d);
+            return;
 
         case OEDIT_EXTRADESC_MENU:
             switch ( ( num = atoi ( arg ) ) )
@@ -2008,9 +2043,13 @@ void oedit_parse ( Descriptor *d, char *arg )
                             OLC_DESC ( d ) = OLC_DESC ( d )->next;
                         }
                     }
-                    /*
-                     * No break - drop into default case.
-                     */
+                    oedit_disp_extradesc_menu ( d );
+                    return;
+                case 4:
+                    // Go to the first extra desc that matches the keyword that will be entered
+                    d->Output ( "Enter keyword(s):\r\n" );
+                    OLC_MODE ( d ) = OEDIT_EXTRADESC_KEYWORD;
+                    return;
                 default:
                     oedit_disp_extradesc_menu ( d );
                     return;
