@@ -2828,7 +2828,14 @@ int Descriptor::process_input() {
     nl_pos = strchr(inbuf, '\n');
 
     if (nl_pos == NULL)
-        return (0);
+    {
+        nl_pos = inbuf + bytes_read - 1;
+        *nl_pos = '\n';
+        char buffer[MAX_INPUT_LENGTH];
+        snprintf ( buffer, sizeof buffer, "The line was too long.\r\n" );
+        if ( write_to_descriptor ( descriptor, buffer, comp) < 0 )
+            return -1;
+    }
 
     /*
      * okay, at this point we have at least one newline in the string; now we
