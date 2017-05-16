@@ -306,8 +306,8 @@ SPECIAL(vehicle) {
         }
     else if ( GET_OBJ_TYPE(obj) == ITEM_VEHICLE || GET_OBJ_TYPE(obj) == ITEM_VEHICLE2 )
     {
-            act("You climb into $o.", TRUE, ch, obj, 0, TO_CHAR);
-            act("$n climbs into $o.", TRUE, ch, obj, 0, TO_ROOM);
+            act("You climb into $p.", TRUE, ch, obj, 0, TO_CHAR);
+            act("$n climbs into $p.", TRUE, ch, obj, 0, TO_ROOM);
             move_char_to(ch, real_room(GET_OBJ_VAL(obj, 0)));
             act("$n climbs in.", TRUE, ch, 0, 0, TO_ROOM);
             do_look(ch, (char *)"", 0, 0);
@@ -952,11 +952,13 @@ room_vnum find_new_vehicle_room()
 
 int create_vehicle_room(struct obj_data *obj)
 {
-  Room *vroom;
-//  char buf[MAX_STRING_LENGTH];
-//  room_vnum vnum;
-
-  vroom = world_vnum[ GET_OBJ_VAL ( obj, 0 ) ];
+  Room *vroom = real_room ( GET_OBJ_VAL ( obj, 0 ) );
+  if ( !vroom )
+  {
+      new_mudlog ( BRF, LVL_GOD, TRUE, "SYSERR: vehicle [%d] %s, has an invalid vehicle room set",
+          GET_OBJ_VNUM ( obj ), obj->short_description );
+      return -1;
+  }
   vroom->vehicle = obj;
   ASSIGNOBJ ( GET_OBJ_VNUM ( obj ), vehicle );
   ASSIGNROOM ( vroom->number, vehicle2 );
