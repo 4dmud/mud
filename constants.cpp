@@ -504,6 +504,7 @@ const vector< vector<const char*> > origin_names =
       "lamb" },
     // 9 ORIGIN_NORMAL_ANIMAL
     { "antelope",
+      "boar",
       "bronco",
       "buck",
       "bull",
@@ -567,6 +568,7 @@ const vector< vector<const char*> > origin_names =
       "racoon",
       "rat",
       "rodent",
+      "she-wolf",
       "silverfox",
       "skunk",
       "squirrel",

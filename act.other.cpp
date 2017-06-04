@@ -2426,6 +2426,68 @@ ACMD ( do_pagewidth )
     ch->save();
 }
 
+ACMD ( do_wire )
+{
+    skip_spaces ( &argument );
+    char arg[MAX_INPUT_LENGTH];
+    argument = any_one_arg ( argument, arg );
+    skip_spaces ( &argument );
+    int tps = atoi ( arg );
+
+    if ( tps == 0 )
+    {
+        ch->Send ( "Usage: wire <number of TPs> <player name>\r\n" );
+        return;
+    }
+    else if ( tps < 0 )
+    {
+        ch->Send ( "Who are you, Robin Hood?\r\n" );
+        return;
+    }
+    else if ( !IS_IMM ( ch ) && tps > TRADEPOINTS ( ch ) )
+    {
+        ch->Send ( "You can't wire that many tradepoints, you've only got %d of them.\r\n", TRADEPOINTS ( ch ) );
+        return;
+    }
+
+    if ( !*argument )
+    {
+        ch->Send ( "Usage: wire <number of TPs> <player name>\r\n" );
+        return;
+    }
+
+    Character *player = nullptr;
+    for ( Descriptor *d = descriptor_list; d; d = d->next )
+    {
+        Character *i = d->character;
+        if ( IS_PLAYING ( d ) && i && isname_hard ( argument, GET_NAME ( i ) ) )
+        {
+            player = i;
+            break;
+        }
+    }
+
+    if ( !player )
+    {
+        ch->Send ( "There's no player called %s online.\r\n", argument );
+        return;
+    }
+
+    TRADEPOINTS ( player ) += tps;
+    ch->Send ( "You wire %d tradepoints to %s.\r\n", tps, GET_NAME ( player ) );
+    player->Send ( "%s wired %d tradepoints to your account.\r\n", GET_NAME ( ch ), tps );
+
+    if ( IS_IMM ( ch ) )
+        new_mudlog ( CMP, LVL_IMMORT, TRUE, "%s wired %d tradepoints to %s (%d)", GET_NAME ( ch ),
+            tps, GET_NAME ( player ), TRADEPOINTS ( player ) );
+    else
+    {
+        TRADEPOINTS ( ch ) -= tps;
+        new_mudlog ( CMP, LVL_IMMORT, TRUE, "%s (%d) wired %d tradepoints to %s (%d)", GET_NAME ( ch ),
+            TRADEPOINTS ( ch ), tps, GET_NAME ( player ), TRADEPOINTS ( player ) );
+    }
+}
+
 // System use only!!!
 ACMD(do_fake_cmd)
 {

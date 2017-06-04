@@ -1340,13 +1340,17 @@ struct obj_data *unequip_char ( Character *ch, int pos, bool show_wear_off_msg )
 
     if ( obj->obj_flags.obj_innate > 0 )
     {
+        bool wear_off_shown = FALSE;
         for ( aff = ch->affected; aff; aff = anext )
         {
             anext = aff->next;
             if ( aff->type == obj->obj_flags.obj_innate )
             {
-                if ( show_wear_off_msg && spell_info[aff->type].wear_off_msg && *spell_info[aff->type].wear_off_msg )
+                if ( !wear_off_shown && show_wear_off_msg && spell_info[aff->type].wear_off_msg && *spell_info[aff->type].wear_off_msg )
+                {
                     ch->Send ( "%s\r\n", spell_info[aff->type].wear_off_msg );
+                    wear_off_shown = TRUE;
+                }
                 ch->affect_remove ( aff );
             }
         }

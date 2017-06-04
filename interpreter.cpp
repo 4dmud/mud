@@ -335,6 +335,7 @@ ACMD ( do_where );
 ACMD ( do_who );
 ACMD ( do_wield );
 ACMD ( do_wimpy );
+ACMD ( do_wire );
 ACMD ( do_wizlock );
 ACMD ( do_wiznet );
 ACMD ( do_wizsplit );
@@ -941,8 +942,9 @@ const command_info cmd_info[] =
     { "whisper"  , "whis"     , POS_RESTING , do_spec_comm, 0, SCMD_WHISPER, 0 },
     { "wield"    , "wie" , POS_RESTING , do_wield    , 0, 0, 0 },
     { "wimpy"    , "wim" , POS_DEAD    , do_wimpy    , 0, 0, 0 },
-    { "withdraw" , "with"     , POS_STANDING, do_not_here , 1, 0, 0 },
-    { "wiz"	 , "wiz"	, POS_DEAD, do_wizsplit, 0, 0, 0 },
+    { "wire"     , "wire", POS_DEAD    , do_wire     , 0, 0, 0 },
+    { "withdraw" , "with", POS_STANDING, do_not_here , 1, 0, 0 },
+    { "wiz"	     , "wiz" , POS_DEAD    , do_wizsplit , 0, 0, 0 },
     //    { "wiznet"   , "wiz" , POS_DEAD    , do_wiznet   , LVL_HERO+1, 0, WIZ_IMM1_GRP },
     //    { ";"        , ";"   , POS_DEAD    , do_wiznet   , LVL_HERO+1, 0, WIZ_IMM1_GRP },
     { "wiznet"   , "wiz" , POS_DEAD    , do_wiznet   , 0, 0, 0 },
