@@ -3647,6 +3647,12 @@ void process_target ( trig_data *trig, char *cmd )
     }
 }
 
+void process_log ( trig_data *trig, char *cmd )
+{
+    new_mudlog ( CMP, LVL_IMMORT, TRUE, "Trigger [%d] %s: %s", GET_TRIG_VNUM ( trig ),
+        GET_TRIG_NAME ( trig ), cmd );
+}
+
 void extract_value ( struct script_data *sc, trig_data * trig, char *cmd )
 {
     char buf[MAX_INPUT_LENGTH];
@@ -4226,6 +4232,9 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 
             else if ( !strn_cmp ( cmd, "target", 6 ) )
                 process_target ( trig, cmd );
+
+            else if  (!strn_cmp ( cmd, "log", 3 ) )
+                process_log ( trig, cmd );
 
             else
             {

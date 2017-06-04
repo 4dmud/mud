@@ -1195,7 +1195,7 @@ ASKILL ( skill_steal )
         }
     }
 
-    if ( ohoh && IS_NPC ( vict ) && AWAKE ( vict ) )
+    if ( ohoh && IS_NPC ( vict ) && AWAKE ( vict ) && GET_MOB_SPEC ( vict ) != shop_keeper )
         start_fighting ( vict, ch );
     return ( !ohoh ? SKILL_STEAL : 0 );
 }
