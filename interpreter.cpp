@@ -1239,6 +1239,7 @@ void command_interpreter ( Character *ch, char *argument, trig_data *trig )
         {
             case POS_DEAD:
                 ch->Send ( "Lie still; you are DEAD!!! :-(\r\n" );
+                ch->Send ( "You can wait for someone to heal you or type die.\r\n" );
                 break;
             case POS_INCAP:
             case POS_MORTALLYW:

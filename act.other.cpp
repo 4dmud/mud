@@ -404,7 +404,7 @@ ACMD ( do_die )
 {
     if ( IS_NPC ( ch ) || !ch->desc )
         return;
-    if ( PLR_FLAGGED ( ch, PLR_DYING ) )
+    if ( GET_POS ( ch ) == POS_DEAD || PLR_FLAGGED ( ch, PLR_DYING ) )
     {
         ch->Send ( "See you next lifetime...\r\n" );
         raw_kill ( ch, NULL );
