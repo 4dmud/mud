@@ -75,6 +75,12 @@ ACMD(do_string)
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
 
+  if ( !IS_IMM ( ch ) && !PLR_FLAGGED ( ch, PLR_RP_LEADER ) )
+  {
+      ch->Send ( "You can't use this command.\r\n" );
+      return;
+  }
+
   half_chop(argument, buf, argument);
   half_chop(argument, buf1, buf2);
 
