@@ -1125,7 +1125,6 @@ ACTION(thing_throttle)
 
   if (!AFF_FLAGGED(vict, AFF_STUCK) ||
       !skill_cost(0, 0, 20, ch) ||
-      GET_POS(vict) < POS_STANDING ||
       GET_POS(ch) < POS_STANDING ||
       has_weapon(ch) || GET_EQ(ch, WEAR_FOCUS) || GET_EQ(ch, WEAR_SHIELD)  ||
       ((number(0, 101) - (2* GET_DEX(ch))) > total_chance(ch, SKILL_STRANGLE)))
