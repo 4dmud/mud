@@ -988,16 +988,22 @@ void parse_note ( Character *ch, char *argument, int type )
             return;
         }
 
-        if ( strlen ( ch->pnote->text ) + strlen ( argument ) >= 4096 )
+        if ( strlen ( argument ) >= 4096 || ( ch->pnote->text && ( strlen ( ch->pnote->text ) + strlen ( argument ) >= 4096 ) ) )
         {
             ch->Send ( "The note will be too long.\r\n" );
             return;
         }
 
-        strcpy ( buffer, ch->pnote->text );
+        if ( ch->pnote->text )
+        {
+            strcpy ( buffer, ch->pnote->text );
+            free_string ( &ch->pnote->text );
+        }
+        else
+            *buffer = '\0';
+
         strcat ( buffer, argument );
         strcat ( buffer, "\r\n" );
-        free_string ( &ch->pnote->text );
         ch->pnote->text = strdup ( buffer );
         ch->Send ( "Ok.\r\n" );
         return;
@@ -1056,8 +1062,7 @@ void parse_note ( Character *ch, char *argument, int type )
     if ( !str_cmp ( arg, "desc" ) || !str_cmp ( arg, "write" ) )
     {
         note_attach ( ch, type );
-        if ( argument[0] == '\0' )
-            string_append ( ch, &ch->pnote->text );
+        string_append ( ch, &ch->pnote->text );
         return;
     }
 
