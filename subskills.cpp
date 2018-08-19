@@ -1206,7 +1206,7 @@ int toggle_sub_status(Character *ch, int i, int onoff) {
     if (IS_NPC(ch))
         return STATUS_ON;
 
-        return SAVED(ch).SetSubStatus((subskill_list)i, (sub_status_toggle)onoff);
+    return SAVED(ch).SetSubStatus((subskill_list)i, (sub_status_toggle)onoff);
 }
 
 

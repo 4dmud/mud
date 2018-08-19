@@ -267,7 +267,7 @@ int str_cmp ( const char *arg1, const char *arg2 )
 {
     int chk, i;
 
-    if ( arg1 == NULL || arg2 == NULL )
+    if ( arg1 == nullptr || arg2 == nullptr )
     {
         log ( "SYSERR: str_cmp() passed a NULL pointer, %p or %p.", arg1,
               arg2 );

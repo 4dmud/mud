@@ -103,7 +103,7 @@ int find_first_step ( room_rnum src, room_rnum target,bool honour_notrack=false 
 
 size_t Character::Send ( const char *messg, ... )
 {
-    if ( this && this->desc && messg && *messg )
+    if ( this->desc && messg && *messg )
     {
         size_t left;
         va_list args;
@@ -118,14 +118,14 @@ size_t Character::Send ( const char *messg, ... )
 
 size_t Character::Send ( string &i )
 {
-    if ( this && this->desc )
+    if ( this->desc )
         return this->desc->Output ( i );
     else
         return 0;
 }
 size_t Character::Send ( string *i )
 {
-    if ( this && this->desc )
+    if ( this->desc )
         return this->desc->Output ( i );
     else
         return 0;
@@ -133,7 +133,7 @@ size_t Character::Send ( string *i )
 
 size_t Character::Send ( stringstream &i )
 {
-    if ( this && this->desc )
+    if ( this->desc )
         return this->desc->Output ( i );
     else
         return 0;
@@ -255,9 +255,6 @@ void Character::freeself()
 {
     int i;
     struct alias_data *a;
-
-    if ( this == NULL )
-        return;
 
     /* fix seated players */
     char_from_chair ( this );
@@ -614,8 +611,6 @@ void Character::default_char()
 {
     int i;
     time_t tme = time ( 0 );
-    if ( !this )
-        return;
     vnum 				= NOBODY;
     proto 				= TRUE;
     master 				= NULL;
@@ -904,7 +899,7 @@ void Character::check_regen_rates()
     int type, gain = 0;
     unsigned long t;
 
-    if ( this == NULL || GET_HIT ( this ) <= HIT_INCAP )
+    if ( GET_HIT ( this ) <= HIT_INCAP )
         return;
 
     for ( type = REGEN_HIT; type <= REGEN_STAMINA; type++ )
@@ -954,11 +949,6 @@ void Character::check_regen_rates()
 }
 void Character::save()
 {
-    if ( this == NULL )
-    {
-        log ( "SYSERR: save() received null ch!" );
-        return;
-    }
     if ( IS_NPC ( this ) )
     {
         log ( "SYSERR: save() called on an NPC! %s, %d", __FILE__, __LINE__ );

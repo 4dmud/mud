@@ -823,11 +823,12 @@ void cedit_parse(Descriptor *d, char *arg)
           new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(d->character)), TRUE,
                  "OLC: %s modifies the game configuration.", GET_NAME(d->character));
           cleanup_olc(d, CLEANUP_CONFIG);
-       if (CONFIG_AUTO_SAVE) {
-         cedit_save_to_disk();
-         d->Output( "Game configuration saved to disk.\r\n");
-       } else
-          d->Output( "Game configuration saved to memory.\r\n");
+          if (CONFIG_AUTO_SAVE) {
+            cedit_save_to_disk();
+            d->Output( "Game configuration saved to disk.\r\n");
+          }
+          else
+            d->Output( "Game configuration saved to memory.\r\n");
           return;
         case 'n':
         case 'N':

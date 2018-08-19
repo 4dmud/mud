@@ -829,30 +829,30 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
                            GET_WEP_BALANCE(obj)
              );
     }
-     else
+    else
         ch->Send( "{cyWanted Weapon Balance: {cg(base){cc-%s-{cg(tip)\r\n"
                   "{cyActual Weapon Balance: {cg(base){cc-%s-{cg(tip)\r\n",
                   balance_display(perf_balance(GET_WEP_TYPE(obj))),
                   balance_display(GET_WEP_BALANCE(obj))
                 );
-        ch->Send( "This balance gives the weapon %d speed, %d accuracy and %d evasion.\r\n",
-                  get_weapon_speed(obj),
-                  get_weapon_accuracy(obj),
-                  get_weapon_evasion(obj));
+    ch->Send( "This balance gives the weapon %d speed, %d accuracy and %d evasion.\r\n",
+              get_weapon_speed(obj),
+              get_weapon_accuracy(obj),
+              get_weapon_evasion(obj));
 
-        w_type = GET_OBJ_VAL(obj, 3);
-        ch->Send( "{cyThe %s handed weapon is a {cC%d{cycm{cc %s{cy that can {cc%s{cy at {cC%d{cyD{cC%d{cy damage.{c0\r\n",
-                  wep_hands(obj) == 2 ? "two" : "one",GET_WEP_LENGTH(obj), weapon_type_name(obj),
-                  attack_hit_text[w_type].singular, GET_OBJ_VAL(obj, 1),  GET_OBJ_VAL(obj, 2));
-        w_type += TYPE_HIT;
-        att[0] = weapon_type_mod(w_type, PART_TOP_CENTER);
-        att[1] = weapon_type_mod(w_type, PART_TOP_LEFT);
-        att[2] = weapon_type_mod(w_type, PART_TOP_RIGHT);
-        att[3] = weapon_type_mod(w_type, PART_CENTER);
-        att[4] = weapon_type_mod(w_type, PART_LOWER_LEFT);
-        att[5] = weapon_type_mod(w_type, PART_LOWER_RIGHT);
+    w_type = GET_OBJ_VAL(obj, 3);
+    ch->Send( "{cyThe %s handed weapon is a {cC%d{cycm{cc %s{cy that can {cc%s{cy at {cC%d{cyD{cC%d{cy damage.{c0\r\n",
+              wep_hands(obj) == 2 ? "two" : "one",GET_WEP_LENGTH(obj), weapon_type_name(obj),
+              attack_hit_text[w_type].singular, GET_OBJ_VAL(obj, 1),  GET_OBJ_VAL(obj, 2));
+    w_type += TYPE_HIT;
+    att[0] = weapon_type_mod(w_type, PART_TOP_CENTER);
+    att[1] = weapon_type_mod(w_type, PART_TOP_LEFT);
+    att[2] = weapon_type_mod(w_type, PART_TOP_RIGHT);
+    att[3] = weapon_type_mod(w_type, PART_CENTER);
+    att[4] = weapon_type_mod(w_type, PART_LOWER_LEFT);
+    att[5] = weapon_type_mod(w_type, PART_LOWER_RIGHT);
 
-        total = (att[0] +att[1] +att[2] +att[3] +att[4] +att[5]);
+    total = (att[0] +att[1] +att[2] +att[3] +att[4] +att[5]);
     if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
         {
         ch->Send(

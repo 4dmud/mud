@@ -226,12 +226,12 @@ int hit_gain ( Character *ch )
     if ( get_sub_status ( ch, SUB_NIGHT_REGEN ) )
         gain *= 2;
 
-        if ( AFF_FLAGGED(ch, AFF_POISON_4))
-                gain = 0;
-        if ( AFF_FLAGGED(ch, AFF_POISON_3))
-                gain = 0;
-        if ( AFF_FLAGGED(ch, AFF_POISON_2))
-                gain = 0;
+    if ( AFF_FLAGGED(ch, AFF_POISON_4))
+        gain = 0;
+    if ( AFF_FLAGGED(ch, AFF_POISON_3))
+        gain = 0;
+    if ( AFF_FLAGGED(ch, AFF_POISON_2))
+        gain = 0;
 
     return ( abs ( gain ) );
 }
@@ -610,17 +610,17 @@ void gain_exp_regardless ( Character *ch, gold_int gain, bool silent )
             new_mudlog ( BRF, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "%s advanced %d level%s to level %d.",
                          GET_NAME ( ch ), num_levels, num_levels == 1 ? "" : "s",
                          GET_LEVEL ( ch ) );
-if (!silent) {
-            if ( num_levels == 1 )
-                ch->Send ( "{cR[ You rise a level! ]{c0\r\n" );
-            else
-                ch->Send ( "{cR[ You rise %d levels! ]{c0\r\n", num_levels );
-}
+            if (!silent) {
+                if ( num_levels == 1 )
+                    ch->Send ( "{cR[ You rise a level! ]{c0\r\n" );
+                else
+                    ch->Send ( "{cR[ You rise %d levels! ]{c0\r\n", num_levels );
+            }
             num_hp = GET_MAX_HIT ( ch ) - num_hp;
             num_ma = GET_MAX_MANA ( ch ) - num_ma;
             num_mv = GET_MAX_MOVE ( ch ) - num_mv;
-if (!silent)
-            ch->Send ( "You gain: %d-HP %d-MANA %d-MOVE.\r\n", num_hp, num_ma, num_mv );
+            if (!silent)
+                ch->Send ( "You gain: %d-HP %d-MANA %d-MOVE.\r\n", num_hp, num_ma, num_mv );
 
             ch->save();
 

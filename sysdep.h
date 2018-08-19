@@ -162,6 +162,7 @@
 #include <iomanip>
 #include <ios>
 #include <iterator>
+#include <numeric>
 
 #if __STDC_VERSION__ < 199901L
 # if __GNUC__ >= 2

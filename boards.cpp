@@ -147,7 +147,7 @@ int board_index ( struct obj_data *obj )
         if ( BOARD_RNUM ( i ) == GET_OBJ_RNUM ( obj ) )
             return i;
 
-        return -1;
+    return -1;
 }
 
 /* search the room ch is standing in to find which board he's looking at */

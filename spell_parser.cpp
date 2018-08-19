@@ -671,8 +671,8 @@ int call_magic ( Character *caster, Character *cvict,
     if ( IS_SET ( SINFO.routines, MAG_CREATIONS ) )
         mag_creations ( level, caster, spellnum, tar_str );
 
-        if (IS_SET (SINFO.routines, MAG_ROOM_AFFECTS))
-                mag_room_affects(level, caster, spellnum);
+    if (IS_SET (SINFO.routines, MAG_ROOM_AFFECTS))
+        mag_room_affects(level, caster, spellnum);
 
     if ( IS_SET ( SINFO.routines, MAG_MANUAL ) )
         switch ( spellnum )
@@ -1444,17 +1444,17 @@ int knows_spell ( Character *ch, int spell )
             return TRUE;
     }
 
-
     if ( GET_LEVEL ( ch ) >= LVL_IMMORT )
         return 1;
     if ( spell < 0 || spell >= MAX_SKILLS )
         return 0;
-        /* only allow players to have access to skills and spells */
-        /* system TYPE_HIT == 0 and system spells == 3 */
-        if (spell_info[spell].type == 0)
-               return 0;
-        if (spell_info[spell].type > 2)
-               return 0;
+
+    /* only allow players to have access to skills and spells */
+    /* system TYPE_HIT == 0 and system spells == 3 */
+    if (spell_info[spell].type == 0)
+        return 0;
+    if (spell_info[spell].type > 2)
+        return 0;
     if ( spell_info[spell].min_level >= LVL_IMMORT )
         return 0;
 

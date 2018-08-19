@@ -1962,17 +1962,17 @@ void oedit_parse ( Descriptor *d, char *arg )
             for (i = 0; ; i++)
                 if (attachment_types[i][0] == '\n')
                     break;
-                num = atoi(arg);
-                if (num < 0 || num > i) {
-                    d->Output("Wrong choice.\r\n");
-                    oedit_disp_attachment_type(d);
-                    return;
-                }
-                if (num)
-                    OLC_ATTACHMENT(d)->type = num;
-                OLC_VAL(d) = 1;
-                oedit_disp_attachment_menu(d);
+            num = atoi(arg);
+            if (num < 0 || num > i) {
+                d->Output("Wrong choice.\r\n");
+                oedit_disp_attachment_type(d);
                 return;
+            }
+            if (num)
+                OLC_ATTACHMENT(d)->type = num;
+            OLC_VAL(d) = 1;
+            oedit_disp_attachment_menu(d);
+            return;
 
         case OEDIT_ATTACHMENT_VALUE:
             OLC_ATTACHMENT(d)->value = atoi(arg);

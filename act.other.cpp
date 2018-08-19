@@ -1958,7 +1958,7 @@ ACMD ( do_file )
     vector<int> entries_to_show;
     for ( int i = entries.size() - 1; i >= 0 && req_entries > 0; --i )
     {
-        if ( !show_all && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "syslog" ) && entries[i].substr( entries[i].size() - 7 ) == "(fixed)" )
+        if ( !show_all && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "syslog" ) && ( entries[i].size() < 7 || entries[i].substr( entries[i].size() - 7 ) == "(fixed)" ) )
             continue;
 
         entries_to_show.push_back ( i );

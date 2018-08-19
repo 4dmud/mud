@@ -76,8 +76,6 @@ extern int buf_switches;         /* # of switches from small to large buf */
 size_t Descriptor::Output(const char *txt, ...) {
     va_list args;
     size_t left;
-    if (!this)
-        return 0;
 
     va_start(args, txt);
     left = vwrite_to_output(txt, args);

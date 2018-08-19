@@ -85,9 +85,10 @@ victim = new Character(FALSE);
     if (!PLR_FLAGGED(victim, PLR_DELETED))
       ret = TRUE;
     delete victim;
-  } else
+  }
+  else
     delete victim;
-    TEMP_LOAD_CHAR = FALSE;
+  TEMP_LOAD_CHAR = FALSE;
   return ret;
 }
 

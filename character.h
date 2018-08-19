@@ -107,7 +107,7 @@ public:
     #if (1)
     template<typename T>
     Character & operator<< (const T & i)  {
-        if (this != NULL && desc != NULL) {
+        if (desc != NULL) {
             if (send_string == NULL)
                 send_string = new stringstream();
             send_string->str("");

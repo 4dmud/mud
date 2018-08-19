@@ -6423,35 +6423,32 @@ int spell_weight ( struct obj_data *obj, int val )
   if ( i == -1 ) /* i.e.: no spell */
     return 0;
 
-    /*
-     * Check for negative spells, spells beyond the top define, and any
-     * spell which is actually a skill.
-     */
-    if ( i <= 0 )
-        return 0;
-    if ( i >= MAX_SKILLS )
-        return 0;
-    if ( spell_info[i].type != 1)
-        return 0;
+  /*
+   * Check for negative spells, spells beyond the top define, and any
+   * spell which is actually a skill.
+   */
+  if ( i <= 0 )
+    return 0;
+  if ( i >= MAX_SKILLS )
+    return 0;
+  if ( spell_info[i].type != 1)
+    return 0;
 
-    switch ( GET_OBJ_VAL ( obj, val ) )
-    {
-        case SPELL_GROUP_HEAL:
-            return 5;
-            break;
-        case SPELL_HEAL:
-            return 4;
-            break;
-        case SPELL_CURE_CRITIC:
-            return 3;
-            break;
-        default:
-            return 2;
-            break;
-    }
-
-
-
+  switch ( GET_OBJ_VAL ( obj, val ) )
+  {
+    case SPELL_GROUP_HEAL:
+        return 5;
+        break;
+    case SPELL_HEAL:
+        return 4;
+        break;
+    case SPELL_CURE_CRITIC:
+        return 3;
+        break;
+    default:
+        return 2;
+        break;
+  }
 }
 
 

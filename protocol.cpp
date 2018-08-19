@@ -1685,7 +1685,7 @@ static void PerformHandshake( descriptor_t *apDescriptor, char aCmd, char aProto
          if ( aCmd == (char)WILL )
          {
             /* If we don't support MSDP, fake it with ATCP */
-            if ( !pProtocol->bMSDP );
+            //if ( !pProtocol->bMSDP );
             {
                pProtocol->bATCP = true;
 

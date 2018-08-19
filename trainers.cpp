@@ -152,17 +152,15 @@ void sort_spells ( void )
     for ( a = 1; a <= start_skill; a++)
         spell_sort_info[a] = spell_sort_data[a];
 
-
     for ( ; skill_sort_data[b] != 0; a++, b++ )
         spell_sort_info[a] = skill_sort_data[b];
 
-        start_sub = a;
+    start_sub = a;
 
     for ( b = 0; b < TOP_SUB_DEFINE; a++, b++ )
         spell_sort_info[a] = sub_sort_data[b];
 
-        end_sub = a;
-
+    end_sub = a;
 }
 
 const char *how_good ( int percent )

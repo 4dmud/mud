@@ -128,33 +128,31 @@ const char *race_menu =
 
 
 /* body standard 21 parts */
-#define BODY_STANDARD static_cast<long long unsigned int>(BODY_LIGHT|BODY_BODY|BODY_HEAD|BODY_LEGS|BODY_FEET| \
+#define BODY_STANDARD (BODY_LIGHT|BODY_BODY|BODY_HEAD|BODY_LEGS|BODY_FEET| \
                        BODY_HANDS|BODY_ARMS|BODY_FOCUS|BODY_ABOUT|BODY_WIELD|BODY_WIELD_2| \
                        BODY_SHIELD|BODY_FINGER_R|BODY_FINGER_L|BODY_EYES|BODY_FACE| \
                        BODY_HOLD|BODY_EAR_R|BODY_EAR_L|BODY_WRIST_R|BODY_WRIST_L| \
                        BODY_NECK_1|BODY_WAIST)
 
-#define HUMANOID   	static_cast<long long unsigned int>(BODY_STANDARD|BODY_HIPS|BODY_ANKLE_R|BODY_ANKLE_L)
+#define HUMANOID   	(BODY_STANDARD|BODY_HIPS|BODY_ANKLE_R|BODY_ANKLE_L)
 
-#define FAUN    	static_cast<long long unsigned int>(BODY_STANDARD|BODY_TAIL|BODY_HIPS|BODY_HORNS)
+#define FAUN    	(BODY_STANDARD|BODY_TAIL|BODY_HIPS|BODY_HORNS)
 
-#define CENTAUR         static_cast<long long unsigned int>(BODY_STANDARD|BODY_TAIL|BODY_LEGS_2|BODY_FEET_2)
+#define CENTAUR     (BODY_STANDARD|BODY_TAIL|BODY_LEGS_2|BODY_FEET_2)
 
-#define MARTIAN         static_cast<long long unsigned int>(BODY_STANDARD|BODY_ANKLE_R|BODY_ANKLE_L|BODY_ANTENNA)
+#define MARTIAN     (BODY_STANDARD|BODY_ANKLE_R|BODY_ANKLE_L|BODY_ANTENNA)
 
-#define SWOLF           static_cast<long long unsigned int>(BODY_STANDARD|BODY_TAIL|BODY_HIPS|BODY_NECK_2)
+#define SWOLF       (BODY_STANDARD|BODY_TAIL|BODY_HIPS|BODY_NECK_2)
 
 
 
-#define DEFAULT    	static_cast<long long unsigned int>(BODY_STANDARD|BODY_ANKLE_R|BODY_ANKLE_L)
+#define DEFAULT    	(BODY_STANDARD|BODY_ANKLE_R|BODY_ANKLE_L)
 
 //  Player race structure
 
 const struct race_data races[NUM_RACES] = {
             {
-                RACE_FAUN, FAUN
-            }
-            , {
+                RACE_FAUN, FAUN}, {
                 RACE_CENTAUR, CENTAUR}, {
                 RACE_ELF, HUMANOID}, {
                 RACE_DWARF, HUMANOID}, {
@@ -162,7 +160,7 @@ const struct race_data races[NUM_RACES] = {
                 RACE_GRINGO, HUMANOID}, {
                 RACE_MARTIAN, MARTIAN}, {
                 RACE_SPACE_WOLF, SWOLF}, {
-        RACE_GLADIATOR, HUMANOID}
+                RACE_GLADIATOR, HUMANOID}
         };
 
 
@@ -214,12 +212,12 @@ int parse_race(char* arg, bool consider_gladiator) {
         return RACE_INDIAN;
         break;
     case 'g':
-    if(!consider_gladiator || strlen(arg) == 1 || LOWER(*(arg+1)) == 'r')
+        if(!consider_gladiator || strlen(arg) == 1 || LOWER(*(arg+1)) == 'r')
             return RACE_GRINGO;
-    else if(LOWER(*(arg+1)) == 'l')
-        return RACE_GLADIATOR;
-    else
-        return RACE_UNDEFINED;
+        else if(LOWER(*(arg+1)) == 'l')
+            return RACE_GLADIATOR;
+        else
+            return RACE_UNDEFINED;
         break;
     case 'm':
         return RACE_MARTIAN;

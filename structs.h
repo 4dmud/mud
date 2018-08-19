@@ -708,7 +708,7 @@ class Room;
 #define BODY_WIELD_2    (1 << 28)
 #define BODY_LEGS_2 	(1 << 29)
 #define BODY_FEET_2 	(1 << 30)
-#define BODY_FOCUS      (1 << 31)
+#define BODY_FOCUS      (1ull << 31)
 /* extra body positions */
 #define BODY_THUMB_R    (1 << 0)
 #define BODY_THUMB_L    (1 << 1)

@@ -163,7 +163,7 @@ int Room::copy_room(Room *from) {
 int Room::copy_room_strings(Room *source) {
     int i;
 
-    if (this == NULL || source == NULL) {
+    if (source == NULL) {
         log("SYSERR: GenOLC: copy_room_strings: NULL values passed.");
         return FALSE;
     }
