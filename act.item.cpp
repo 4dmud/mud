@@ -1702,7 +1702,7 @@ int perform_drop ( Character *ch, struct obj_data *obj, sbyte mode, const char *
     if ( drop_otrigger ( obj, ch ) <= 0 )
         return ( 0 );
 
-    if ( ( mode == SCMD_DROP ) && !drop_wtrigger ( obj, ch ) )
+    if ( ( mode == SCMD_DROP ) && drop_wtrigger ( obj, ch ) <= 0 )
         return ( 0 );
 
     if ( OBJ_FLAGGED ( obj, ITEM_NODROP ) )
