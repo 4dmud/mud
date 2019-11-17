@@ -603,11 +603,14 @@ bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
         return FALSE;
     }
 
-    int empty_weight = GET_OBJ_WEIGHT ( &obj_proto[ GET_OBJ_RNUM ( cont ) ] );
-    if ( GET_OBJ_WEIGHT ( cont ) - empty_weight + GET_OBJ_WEIGHT ( obj ) > GET_OBJ_VAL ( cont, 0 ) )
+    if ( VALID_OBJ_RNUM ( cont ) )
     {
-        act ( "$p won't fit in $P.", FALSE, ch, obj, cont, TO_CHAR );
-        return FALSE;
+        int empty_weight = GET_OBJ_WEIGHT ( &obj_proto[ GET_OBJ_RNUM ( cont ) ] );
+        if ( GET_OBJ_WEIGHT ( cont ) - empty_weight + GET_OBJ_WEIGHT ( obj ) > GET_OBJ_VAL ( cont, 0 ) )
+        {
+            act ( "$p won't fit in $P.", FALSE, ch, obj, cont, TO_CHAR );
+            return FALSE;
+        }
     }
 
     if ( GET_OBJ_VNUM ( obj ) >= 3300 && GET_OBJ_VNUM ( obj ) <= 3312 )
