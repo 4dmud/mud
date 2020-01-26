@@ -3016,7 +3016,7 @@ void improve_skill ( Character *ch, int skill )
 
     SET_SKILL ( ch, skill, percent );
     ch->Send ( "You feel your ability in %s %s.\r\n",  skill_name ( skill ), ( percent >= 97 ) ? "reach full strength" : "improve" );
-    gain_exp ( ch, share );
+    gain_exp ( ch, abs ( share ) );
 
     return;
 }
