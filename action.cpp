@@ -166,7 +166,7 @@ ACTION(thing_lumberjack)
       lognum = GET_OBJ_VAL ( obj, 4 );
       logs   = GET_OBJ_VAL ( obj, 5 );
 
-      if ( real_object ( lognum ) == NOTHING)
+      if ( real_object ( lognum ) <= 0 )
       {
         ch->Send( "The tree disolves into sawdust.\r\n");
         return time;

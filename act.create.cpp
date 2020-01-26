@@ -1133,7 +1133,7 @@ ACMD ( do_fell )
     }
 
 
-    if ( found != FALSE && ( GET_OBJ_TYPE ( o ) != ITEM_TREE ) )
+    if ( found != FALSE && ( GET_OBJ_TYPE ( o ) != ITEM_TREE || GET_OBJ_VNUM ( o ) == NOTHING ) )
     {
         ch->Send ( "You can't see the proper tree!\r\n" );
         return;
