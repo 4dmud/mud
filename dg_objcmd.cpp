@@ -519,34 +519,43 @@ OCMD ( do_opurge )
 
 OCMD ( do_oteleport )
 {
-    Character *ch = NULL, *next_ch;
-    room_rnum target, rm, was_in;
+    Character *ch = nullptr, *next_ch, *target_char = nullptr;
+    room_rnum target_room = nullptr;
     char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+    obj_data *object = nullptr, *target_container = nullptr;
 
     argument = two_arguments ( argument, arg1, arg2 );
     skip_spaces ( &argument );
 
     if ( !*arg1 || !*arg2 )
     {
-        obj_log ( obj, "oteleport called with too few args" );
+        obj_log ( obj, "oteleport called with too few args (%s, %s)", arg1, arg2 );
         return;
     }
 
-    target = find_obj_target_room ( obj, arg2 );
-
-    if ( target == NULL )
-        obj_log ( obj, "oteleport target is an invalid room" );
-    else if ( !str_cmp ( arg1, "all" ) )
+    target_room = get_room ( arg2 );
+    if ( target_room == nullptr )
     {
-        rm = obj_room ( obj );
-        if ( target == rm )
+        target_char = get_char_by_obj ( obj, arg2 );
+        if ( target_char == nullptr )
+            target_container = get_obj_by_obj ( obj, arg2 );
+    }
+
+    if ( !str_cmp ( arg1, "all" ) )
+    {
+        if ( target_room == nullptr )
         {
-            obj_log ( obj, "oteleport target room is itself" );
+            obj_log ( obj, "oteleport target is an invalid room (%s, %s)", arg1, arg2 );
             return;
         }
+
+        room_rnum rm = obj_room ( obj );
+        if ( rm == nullptr )
+            return;
+
         for ( ch = rm->people; ch; ch = next_ch )
         {
-            next_ch = ch ? ch->next_in_room : NULL;
+            next_ch = ch ? ch->next_in_room : nullptr;
             if ( !valid_dg_target ( ch, TRUE ) )
                 continue;
             if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_NORECALL ) && str_cmp(argument, "override") )
@@ -555,35 +564,53 @@ OCMD ( do_oteleport )
                 break;
             }
             char_from_room ( ch );
-            char_to_room ( ch, target );
+            char_to_room ( ch, target_room );
             enter_wtrigger ( IN_ROOM ( ch ), ch, -1 );
         }
     }
-
-    else
+    else if ( ( ch = get_char_by_obj ( obj, arg1 ) ) )
     {
-        if ( ( ch = get_char_by_obj ( obj, arg1 ) ) )
+        if ( valid_dg_target ( ch, TRUE ) )
         {
-
-            was_in = IN_ROOM ( ch );
-            if ( valid_dg_target ( ch, TRUE ) )
+            if ( ROOM_FLAGGED ( ch->in_room, ROOM_NORECALL ) && str_cmp(argument, "override") )
             {
-                if ( ROOM_FLAGGED ( ch->in_room, ROOM_NORECALL ) && str_cmp(argument, "override") )
-                {
-                    ch->Send ( "The magic fizzles out leaving you stranded.\r\n" );
-                    return;
-                }
-                char_from_room ( ch );
-                char_to_room ( ch, target );
-                enter_wtrigger ( IN_ROOM ( ch ), ch, -1 );
-                if ( isname ( argument, "followers" ) )
-                    followers_to_master ( ch, was_in );
+                ch->Send ( "The magic fizzles out leaving you stranded.\r\n" );
+                return;
             }
+            room_rnum was_in = IN_ROOM ( ch );
+            char_from_room ( ch );
+            char_to_room ( ch, target_room );
+            enter_wtrigger ( IN_ROOM ( ch ), ch, -1 );
+            if ( isname ( argument, "followers" ) )
+                followers_to_master ( ch, was_in );
+        }
+        return;
+    }
+    else if ( ( object = get_obj_by_obj ( obj, arg1 ) ) )
+    {
+        if ( target_room || target_char || target_container )
+        {
+            if ( IN_ROOM ( object ) )
+                obj_from_room ( object );
+            else if ( object->in_obj )
+                obj_from_obj ( object );
+            else if ( object->carried_by )
+                obj_from_char ( object );
+            else if ( object->worn_by )
+                unequip_char ( object->worn_by, object->worn_on );
         }
 
+        if ( target_room )
+            obj_to_room ( object, target_room );
+        else if ( target_char )
+            obj_to_char ( object, target_char );
+        else if ( target_container )
+            obj_to_obj ( object, target_container );
         else
-            obj_log ( obj, "oteleport: no target found" );
+            obj_log ( obj, "oteleport: no target found (%s, %s)", arg1, arg2 );
     }
+    else
+        obj_log ( obj, "oteleport: no target found (%s, %s)", arg1, arg2 );
 }
 
 

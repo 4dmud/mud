@@ -418,29 +418,33 @@ WCMD(do_wdoor)
 
 WCMD(do_wteleport)
 {
-  Character *ch, *next_ch;
-  room_rnum target, was_in;
-  room_vnum nr;
+  Character *ch, *next_ch, *target_char = nullptr;
+  obj_data *obj, *target_container = nullptr;
+  room_rnum target_room = nullptr, was_in;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+
   argument = two_arguments(argument, arg1, arg2);
   skip_spaces(&argument);
+
   if (!*arg1 || !*arg2)
   {
-    wld_log(room, "wteleport called with too few args");
+    wld_log(room, "wteleport called with too few args: %s, %s", arg1, arg2);
     return;
   }
 
-  nr = atoi(arg2);
-  target = real_room(nr);
-
-  if (target == NULL)
-    wld_log(room, "wteleport target is an invalid room (vnum: %s)", arg2);
-
-  else if (!str_cmp(arg1, "all"))
+  target_room = get_room (arg2);
+  if (target_room == nullptr)
   {
-    if (nr == room->number)
+    target_char = get_char_by_room (room, arg2);
+    if (target_char == nullptr)
+      target_container = get_obj_by_room (room, arg2);
+  }
+
+  if (!str_cmp(arg1, "all"))
+  {
+    if (target_room == nullptr)
     {
-      wld_log(room, "wteleport all target is itself");
+      wld_log(room, "wteleport target is an invalid room (vnum: %s)", arg2);
       return;
     }
 
@@ -450,34 +454,59 @@ WCMD(do_wteleport)
       if (!valid_dg_target(ch, TRUE))
         continue;
       char_from_room(ch);
-      char_to_room(ch, target);
+      char_to_room(ch, target_room);
       entry_memory_mtrigger(ch);
       greet_mtrigger(ch, -1);
       greet_memory_mtrigger(ch);
       enter_wtrigger(IN_ROOM(ch), ch, -1);
     }
   }
-
-  else
+  else if ((ch = get_char_by_room(room, arg1)))
   {
-    if ((ch = get_char_by_room(room, arg1)))
+    if (target_room == nullptr)
     {
-      if (valid_dg_target(ch, TRUE))
-      {
-        was_in = IN_ROOM(ch);
-        char_from_room(ch);
-        char_to_room(ch, target);
-        entry_memory_mtrigger(ch);
-        greet_mtrigger(ch, -1);
-        greet_memory_mtrigger(ch);
-        enter_wtrigger(IN_ROOM(ch), ch, -1);
-        if (isname(argument, "followers"))
-          followers_to_master(ch, was_in);
-      }
+      wld_log(room, "wteleport target is an invalid room (vnum: %s)", arg2);
+      return;
     }
-    else
-      wld_log(room, "wteleport: no target found");
+
+    if (valid_dg_target(ch, TRUE))
+    {
+      was_in = IN_ROOM(ch);
+      char_from_room(ch);
+      char_to_room(ch, target_room);
+      entry_memory_mtrigger(ch);
+      greet_mtrigger(ch, -1);
+      greet_memory_mtrigger(ch);
+      enter_wtrigger(IN_ROOM(ch), ch, -1);
+      if (isname(argument, "followers"))
+        followers_to_master(ch, was_in);
+    }
   }
+  else if ((obj = get_obj_by_room (room, arg1)))
+  {
+    if (target_room || target_char || target_container)
+    {
+      if (IN_ROOM (obj))
+        obj_from_room (obj);
+      else if (obj->in_obj)
+        obj_from_obj (obj);
+      else if (obj->carried_by)
+        obj_from_char (obj);
+      else if (obj->worn_by)
+        unequip_char (obj->worn_by, obj->worn_on);
+    }
+
+    if (target_room)
+      obj_to_room (obj, target_room);
+    else if (target_char)
+      obj_to_char (obj, target_char);
+    else if (target_container)
+      obj_to_obj (obj, target_container);
+    else
+      wld_log(room, "wteleport: no target found (%s, %s)", arg1, arg2);
+  }
+  else
+    wld_log(room, "wteleport: no target found (%s, %s)", arg1, arg2);
 }
 
 

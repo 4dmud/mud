@@ -1023,13 +1023,15 @@ ACMD(do_mat) {
 
 
 /*
- * lets the mobile transfer people.  the all argument transfers
- * everyone in the current room to the specified location
+ * lets the mobile transfer people and objects.  the all argument
+ * transfers everyone in the current room to the specified location
  */
 ACMD(do_mteleport) {
     char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-    room_rnum target, was_in;
-    Character *vict, *next_ch;
+    room_rnum target_room = nullptr;
+    Character *vict, *next_ch, *target_char = nullptr;
+    obj_data *obj = nullptr, *target_container = nullptr;
+
     if (!MOB_OR_IMPL(ch)) {
         ch->Send( "Huh?!?\r\n");
         return;
@@ -1042,51 +1044,51 @@ ACMD(do_mteleport) {
     skip_spaces(&argument);
 
     if (!*arg1 || !*arg2) {
-        mob_log(ch, "mteleport: bad syntax");
+        mob_log(ch, "mteleport: bad syntax (%s, %s)", arg1, arg2);
         return;
     }
 
-    target = find_target_room(ch, arg2);
-
-    if (target == NULL) {
-        mob_log(ch, "mteleport target is an invalid room");
-        return;
+    target_room = get_room (arg2);
+    if (target_room == nullptr)
+    {
+        target_char = get_char_by_room (IN_ROOM(ch), arg2);
+        if (target_char == nullptr)
+            target_container = get_obj_by_room (IN_ROOM(ch), arg2);
     }
+
     if (!str_cmp(arg1, "all")) {
-        if (target == IN_ROOM(ch)) {
-            //mob_log(ch, "mteleport all is teleporting people to the same room as the mob teleporting them is in");
+        if (!target_room)
+        {
+            mob_log (ch, "mteleport: no target room found (%s, %s)", arg1, arg2);
             return;
         }
-       if ( IN_ROOM ( ch ) != NULL )
+        if ( IN_ROOM ( ch ) != NULL )
         for (vict = IN_ROOM(ch)->people; vict; vict = next_ch) {
             next_ch = vict->next_in_room;
             if (vict == ch)
                 continue;
             if (valid_dg_target(vict, TRUE)) {
                 char_from_room(vict);
-                char_to_room(vict, target);
+                char_to_room(vict, target_room);
                 entry_memory_mtrigger(ch);
                 greet_mtrigger(ch, -1);
                 greet_memory_mtrigger(ch);
                 enter_wtrigger(IN_ROOM(ch), ch, -1);
             }
         }
-    } else {
-        if (*arg1 == UID_CHAR) {
-            if (!(vict = get_char(arg1))) {
-                // sprintf(buf, "mteleport: victim (%s) does not exist",arg1);
-                // mob_log(ch, buf);
-                return;
-            }
-        } else if (!(vict = get_char_vis(ch, arg1, NULL, FIND_CHAR_ROOM))) {
-            // sprintf(buf, "mteleport: victim (%s) does not exist",arg1);
-            // mob_log(ch, buf);
+    }
+    else if ((*arg1 == UID_CHAR && (vict = get_char(arg1))) ||
+            (*arg1 != UID_CHAR && (vict = get_char_vis(ch, arg1, NULL, FIND_CHAR_ROOM))))
+    {
+        if (!target_room)
+        {
+            mob_log (ch, "mteleport: no target room found (%s, %s)", arg1, arg2);
             return;
         }
         if (valid_dg_target(vict, TRUE)) {
-            was_in = IN_ROOM(vict);
+            room_rnum was_in = IN_ROOM(vict);
             char_from_room(vict);
-            char_to_room(vict, target);
+            char_to_room(vict, target_room);
             entry_memory_mtrigger(vict);
             greet_mtrigger(vict, -1);
             greet_memory_mtrigger(vict);
@@ -1095,6 +1097,31 @@ ACMD(do_mteleport) {
                 followers_to_master(vict, was_in);
         }
     }
+    else if ((obj = get_obj_by_room(IN_ROOM(ch), arg1)))
+    {
+        if (target_room || target_char || target_container)
+        {
+            if (IN_ROOM(obj))
+                obj_from_room (obj);
+            else if (obj->in_obj)
+                obj_from_obj (obj);
+            else if (obj->carried_by)
+                obj_from_char (obj);
+            else if (obj->worn_by)
+                unequip_char (obj->worn_by, obj->worn_on);
+        }
+
+        if (target_room)
+            obj_to_room (obj, target_room);
+        else if (target_char)
+            obj_to_char (obj, target_char);
+        else if (target_container)
+            obj_to_obj (obj, target_container);
+        else
+            mob_log (ch, "mteleport: no target found (%s, %s)", arg1, arg2);
+    }
+    else
+        mob_log (ch, "mteleport: no target found (%s, %s)", arg1, arg2);
 }
 
 
