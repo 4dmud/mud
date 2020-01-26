@@ -383,6 +383,10 @@ struct alias_data {
 #define SCMD_WEAVE     110
 #define SCMD_FORGE     111
 
+/* do_map */
+#define SCMD_MAP     0
+#define SCMD_AUTOMAP 1
+
 #if !defined(LOWER)
 #define LOWER(c)   (((c)>='A'  && (c) <= 'Z') ? ((c)+('a'-'A')) : (c))
 #endif

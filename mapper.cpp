@@ -57,6 +57,9 @@
 #include "oasis.h"
 #include "mapper.h"
 
+/* extern variables */
+extern string local_map;
+
 void draw_wilderness_map ( Character *ch );
 room_rnum visible_room ( room_rnum r, int door, bool *two_way_connection );
 
@@ -268,16 +271,17 @@ void reformat_desc( char *desc , size_t len)
 }
 
 /* Display the map to the player */
-void show_map( Character *ch, int mxp)
+void show_map( Character *ch, int mxp, int subcmd = SCMD_MAP )
 {
   char buf[MAX_STRING_LENGTH * 2];
   int x, y, sec, sect = 0;
+  size_t len = 0;
 
   buf[0] = '\0';
   if (mxp)
     ch->Send( "%s", MXPTAG("FRAME Map REDIRECT"));
 
-  ch->Send( "\n\r {cy+-----------+{cw\n\r");
+  len += snprintf ( buf + len, sizeof ( buf ) - len, "{cy+-----------+{cx\r\n" );
 
   // mark the center, where ch is
   amap[MAPX / 2][MAPY / 2].tegn[0] = 'X';
@@ -286,8 +290,7 @@ void show_map( Character *ch, int mxp)
   /* Write out the main map area with text */
   for( x = 0; x <= MAPX; x++ )
   {
-
-    strlcpy( buf, " {cy|{c0", sizeof(buf) );
+    len += snprintf ( buf + len, sizeof ( buf ) - len, "{cy|{cx" );
 
     for( y = 0; y <= MAPY; y++ )
     {
@@ -297,13 +300,13 @@ void show_map( Character *ch, int mxp)
       case '|':
       case '\\':
       case '/':
-        sprintf(buf + strlen(buf), "{cg%c{c0", *amap[x][y].tegn);
+        len += snprintf ( buf + len, sizeof ( buf ) - len, "{cg%c{cx", *amap[x][y].tegn );
         break;
       case ' ':
-        sprintf(buf + strlen(buf), " ");
+        len += snprintf ( buf + len, sizeof ( buf ) - len, " " );
         break;
       case 'X':
-        sprintf(buf + strlen(buf), "{cR*");
+        len += snprintf ( buf + len, sizeof ( buf ) - len, "{cR*" );
         break;
       default:
         sec = atoi(amap[x][y].tegn);
@@ -336,35 +339,33 @@ void show_map( Character *ch, int mxp)
         case SECT_PRAIRIE:
         case SECT_BADLANDS:
         case SECT_RAIL:
-
-          sprintf(buf + strlen(buf), "%s%s", map_bit[sec].colour, map_bit[sec].bit);
+          len += snprintf ( buf + len, sizeof ( buf ) - len, "%s%s", map_bit[sec].colour, map_bit[sec].bit );
           break;
         default:
-          sprintf(buf + strlen(buf), " ");
+          len += snprintf ( buf + len, sizeof ( buf ) - len, " " );
           break;
         }
       }
     }
 
-    if (!mxp)
+    if ( !mxp && subcmd == SCMD_MAP )
     {
-      ch->Send( "%s", buf);
-      ch->Send( "{cy|{c0  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   \r\n",
-                       MDIS(0) ? map_bit[sect].colour : "", MDIS(0) ? map_bit[sect].bit : "", MDIS(0) ? ' ' : ' ', MDIS(0) ? map_bit[sect].name : "",
-                       MDIS(1) ? map_bit[sect+1].colour : "", MDIS(1) ? map_bit[sect+1].bit : "", MDIS(1) ? ' ' : ' ', MDIS(1) ? map_bit[sect+1].name : "");
+      len += snprintf ( buf + len, sizeof ( buf ) - len, "{cy|{cx  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   \r\n",
+        MDIS(0) ? map_bit[sect].colour : "", MDIS(0) ? map_bit[sect].bit : "", MDIS(0) ? ' ' : ' ',
+        MDIS(0) ? map_bit[sect].name : "", MDIS(1) ? map_bit[sect+1].colour : "",
+        MDIS(1) ? map_bit[sect+1].bit : "", MDIS(1) ? ' ' : ' ', MDIS(1) ? map_bit[sect+1].name : "" );
       sect+=2;
 
     }
     else
-    {
-      ch->Send( "%s {cy|{c0\r\n", buf);
-    }
+      len += snprintf ( buf + len, sizeof ( buf ) - len, "{cy|{cx\r\n" );
   }
 
   /* Finish off map area */
-  ch->Send( " {cy+-----------+{c0\r\n");
+  len += snprintf ( buf + len, sizeof ( buf ) - len, "{cy+-----------+{cx\r\n" );
   if (mxp)
     ch->Send( "%s", MXPTAG("FRAME _previous REDIRECT"));
+  local_map += string ( buf );
 }
 
 /* Clear and generate the map */

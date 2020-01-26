@@ -2426,6 +2426,24 @@ ACMD ( do_pagewidth )
     ch->save();
 }
 
+ACMD ( do_automap )
+{
+    skip_spaces ( &argument );
+
+    if ( !str_cmp ( argument, "off" ) ||
+         !str_cmp ( argument, "left" ) ||
+         !str_cmp ( argument, "right" ) ||
+         !str_cmp ( argument, "up" ) ||
+         !str_cmp ( argument, "down" ) )
+    {
+        GET_AUTOMAP ( ch ) = string ( argument );
+        ch->Send ( "Automap is set to: %s.\r\n", argument );
+        ch->save();
+    }
+    else
+        ch->Send ( "Usage: automap off|left|right|up|down\r\n" );
+}
+
 ACMD ( do_wire )
 {
     skip_spaces ( &argument );

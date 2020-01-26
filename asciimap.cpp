@@ -1,16 +1,16 @@
 /********************************************************************\
-*   History: Developed by: mlkesl@stthomas.edu			     *
+*   History: Developed by: mlkesl@stthomas.edu                       *
 *                     and: mlk                                       *
 *   MapArea: when given a room, ch, x, and y                         *
 *            this function will fill in values of map as it should   *
 *   ShowMap: will simply spit out the contents of map array          *
-*	    Would look much nicer if you built your own areas        *
-*	    without all of the overlapping stock Rom has             *
+*          Would look much nicer if you built your own areas         *
+*          without all of the overlapping stock Rom has              *
 *   do_map: core function, takes map size as argument                *
 *   update: map is now a 2 dimensional array of integers             *
-*	    uses NUM_ROOM_SECTORS for null                                   *
-*	    uses NUM_ROOM_SECTORS+1 for mazes or one ways to SECT_ENTER	     *
-*	    use the SECTOR numbers to represent sector types :)	     *
+*       uses NUM_ROOM_SECTORS for null                               *
+*       uses NUM_ROOM_SECTORS+1 for mazes or one ways to SECT_ENTER  *
+*       use the SECTOR numbers to represent sector types :)          *
 *                                                                    *
 \********************************************************************/
 
@@ -68,13 +68,13 @@
 struct obj_data *find_vehicle_by_vnum ( int vnum );
 struct obj_data *get_obj_in_list_type ( int type, struct obj_data *list );
 
-void show_map( Character *ch, int mxp);
+void show_map( Character *ch, int mxp, int subcmd = SCMD_MAP );
 void display_map ( Character *ch );
 void parse_room_name ( room_rnum in_room, char *bufptr, size_t len );
 
 int mapgrid[MAX_MAP][MAX_MAP]; // mapgrid[x][y]: x = row, y = column
 int offsets[4][2] = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
-
+string local_map;
 
 /* visible_room returns the displayable room where you end up when you go into the
    direction door from room r */
@@ -146,7 +146,7 @@ void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
 }
 
 /* mlk :: shows a map, specified by size */
-void ShowMap ( Character *ch, int min, int max )
+void ShowMap ( Character *ch, int min, int max, int subcmd )
 {
     int x, y;
     int sect = 0;
@@ -156,7 +156,8 @@ void ShowMap ( Character *ch, int min, int max )
     /* every row */
     for ( x = min; x <= max; ++x )
     {
-        len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   |   ",
+        if ( subcmd == SCMD_MAP )
+            len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   |   ",
             MDIS ( 0 ) ? map_bit[sect].colour : "", MDIS ( 0 ) ? map_bit[sect].bit : "",
             MDIS ( 0 ) ? ' ' : ' ', MDIS ( 0 ) ? map_bit[sect].name : "",
             MDIS ( 1 ) ? map_bit[sect+1].colour : "", MDIS ( 1 ) ? map_bit[sect+1].bit : "",
@@ -195,24 +196,24 @@ void ShowMap ( Character *ch, int min, int max )
                 case SECT_PRAIRIE:
                 case SECT_BADLANDS:
                 case SECT_RAIL:
-                    len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit );
-                    break;
-                case ( NUM_ROOM_SECTORS + 1 ):
-                    len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cl?{cn" );
+                    len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len, "%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit );
                     break;
                 default:
-                    len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cR*" );
+                    len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len, "{cR*" );
                     break;
             }
-            len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len," " );
+            len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len, " " );
         }
-        len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cx\r\n" );
+        len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len, "{cx\r\n" );
     }
 
-    len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cx\r\n" );
+    len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len, "{cx\r\n" );
     mapdisp[len] = 0;
-    ch->Send ( "%s", mapdisp );
-    return;
+
+    if ( subcmd == SCMD_MAP )
+        local_map += string ( mapdisp );
+    else
+        local_map = string ( mapdisp );
 }
 
 
@@ -220,9 +221,13 @@ void ShowMap ( Character *ch, int min, int max )
 /* this is the main function to show the map, its do_map with " " */
 
 /* Heavily modified - Edward */
-void ShowRoom ( Character *ch, int min, int max )
+void ShowRoom ( Character *ch, int min, int max, int subcmd )
 {
     char dispbuf[MAX_INPUT_LENGTH];
+
+    ShowMap ( ch, min, max, subcmd );
+    if ( subcmd == SCMD_AUTOMAP )
+        return;
 
     parse_room_name ( IN_ROOM ( ch ), dispbuf, sizeof ( dispbuf ) );
     ch->Send ( "{cx   {cc%s{cx", dispbuf );
@@ -231,10 +236,6 @@ void ShowRoom ( Character *ch, int min, int max )
         ch->Send ( " {cc[Room %d]{cx", IN_ROOM ( ch )->number );
 
     ch->Send ( "\r\n" );
-
-    ShowMap ( ch, min, max );
-
-    return;
 }
 
 void draw_wilderness_map ( Character *ch )
@@ -289,6 +290,100 @@ void draw_wilderness_map ( Character *ch )
     }
 }
 
+void crop_wilderness_map()
+{
+    // remove empty rows starting from the top
+    size_t pos1 = 0, pos2;
+    while (true) {
+		pos2 = local_map.find ( "{cx\r\n", pos1 );
+		if ( pos2 == string::npos )
+			break;
+		if ( count ( local_map.begin() + pos1, local_map.begin() + pos2, '{' ) > count ( local_map.begin() + pos1, local_map.begin() + pos2, '?' ) )
+            break;
+        local_map.erase ( pos1, pos2 + 5 - pos1 );
+	}
+
+    // remove empty rows starting from the bottom
+    while (true) {
+        pos2 = local_map.rfind ( "{cx\r\n" );
+        pos1 = local_map.rfind ( "{cx\r\n", pos2-1 );
+        if ( count ( local_map.begin() + pos1+1, local_map.begin() + pos2, '{' ) > count ( local_map.begin() + pos1+1, local_map.begin() + pos2, '?' ) )
+            break;
+        local_map.erase ( pos1 + 5, pos2 - pos1 );
+    }
+
+    // find the number of columns to remove from the left
+    int num_col = 1e6;
+    pos1 = 0;
+    while (true) {
+        int c = 0;
+        pos2 = local_map.find ( "{cx\r\n", pos1 );
+        if ( pos2 == string::npos )
+            break;
+        while ( pos1 < pos2 && c < num_col )
+        {
+            if ( local_map.substr ( pos1, 4 ) != "{cl?" )
+                break;
+            c++;
+            pos1 += 5;
+        }
+        num_col = min ( num_col, c );
+        pos1 = pos2 + 5;
+    }
+
+    // remove empty columns from the left
+    if ( num_col > 0 )
+    {
+        pos1 = 0;
+        while (true)
+        {
+            for ( int i = 0; i < num_col; ++i )
+                local_map.erase ( pos1, 5 );
+            pos2 = local_map.find ( "{cx\r\n", pos1 );
+            if ( pos2 == string::npos )
+                break;
+            pos1 = pos2 + 5;
+        }
+    }
+
+    // find the number of columns to remove from the right
+    num_col = 1e6;
+    pos1 = local_map.length() - 10; // position of the last colour
+    while ( pos1 < local_map.length() )
+    {
+        int c = 0;
+        pos2 = local_map.rfind ( "{cx\r\n", pos1 );
+        if ( pos2 == string::npos )
+            pos2 = 0;
+        while ( pos1 > pos2 && c < num_col )
+        {
+            if ( local_map.substr ( pos1, 4 ) != "{cl?" )
+                break;
+            c++;
+            pos1 -= 5;
+        }
+        num_col = min ( num_col, c );
+        pos1 = pos2 - 5;
+    }
+    if ( num_col == 0 )
+        return;
+
+    // remove empty columns from the right
+    pos1 = local_map.length() - 10; // position of the last colour
+    while ( pos1 < local_map.length() )
+    {
+        for ( int i = 0; i < num_col; ++i )
+        {
+            local_map.erase ( pos1, 5 );
+            pos1 -= 5;
+        }
+        pos2 = local_map.rfind ( "{cx\r\n", pos1 );
+        if ( pos2 == string::npos )
+            break;
+        pos1 = pos2 - 5;
+    }
+}
+
 /* This is the main map function, do_map(ch, " ") is good to use */
 /* do_map(ch "number") is for immortals to see the world map     */
 
@@ -297,8 +392,15 @@ void draw_wilderness_map ( Character *ch )
  ** is the map size shown by default. Also look for: ShowMap (ch, min, max+1);
  ** and change the size of min and max and see what you like.
  */
-ACMD ( do_map )
+/* If subcmd == SCMD_AUTOMAP (the player typed "look" or moved with automap
+   not being "off"):
+   - Don't show the legend
+   - Remove empty rows and columns in the wilderness map
+   - If automap is "left" or "right", combine the map with the room desc.
+*/
+void do_map ( Character *ch, char *argument, int cmd, int subcmd )
 {
+    local_map = "";
     if ( IS_DARK ( IN_ROOM ( ch ) ) && !CAN_SEE_IN_DARK ( ch ) )
     {
         ch->Send ( "{cbThe wilderness is pitch black at night... {cx\r\n" );
@@ -326,8 +428,10 @@ ACMD ( do_map )
     if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_WILDERNESS ) && !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
     {
         draw_map ( ch );
-        show_map ( ch, FALSE );
+        show_map ( ch, FALSE, subcmd );
         IN_ROOM ( ch ) = was_in;
+        if ( subcmd == SCMD_MAP )
+            ch->Send ( "%s", local_map.c_str() );
         return;
     }
 
@@ -350,65 +454,70 @@ ACMD ( do_map )
             size = 4;
         Room *r = was_in;
         parse_room_name ( r, buf, sizeof ( buf ) );
-        ch->Send ( "%s: %s\r\n", buf, map_bit[mapgrid[center][center]].name );
+        local_map += "{cw" + string ( buf ) + ": " + string ( map_bit[mapgrid[center][center]].name ) + "{cx\r\n";
 
         if ( mapgrid[center - 1][center] < NUM_ROOM_SECTORS )
         {
-            ch->Send ( "North: %s", map_bit[mapgrid[center - 1][center]].name );
+            local_map += "{cwNorth: " + string ( map_bit[mapgrid[center - 1][center]].name );
             for ( i = 2; i <= size && mapgrid[center - i][center] < NUM_ROOM_SECTORS; i++ )
-                ch->Send ( ", %s", map_bit[mapgrid[center - i][center]].name );
-            ch->Send ( "\r\n" );
+                local_map += ", " + string ( map_bit[mapgrid[center - i][center]].name );
+            local_map += "{cx\r\n";
         }
         if ( mapgrid[center][center + 1] < NUM_ROOM_SECTORS )
         {
-            ch->Send ( "East: %s", map_bit[mapgrid[center][center + 1]].name );
+            local_map += "{cwEast: " + string ( map_bit[mapgrid[center][center + 1]].name );
             for ( i = 2; i <= size && mapgrid[center][center + i] < NUM_ROOM_SECTORS; i++ )
-                ch->Send ( ", %s", map_bit[mapgrid[center][center + i]].name );
-            ch->Send ( "\r\n" );
+                local_map += ", " + string ( map_bit[mapgrid[center][center + i]].name );
+            local_map += "{cx\r\n";
         }
         if ( mapgrid[center + 1][center] < NUM_ROOM_SECTORS )
         {
-            ch->Send ( "South: %s", map_bit[mapgrid[center + 1][center]].name );
+            local_map += "{cwSouth: " + string ( map_bit[mapgrid[center + 1][center]].name );
             for ( i = 2; i <= size && mapgrid[center + i][center] < NUM_ROOM_SECTORS; i++ )
-                ch->Send ( ", %s", map_bit[mapgrid[center + i][center]].name );
-            ch->Send ( "\r\n" );
+                local_map += ", " + string ( map_bit[mapgrid[center + i][center]].name );
+            local_map += "{cx\r\n";
         }
         if ( mapgrid[center][center - 1] < NUM_ROOM_SECTORS )
         {
-            ch->Send ( "West: %s", map_bit[mapgrid[center][center - 1]].name );
+            local_map += "{cwWest: " + string ( map_bit[mapgrid[center][center - 1]].name );
             for ( i = 2; i <= size && mapgrid[center][center - i] < NUM_ROOM_SECTORS; i++ )
-                ch->Send ( ", %s", map_bit[mapgrid[center][center - i]].name );
-            ch->Send ( "\r\n" );
+                local_map += ", " + string ( map_bit[mapgrid[center][center - i]].name );
+            local_map += "{cx\r\n";
         }
 
         r = visible_room ( IN_ROOM ( ch ), UP, &two_way );
         if ( r != NULL )
-            ch->Send ( "Up: %s\r\n", map_bit[ r->sector_type ].name );
+            local_map += "{cwUp: " + string ( map_bit[ r->sector_type ].name ) + "{cx\r\n";
 
         r = visible_room ( IN_ROOM ( ch ), DOWN, &two_way );
         if ( r != NULL )
-            ch->Send ( "Down: %s\r\n", map_bit[ r->sector_type ].name );
+            local_map += "{cwDown: " + string ( map_bit[ r->sector_type ].name ) + "{cx\r\n";
 
         if ( mapgrid[center - 1][center - 1] < NUM_ROOM_SECTORS )
-            ch->Send ( "Northwest: %s\r\n", map_bit[mapgrid[center - 1][center - 1]].name );
+            local_map += "{cwNorthwest: " + string ( map_bit[mapgrid[center - 1][center - 1]].name ) + "{cx\r\n";
 
         if ( mapgrid[center - 1][center + 1] < NUM_ROOM_SECTORS )
-            ch->Send ( "Northeast: %s\r\n", map_bit[mapgrid[center - 1][center + 1]].name );
+            local_map += "{cwNortheast: " + string ( map_bit[mapgrid[center - 1][center + 1]].name ) + "{cx\r\n";
 
         if ( mapgrid[center + 1][center + 1] < NUM_ROOM_SECTORS )
-            ch->Send ( "Southeast: %s\r\n", map_bit[mapgrid[center + 1][center + 1]].name );
+            local_map += "{cwSoutheast: " + string ( map_bit[mapgrid[center + 1][center + 1]].name ) + "{cx\r\n";
 
         if ( mapgrid[center + 1][center - 1] < NUM_ROOM_SECTORS )
-            ch->Send ( "Southwest: %s\r\n", map_bit[mapgrid[center + 1][center - 1]].name );
+            local_map += "{cwSouthwest: " + string ( map_bit[mapgrid[center + 1][center - 1]].name ) + "{cx\r\n";
 
         IN_ROOM ( ch ) = was_in;
+        if ( subcmd == SCMD_MAP )
+            ch->Send ( "%s", local_map.c_str() );
         return;
     }
 
     /* marks the center, where ch is */
     mapgrid[center][center] = NUM_ROOM_SECTORS + 2;	/* can be any number above NUM_ROOM_SECTORS+1 */
 
-    ShowRoom ( ch, min, max );
+    ShowRoom ( ch, min, max, subcmd );
     IN_ROOM ( ch ) = was_in;
-    return;
+    if ( subcmd == SCMD_MAP )
+        ch->Send ( "%s", local_map.c_str() );
+    else if ( subcmd == SCMD_AUTOMAP && ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_WILDERNESS ) )
+        crop_wilderness_map();
 }

@@ -693,6 +693,7 @@ int has_body ( Character *ch, int flag );
 #define GET_ETHOS(ch) ((ch)->char_specials.declared_align)
 #define GET_DETECTOR(ch) ((ch)->char_specials.arti_detector)
 #define GET_DEED_COUNT(ch) ((ch)->char_specials.deed_count)
+#define GET_AUTOMAP(ch)   ((ch)->player_specials->automap)
 
 #define SPECIALS(ch)          ((ch)->player_specials)
 #define SAVED(ch)            	(SPECIALS(ch)->saved)

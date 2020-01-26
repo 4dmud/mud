@@ -5369,6 +5369,8 @@ int store_to_char ( const char *name, Character *ch )
                     AFK_MSG ( ch ) = str_dup ( line );
                 else if ( !strcmp ( tag, "Age " ) )
                     SPECIALS(ch)->age = num;
+                else if ( !strcmp ( tag, "AutM" ) )
+                    GET_AUTOMAP ( ch ) = string ( line );
 
                 break;
 
@@ -6257,6 +6259,7 @@ void char_to_store ( Character *ch )
         fprintf ( fl, "Etho: %d\n", GET_ETHOS(ch));
     if (GET_DETECTOR(ch))
         fprintf ( fl, "Drip: %d\n", GET_DETECTOR(ch));
+    fprintf ( fl, "AutM: %s\n", GET_AUTOMAP ( ch ).c_str() );
 
     /*Here follows a little something made by Thotter */
     if ( GET_LOGINMSG ( ch ) )

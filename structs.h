@@ -2105,6 +2105,7 @@ public:
     char *pretitle;
     char *loginmsg;      /*THOTTER EDIT: Message displayed in the room when the char logs in     */
     char *logoutmsg;     /*THOTTER EDIT: Message displayed in the room when the char logs out */
+    string automap;
     int remorts;
     int conversions;
     time_t last_note;
@@ -2169,6 +2170,7 @@ public:
         help  = NULL;
         kills.clear();
         age = -1;
+        automap = "off";
     }
     kill_map::iterator KillsBegin() {
         return kills.begin();

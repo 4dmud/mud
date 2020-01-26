@@ -125,6 +125,7 @@ ACMD ( do_astat );
 ACMD ( do_at );
 ACMD ( do_atlvl );
 ACMD ( do_auction );
+ACMD ( do_automap );
 ACMD ( do_autowiz );
 ACMD ( do_awho );
 ACMD ( do_ban );
@@ -496,8 +497,9 @@ const command_info cmd_info[] =
     { "aedit"    , "aed" , POS_DEAD    , do_oasis      , LVL_IMMORT, SCMD_OASIS_AEDIT, WIZ_EDIT_GRP },
     { "astat"    , "ast" , POS_DEAD    , do_astat      , LVL_IMMORT, SCMD_OASIS_AEDIT, WIZ_EDIT_GRP },
     { "affects"  , "aff"  , POS_RESTING , do_affects  , 0, 0, 0 },
-    { "aggro"      , "aggro"  , POS_DEAD    , do_gen_tog  , 0, SCMD_AGGRO, 0 },
-    { "autogroup"      , "autogroup"  , POS_DEAD    , do_gen_tog  , 0, SCMD_AUTOGROUP, 0 },
+    { "aggro"    , "aggro"  , POS_DEAD    , do_gen_tog  , 0, SCMD_AGGRO, 0 },
+    { "autogroup", "autogroup"  , POS_DEAD    , do_gen_tog  , 0, SCMD_AUTOGROUP, 0 },
+    { "automap"  , "automap", POS_DEAD, do_automap, 0, 0, 0 },
     { "ahall"    , "ahall", POS_DEAD    , do_ahall    , 0, 0, 0 },
     { "alias"    , "ali" , POS_DEAD    , do_alias    , 0, 0, 0 },
 //	{ "analyze"  , "analyze", POS_STANDING, do_analyze, 0, 0, 0 },
@@ -705,7 +707,7 @@ const command_info cmd_info[] =
     { "mail"     , "mail"     , POS_STANDING, do_not_here , 1, 0, 0 },
 //	{ "make"     , "make"     , POS_STANDING, do_assemble , 0, SUB_MAKE, 0 },
 //	{ "mix"      , "mix" , POS_STANDING, do_assemble , 0, SUB_MIX, 0 },
-    { "map"      , "map"  , POS_DEAD    , do_map      , 0, 0, 0 },
+    { "map"      , "map"  , POS_DEAD    , do_map      , 0, SCMD_MAP, 0 },
     { "mine"     , "mine" , POS_STANDING, do_mine     , 0, 0, 0 },
     { "meld"     , "meld" , POS_STANDING, do_meld     , 0, 0, 0 },
     { "mlist"    , "mlist"   , POS_DEAD    , do_oasis    , LVL_BUILDER, SCMD_OASIS_MLIST , WIZ_OLC_GRP},

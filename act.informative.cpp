@@ -58,6 +58,7 @@ extern char *help;
 extern struct time_info_data time_info;
 extern map <int, questcard> questcards;
 extern vector<int> explorable;
+extern string local_map;
 
 extern char *credits;
 extern char *news;
@@ -144,6 +145,7 @@ ACMD ( do_diagnose );
 ACMD ( do_colour );
 ACMD ( do_toggle );
 ACMD ( do_worth );
+ACMD ( do_map );
 void sort_commands ( void );
 ACMD ( do_commands );
 void look_at_char ( Character *i, Character *ch );
@@ -1385,6 +1387,143 @@ void parse_room_description ( room_rnum in_room, char *bufptr, size_t len )
 
 }
 
+// Show the room desc mixed with the map if automap is "left" or "right"
+void show_map_and_room ( Character *ch, const char *room_desc )
+{
+    size_t pos_map1 = 0, pos_map2 = 0, pos_desc1 = 0, pos_desc2 = 0, pw = PAGEWIDTH ( ch );
+
+    do_map ( ch, (char*)"", 0, SCMD_AUTOMAP );
+
+    // wilderness maps can be irregular in width
+    size_t max_map_width = 0; // including colours except {cx
+    if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_WILDERNESS ) )
+    {
+        while ( true )
+        {
+            pos_map2 = local_map.find ( "{cx\r\n", pos_map1 );
+            if ( pos_map2 == string::npos )
+            {
+                max_map_width = max ( max_map_width, local_map.length() - pos_map1 );
+                break;
+            }
+            max_map_width = max ( max_map_width, pos_map2 - pos_map1 );
+            pos_map1 = pos_map2 + 5;
+        }
+    }
+
+    // replace newlines in the room desc with spaces
+    string desc = string ( room_desc );
+    while ( true )
+    {
+        pos_desc1 = desc.find ( "\r\n", pos_desc1 );
+        if ( pos_desc1 == string::npos )
+            break;
+        desc.erase ( pos_desc1, 1 );
+        desc[pos_desc1] = ' ';
+    }
+
+    string desc_colour = "{cg";
+    pos_desc1 = 0;
+    pos_map1 = 0;
+    while ( true )
+    {
+        string line, desc_part;
+        int num_map_colours = 0, num_desc_colours = 0;
+        pos_map2 = local_map.find ( "{cx\r\n", pos_map1 );
+        if ( pos_map2 != string::npos )
+        {
+            line = local_map.substr ( pos_map1, pos_map2 - pos_map1 );
+            num_map_colours = count ( line.begin(), line.end(), '{' );
+            pos_map1 = pos_map2 + 5;
+        }
+
+        // attach the longest possible part of the room desc to the map line
+        for ( pos_desc2 = pos_desc1; pos_desc2 < desc.length(); ++pos_desc2 )
+        {
+            if ( desc[pos_desc2] == '{' )
+            {
+                num_desc_colours++;
+                pos_desc2 += 2;
+            }
+            else if ( desc[pos_desc2] == ' ' )
+            {
+                int len = 1 + pos_desc2 - pos_desc1 - ( num_map_colours + num_desc_colours ) * 3;
+                if ( line.length() > 0 && max_map_width > 0 )
+                    len += max_map_width;
+                else
+                    len += line.length();
+
+                if ( len >= pw )
+                {
+                    do {
+                        if ( desc[pos_desc2] == '{' )
+                            num_desc_colours--;
+                        pos_desc2--;
+                    } while ( desc[pos_desc2] != ' ' );
+                    break;
+                }
+            }
+        }
+
+        if ( pos_desc1 < desc.length() )
+            desc_part = desc.substr ( pos_desc1, pos_desc2 - pos_desc1 );
+
+        if ( line.length() == 0 && desc_part.length() == 0 )
+            break;
+
+        if  ( GET_AUTOMAP ( ch ) == "left" )
+        {
+            if ( line.length() > 0 )
+                line += " ";
+            line += desc_colour + desc_part;
+        }
+        else if  ( GET_AUTOMAP ( ch ) == "right" )
+        {
+            if ( line.length() == 0 )
+                line = desc_colour + desc_part;
+            else // line must be: desc + spaces + line
+            {
+                if ( desc_part.length() == 0 )
+                {
+                    if ( max_map_width > 0 )
+                    {
+                        if ( pw  > max_map_width - num_map_colours * 3 )
+                            line = string ( pw + num_map_colours * 3 - max_map_width, ' ' ) + line;
+                    }
+                    else
+                    {
+                        if ( pw > line.length() - num_map_colours * 3 )
+                            line = string ( pw + num_map_colours * 3 - line.length(), ' ' ) + line;
+                    }
+                }
+                else
+                {
+                    int len = desc_part.length() - ( num_map_colours + num_desc_colours ) * 3;
+                    if ( line.length() > 0 && max_map_width > 0 )
+                        len += max_map_width;
+                    else
+                        len += line.length();
+
+                    if ( len > pw )
+                        len = pw;
+
+                    line = desc_colour + desc_part + string ( pw - len, ' ' ) + line;
+                }
+            }
+        }
+
+        ch->Send ( "%s{cx\r\n", line.c_str() );
+
+        if ( desc_part.length() > 0 )
+        {
+            size_t pos = desc_part.rfind ( "{c" );
+            if ( pos != string::npos )
+                desc_colour = desc_part.substr ( pos, 3 );
+        }
+        pos_desc1 = pos_desc2 + 1;
+    }
+}
+
 void look_at_room ( Character *ch, int ignore_brief )
 {
     char tbuf[MAX_STRING_LENGTH];
@@ -1413,6 +1552,13 @@ void look_at_room ( Character *ch, int ignore_brief )
         ch->Send ( "You see nothing but infinite darkness...\r\n" );
         return;
     }
+
+    if ( GET_AUTOMAP ( ch ) == "up" )
+    {
+        do_map ( ch, (char*)"", 0, SCMD_AUTOMAP );
+        ch->Send ( "%s", local_map.c_str() );
+    }
+
     ch->Send ( "%s", CBCYN ( ch, C_NRM ) );
     if ( !IS_NPC ( ch ) && PRF_FLAGGED ( ch, PRF_ROOMFLAGS ) )
     {
@@ -1460,42 +1606,63 @@ void look_at_room ( Character *ch, int ignore_brief )
         if ( ROOM_FLAGGED ( view_room, ROOM_WILDERNESS ) )
         {
             parse_room_description ( view_room, tbuf, sizeof ( tbuf ) );
-            ch->Send ( "%s", tbuf );
+            if ( GET_AUTOMAP ( ch ) == "left" || GET_AUTOMAP ( ch ) == "right" )
+                show_map_and_room ( ch, tbuf );
+            else
+                ch->Send ( "%s", tbuf );
         }
         else
         {
-                    bool found = FALSE;
-                    if (view_room->q_description && ch->script && ch->script->global_vars)
-                    {
-                       struct trig_var_data *tv;
-                       struct q_descr_data *qv;
-                       for (tv = ch->script->global_vars; tv; tv = tv->next) {
-                           if (found) break;
-                       for (qv = view_room->q_description; qv; qv = qv->next){
-                           if (!strncmp(tv->name.c_str(), &qv->flag[2], strlen(tv->name.c_str()))) {
-                               found = TRUE;
-                               ch->Send("%s\r\n", qv->description);
-                               break;
-                           }
-                       }
-                       }
+            bool found = FALSE;
+            if (view_room->q_description && ch->script && ch->script->global_vars)
+            {
+                struct trig_var_data *tv;
+                struct q_descr_data *qv;
+                for (tv = ch->script->global_vars; tv; tv = tv->next) {
+                    if (found) break;
+                    for (qv = view_room->q_description; qv; qv = qv->next) {
+                        if (!strncmp(tv->name.c_str(), &qv->flag[2], strlen(tv->name.c_str()))) {
+                            found = TRUE;
+                            if ( GET_AUTOMAP ( ch ) == "left" || GET_AUTOMAP ( ch ) == "right" )
+                                show_map_and_room ( ch, qv->description );
+                            else
+                                ch->Send ( "%s", qv->description );
+                            break;
+                        }
                     }
-                    if (!found) {
-                      if (view_room->n_description && (time_info.hours < 6 || time_info.hours >21)) {
-                        if (view_room->tmp_n_description)
-                            ch->Send("%s", view_room->tmp_n_description);
+                }
+            }
+            if (!found) {
+                if (view_room->n_description && (time_info.hours < 6 || time_info.hours >21)) {
+                    if (view_room->tmp_n_description) {
+                        if ( GET_AUTOMAP ( ch ) == "left" || GET_AUTOMAP ( ch ) == "right" )
+                            show_map_and_room ( ch, view_room->tmp_n_description );
                         else
-                            ch->Send("%s", view_room->n_description);
-                      }
-                      else {
-                        if (view_room->tmp_description)
-                            ch->Send("%s", view_room->tmp_description);
+                            ch->Send ( "%s", view_room->tmp_n_description );
+                    }
+                    else {
+                        if ( GET_AUTOMAP ( ch ) == "left" || GET_AUTOMAP ( ch ) == "right" )
+                            show_map_and_room ( ch, view_room->n_description );
                         else
-                ch->Send ( "%s", view_room->GetDescription() );
+                            ch->Send ( "%s", view_room->n_description );
                     }
+                }
+                else {
+                    if (view_room->tmp_description) {
+                        if ( GET_AUTOMAP ( ch ) == "left" || GET_AUTOMAP ( ch ) == "right" )
+                            show_map_and_room ( ch, view_room->tmp_description );
+                        else
+                            ch->Send ( "%s", view_room->tmp_description );
                     }
+                    else {
+                        if ( GET_AUTOMAP ( ch ) == "left" || GET_AUTOMAP ( ch ) == "right" )
+                            show_map_and_room ( ch, view_room->GetDescription() );
+                        else
+                            ch->Send ( "%s", view_room->GetDescription() );
+                    }
+                }
+            }
         }
-
         ch->Send ( "%s", CCNRM ( ch, C_NRM ) );
     }
 
@@ -1521,6 +1688,12 @@ void look_at_room ( Character *ch, int ignore_brief )
 
     if ( ch->desc && ch->desc->mxp )
         update_mxp_map ( ch );
+
+    if ( GET_AUTOMAP ( ch ) == "down" )
+    {
+        do_map ( ch, (char*)"", 0, SCMD_AUTOMAP );
+        ch->Send ( "%s", local_map.c_str() );
+    }
 
     if ( KILL_ALL_ENABLED && PRF_FLAGGED ( ch, PRF_AGGRO ) && view_room == IN_ROOM ( ch ))
     {
@@ -5399,7 +5572,8 @@ ACMD ( do_toggle )
         "     NOTELEPORT: %-3s\r\n"
         " NoDisplayTitle: %-3s    "
         "     NoGraphics: %-3s    "
-        "    ReverseList: %-3s\r\n",
+        "    ReverseList: %-3s\r\n"
+        "        AutoMap: %-5s\r\n",
         ONOFF ( PRF_FLAGGED ( ch, PRF_DISPHP ) ),
         ONOFF ( PRF_FLAGGED ( ch, PRF_BRIEF ) ),
         ONOFF ( !PRF_FLAGGED ( ch, PRF_SUMMONABLE ) ),
@@ -5448,7 +5622,8 @@ ACMD ( do_toggle )
         ONOFF ( !PRF_FLAGGED ( ch, PRF_TELEPORTABLE ) ),
         ONOFF ( !PRF_FLAGGED ( ch, PRF_NOTITLE ) ),
         ONOFF ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ),
-        ONOFF ( PRF_FLAGGED ( ch, PRF_REVERSELIST ) )
+        ONOFF ( PRF_FLAGGED ( ch, PRF_REVERSELIST ) ),
+        GET_AUTOMAP ( ch ).c_str()
         );
 
 }
