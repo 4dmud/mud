@@ -2170,7 +2170,7 @@ public:
         help  = NULL;
         kills.clear();
         age = -1;
-        automap = "off";
+        automap = "right";
     }
     kill_map::iterator KillsBegin() {
         return kills.begin();

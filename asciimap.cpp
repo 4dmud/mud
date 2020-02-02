@@ -290,11 +290,37 @@ void draw_wilderness_map ( Character *ch )
     }
 }
 
-void crop_wilderness_map()
+void crop_map ( bool wilderness_map )
 {
-    // remove empty rows starting from the top
+    // remove the border from the non-wilderness map
     size_t pos1 = 0, pos2;
-    while (true) {
+    if ( !wilderness_map )
+    {
+        pos2 = local_map.find ( "{cx\r\n", pos1 );
+        local_map.erase ( pos1, pos2 + 5 - pos1 );
+
+        pos2 = local_map.rfind ( "{cx\r\n" );
+        pos2 = local_map.rfind ( "{cx\r\n", pos2 - 1 );
+        local_map.erase ( pos2 + 5 );
+
+        while ( true )
+        {
+            pos2 = local_map.find ( "{cy|{cx " );
+            if ( pos2 == string::npos )
+                break;
+            local_map.erase ( pos2, 8 );
+
+            pos2 = local_map.find ( " {cy|{cx" );
+            if ( pos2 == string::npos )
+                break;
+            local_map.erase ( pos2, 5 );
+        }
+    }
+
+    // remove empty rows starting from the top
+    pos1 = 0;
+    while ( true )
+    {
 		pos2 = local_map.find ( "{cx\r\n", pos1 );
 		if ( pos2 == string::npos )
 			break;
@@ -304,7 +330,8 @@ void crop_wilderness_map()
 	}
 
     // remove empty rows starting from the bottom
-    while (true) {
+    while ( true )
+    {
         pos2 = local_map.rfind ( "{cx\r\n" );
         pos1 = local_map.rfind ( "{cx\r\n", pos2-1 );
         if ( count ( local_map.begin() + pos1+1, local_map.begin() + pos2, '{' ) > count ( local_map.begin() + pos1+1, local_map.begin() + pos2, '?' ) )
@@ -313,32 +340,48 @@ void crop_wilderness_map()
     }
 
     // find the number of columns to remove from the left
-    int num_col = 1e6;
+    const int col_max = 1e6;
+    int num_col_left = col_max;
     pos1 = 0;
-    while (true) {
+    while ( true )
+    {
         int c = 0;
         pos2 = local_map.find ( "{cx\r\n", pos1 );
         if ( pos2 == string::npos )
             break;
-        while ( pos1 < pos2 && c < num_col )
+        while ( pos1 < pos2 && c < num_col_left )
         {
-            if ( local_map.substr ( pos1, 4 ) != "{cl?" )
+            if ( wilderness_map )
+            {
+                if ( local_map.substr ( pos1, 4 ) != "{cl?" )
+                    break;
+                c++;
+                pos1 += 5;
+            }
+            else
+            {
+                while ( pos1 < pos2 && c < num_col_left && local_map[pos1] == ' ' )
+                {
+                    c++;
+                    pos1++;
+                }
                 break;
-            c++;
-            pos1 += 5;
+            }
         }
-        num_col = min ( num_col, c );
+        num_col_left = min ( num_col_left, c );
         pos1 = pos2 + 5;
     }
 
     // remove empty columns from the left
-    if ( num_col > 0 )
+    if ( num_col_left > 0 && num_col_left < col_max )
     {
         pos1 = 0;
-        while (true)
+        while ( true )
         {
-            for ( int i = 0; i < num_col; ++i )
-                local_map.erase ( pos1, 5 );
+            if ( wilderness_map )
+                local_map.erase ( pos1, 5 * num_col_left );
+            else
+                local_map.erase ( pos1, num_col_left );
             pos2 = local_map.find ( "{cx\r\n", pos1 );
             if ( pos2 == string::npos )
                 break;
@@ -347,40 +390,80 @@ void crop_wilderness_map()
     }
 
     // find the number of columns to remove from the right
-    num_col = 1e6;
-    pos1 = local_map.length() - 10; // position of the last colour
+    int num_col_right = col_max;
+    if ( wilderness_map )
+        pos1 = local_map.length() - 10; // position of the last colour
+    else
+        pos1 = local_map.length() - 6; // just before {cx\r\n
     while ( pos1 < local_map.length() )
     {
         int c = 0;
         pos2 = local_map.rfind ( "{cx\r\n", pos1 );
         if ( pos2 == string::npos )
             pos2 = 0;
-        while ( pos1 > pos2 && c < num_col )
+        while ( pos1 > pos2 && c < num_col_right )
         {
-            if ( local_map.substr ( pos1, 4 ) != "{cl?" )
+            if ( wilderness_map )
+            {
+                if ( c >= num_col_right || local_map.substr ( pos1, 5 ) != "{cl? " )
+                    break;
+                c++;
+                pos1 -= 5;
+            }
+            else
+            {
+                while ( pos1 > pos2 && c < num_col_right && local_map[pos1] == ' ' )
+                {
+                    c++;
+                    pos1--;
+                }
                 break;
-            c++;
-            pos1 -= 5;
+            }
         }
-        num_col = min ( num_col, c );
-        pos1 = pos2 - 5;
+        num_col_right = min ( num_col_right, c );
+        if ( wilderness_map )
+            pos1 = pos2 - 5;
+        else
+            pos1 = pos2 - 1;
     }
-    if ( num_col == 0 )
-        return;
 
     // remove empty columns from the right
-    pos1 = local_map.length() - 10; // position of the last colour
-    while ( pos1 < local_map.length() )
+    if ( num_col_right > 0 && num_col_right < col_max )
     {
-        for ( int i = 0; i < num_col; ++i )
+        pos2 = local_map.length() - 5;
+        while ( true )
         {
-            local_map.erase ( pos1, 5 );
-            pos1 -= 5;
+            if ( wilderness_map )
+            {
+                pos1 = pos2 - 5 * num_col_right;
+                local_map.erase ( pos1, 5 * num_col_right );
+            }
+            else
+            {
+                pos1 = pos2 - num_col_right;
+                local_map.erase ( pos1, num_col_right );
+            }
+            pos2 = local_map.rfind ( "{cx\r\n", pos1 - 1 );
+            if ( pos2 == string::npos )
+                break;
         }
-        pos2 = local_map.rfind ( "{cx\r\n", pos1 );
-        if ( pos2 == string::npos )
-            break;
-        pos1 = pos2 - 5;
+    }
+
+    // put the border on the non-wilderness map back
+    if ( !wilderness_map )
+    {
+        pos1 = 0;
+        while ( true )
+        {
+            pos2 = local_map.find ( "{cx\r\n", pos1 );
+            if ( pos2 == string::npos )
+                break;
+            local_map.insert ( pos2, " {cy|" );
+            local_map.insert ( pos1, "{cy|{cx " );
+            pos1 = pos2 + 18;
+        }
+        local_map = "{cy+" + string ( 11 - num_col_left - num_col_right, '-' ) + "+{cx\r\n" + local_map;
+        local_map += "{cy+" + string ( 11 - num_col_left - num_col_right, '-' ) + "+{cx\r\n";
     }
 }
 
@@ -395,7 +478,7 @@ void crop_wilderness_map()
 /* If subcmd == SCMD_AUTOMAP (the player typed "look" or moved with automap
    not being "off"):
    - Don't show the legend
-   - Remove empty rows and columns in the wilderness map
+   - Remove empty rows and columns
    - If automap is "left" or "right", combine the map with the room desc.
 */
 void do_map ( Character *ch, char *argument, int cmd, int subcmd )
@@ -432,6 +515,8 @@ void do_map ( Character *ch, char *argument, int cmd, int subcmd )
         IN_ROOM ( ch ) = was_in;
         if ( subcmd == SCMD_MAP )
             ch->Send ( "%s", local_map.c_str() );
+        else if ( subcmd == SCMD_AUTOMAP )
+            crop_map ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_WILDERNESS ) );
         return;
     }
 
@@ -518,6 +603,6 @@ void do_map ( Character *ch, char *argument, int cmd, int subcmd )
     IN_ROOM ( ch ) = was_in;
     if ( subcmd == SCMD_MAP )
         ch->Send ( "%s", local_map.c_str() );
-    else if ( subcmd == SCMD_AUTOMAP && ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_WILDERNESS ) )
-        crop_wilderness_map();
+    else if ( subcmd == SCMD_AUTOMAP )
+        crop_map ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_WILDERNESS ) );
 }
