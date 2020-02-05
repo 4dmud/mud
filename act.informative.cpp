@@ -1411,15 +1411,20 @@ void show_map_and_room ( Character *ch, const char *room_desc )
         }
     }
 
-    // replace newlines in the room desc with spaces
+    // remove newlines in the room desc, or replace them with a space if necessary
     string desc = string ( room_desc );
     while ( true )
     {
         pos_desc1 = desc.find ( "\r\n", pos_desc1 );
         if ( pos_desc1 == string::npos )
             break;
-        desc.erase ( pos_desc1, 1 );
-        desc[pos_desc1] = ' ';
+        if ( pos_desc1 == 0 || pos_desc1 == desc.length()-1 || desc[pos_desc1-1] == ' ' || desc[pos_desc1+1] == ' ' )
+            desc.erase ( pos_desc1, 2 );
+        else
+        {
+            desc.erase ( pos_desc1, 1 );
+            desc[pos_desc1] = ' ';
+        }
     }
 
     string desc_colour = "{cg";
@@ -1459,7 +1464,7 @@ void show_map_and_room ( Character *ch, const char *room_desc )
                         if ( desc[pos_desc2] == '{' )
                             num_desc_colours--;
                         pos_desc2--;
-                    } while ( desc[pos_desc2] != ' ' );
+                    } while ( pos_desc2 < desc.length() && desc[pos_desc2] != ' ' );
                     break;
                 }
             }
