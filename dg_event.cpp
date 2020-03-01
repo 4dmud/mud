@@ -86,7 +86,8 @@ void event_cancel(struct event *event) {
             delete (struct timer_event_data *)event->event_obj;
             break;
         default:
-            free(event->event_obj);
+            log ( "SYSERR: Canceling an event of unknown type %d", event->type );
+            // can't delete the event_obj because we don't know the type
             break;
         }
         delete event;
