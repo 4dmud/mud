@@ -1178,10 +1178,13 @@ void command_interpreter ( Character *ch, char *argument, trig_data *trig )
      * here has been removed.
      */
     {
-        int count = 0;                               /* command trigger count */
-        count += command_wtrigger ( ch, arg, line ); /* any world triggers ? */
-        count += command_mtrigger ( ch, arg, line ); /* any mobile triggers ? */
-        count += command_otrigger ( ch, arg, line ); /* any object triggers ? */
+        int count = 0;                            /* command trigger count */
+        if ( command_wtrigger ( ch, arg, line ) ) /* any world triggers ? */
+            return;
+        if ( command_mtrigger ( ch, arg, line ) ) /* any mobile triggers ? */
+            return;
+        if ( command_otrigger ( ch, arg, line ) ) /* any object triggers ? */
+            return;
 #if ECL
 
         count += fix(cl_funcall(4,

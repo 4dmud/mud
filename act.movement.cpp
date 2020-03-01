@@ -3100,10 +3100,18 @@ ACMD ( do_speedwalk )
             dist = 1;
         dist_str = "";
 
+        vector<string> move_cmd { "north", "east", "south", "west", "up", "down" };
         for ( ; dist && r; dist-- )
+        {
+            // check command triggers
+            if ( command_wtrigger ( ch, (char*) move_cmd[dir].c_str(), (char*) "" ) )
+                break;
+            if ( command_mtrigger ( ch, (char*) move_cmd[dir].c_str(), (char*) "" ) )
+                break;
+            if ( command_otrigger ( ch, (char*) move_cmd[dir].c_str(), (char*) "" ) )
+                break;
             r = perform_move ( ch, dir, 1 );
-        //if (r && *(argument + 1))
-        //send_to_char("\r\n", ch);
+        }
     }
     REMOVE_BIT_AR ( PLR_FLAGS ( ch ), PLR_SPEEDWALK );
     LOOK ( ch );
