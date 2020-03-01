@@ -644,7 +644,7 @@ bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
     return TRUE;
 }
 
-bool is_put_ok ( Character *ch, char *obj_desc, char *cont_desc, int obj_dotmode, int cont_dotmode, struct obj_data **obj_data, struct obj_data **cont_data )
+bool is_put_ok ( Character *ch, char *obj_desc, char *cont_desc, int obj_dotmode, int cont_dotmode, struct obj_data **obj, struct obj_data **cont )
 {
     Character *tmp_Character;
     // no obj name defined
@@ -669,24 +669,24 @@ bool is_put_ok ( Character *ch, char *obj_desc, char *cont_desc, int obj_dotmode
         return FALSE;
     }
 
-    generic_find ( cont_desc, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_Character, cont_data );
+    generic_find ( cont_desc, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_Character, cont );
 
     // container not found
-    if ( !cont_data || !*cont_data )
+    if ( !cont || !*cont )
     {
         ch->Send ( "You don't see %s %s here.\r\n", AN ( cont_desc ), cont_desc );
         return FALSE;
     }
 
     // container object not a container
-    if ( GET_OBJ_TYPE ( *cont_data ) != ITEM_CONTAINER )
+    if ( GET_OBJ_TYPE ( *cont ) != ITEM_CONTAINER )
     {
-        act ( "$p is not a container.", FALSE, ch, *cont_data, 0, TO_CHAR );
+        act ( "$p is not a container.", FALSE, ch, *cont, 0, TO_CHAR );
         return FALSE;
     }
 
     // container is closed
-    if ( OBJVAL_FLAGGED ( *cont_data, CONT_CLOSED ) )
+    if ( OBJVAL_FLAGGED ( *cont, CONT_CLOSED ) )
     {
         ch->Send ( "You'd better open it first!\r\n" );
         return FALSE;
@@ -695,13 +695,13 @@ bool is_put_ok ( Character *ch, char *obj_desc, char *cont_desc, int obj_dotmode
     if ( obj_dotmode == FIND_INDIV )
     {
         // no obj matching the desc found
-        if ( ! ( *obj_data = get_obj_in_list_vis ( ch, obj_desc, NULL, ch->carrying ) ) )
+        if ( ! ( *obj = get_obj_in_list_vis ( ch, obj_desc, NULL, ch->carrying ) ) )
         {
             ch->Send ( "You aren't carrying %s %s.\r\n", AN ( obj_desc ), obj_desc );
             return FALSE;
         }
 
-        if ( obj_data == cont_data )
+        if ( obj == cont )
         {
             ch->Send ( "You attempt to fold it into itself, but fail.\r\n" );
             return FALSE;
@@ -726,7 +726,7 @@ ACMD ( do_put )
     char arg1[MAX_INPUT_LENGTH] = "";
     char arg2[MAX_INPUT_LENGTH] = "";
     char buf[MAX_INPUT_LENGTH] = "";
-    struct obj_data *next_obj_data, *obj_data, *cont_data;
+    struct obj_data *next_obj, *obj, *cont;
     int obj_dotmode, cont_dotmode, howmany = 1, processed_put_counter = 0, failed_put_counter = 0;
     char *obj_desc, *cont_desc;
 
@@ -768,7 +768,7 @@ ACMD ( do_put )
     obj_dotmode = find_all_dots ( obj_desc );
     cont_dotmode = find_all_dots ( cont_desc );
 
-    if ( !is_put_ok ( ch, obj_desc, cont_desc, obj_dotmode, cont_dotmode, &obj_data, &cont_data ) )
+    if ( !is_put_ok ( ch, obj_desc, cont_desc, obj_dotmode, cont_dotmode, &obj, &cont ) )
         return;
 
     if ( !IS_NPC ( ch ) )
@@ -780,11 +780,19 @@ ACMD ( do_put )
         if ( howmany > 1 )
             wearall = 1;
         /** this loop could end in tears if any trigger purges inventory on the perform_put -- mord**/
-        while ( obj_data && howmany )
+        while ( obj && howmany )
         {
-            next_obj_data = obj_data->next_content;
-            perform_put ( ch, obj_data, cont_data ) ? processed_put_counter++ : failed_put_counter++;
-            obj_data = get_obj_in_list_vis ( ch, obj_desc, NULL, next_obj_data );
+            next_obj = obj->next_content;
+            if ( perform_put ( ch, obj, cont ) )
+            {
+                processed_put_counter++;
+                // warn if the object has a put_in trigger
+                if ( SCRIPT_CHECK ( obj, OTRIG_PUT_IN ) )
+                    new_mudlog ( BRF, LVL_GOD, TRUE, "SYSERR: there's a put_in trigger on [%d] %s", GET_OBJ_VNUM ( obj ), obj->short_description );
+            }
+            else
+                failed_put_counter++;
+            obj = get_obj_in_list_vis ( ch, obj_desc, NULL, next_obj );
             howmany--;
         }
         wearall = 0;
@@ -793,11 +801,11 @@ ACMD ( do_put )
                 ( processed_put_counter == 1 && failed_put_counter > 0 ) )
         {
             snprintf ( buf, sizeof ( buf ), "You put %d %s into $p.", processed_put_counter, arg1 );
-            act ( buf, FALSE, ch, cont_data, 0, TO_CHAR );
+            act ( buf, FALSE, ch, cont, 0, TO_CHAR );
             if ( !slipping )
             {
                 snprintf ( buf, sizeof ( buf ), "$n puts %s %s into $p.", processed_put_counter > 1 ? "some" : AN ( arg1 ), arg1 );
-                act ( buf, FALSE, ch, cont_data, 0, TO_ROOM );
+                act ( buf, FALSE, ch, cont, 0, TO_ROOM );
             }
         }
         // put all.<obj> <container>
@@ -806,15 +814,23 @@ ACMD ( do_put )
     else
     {
         wearall = 1;
-        for ( obj_data = ch->carrying; obj_data; obj_data = next_obj_data )
+        for ( obj = ch->carrying; obj; obj = next_obj )
         {
-            next_obj_data = obj_data->next_content;
-            if ( obj_data != cont_data &&
-                    CAN_SEE_OBJ ( ch, obj_data ) &&
-                    GET_OBJ_TYPE ( obj_data ) != ITEM_CONTAINER &&
-                    ( obj_dotmode == FIND_ALL || isname_full ( obj_desc, obj_data->name ) ) )
+            next_obj = obj->next_content;
+            if ( obj != cont &&
+                    CAN_SEE_OBJ ( ch, obj ) &&
+                    GET_OBJ_TYPE ( obj ) != ITEM_CONTAINER &&
+                    ( obj_dotmode == FIND_ALL || isname_full ( obj_desc, obj->name ) ) )
             {
-                perform_put ( ch, obj_data, cont_data ) ? processed_put_counter++ : failed_put_counter++;
+                if ( perform_put ( ch, obj, cont ) )
+                {
+                    // warn if the object has a put_in trigger
+                    if ( SCRIPT_CHECK ( obj, OTRIG_PUT_IN ) )
+                        new_mudlog ( BRF, LVL_GOD, TRUE, "SYSERR: there's a put_in trigger on [%d] %s", GET_OBJ_VNUM ( obj ), obj->short_description );
+                    processed_put_counter++;
+                }
+                else
+                    failed_put_counter++;
             }
         }
         wearall = 0;
@@ -835,21 +851,21 @@ ACMD ( do_put )
             if ( obj_dotmode == FIND_ALL )
             {
                 snprintf ( buf, sizeof ( buf ), "You put everything you can into $p." );
-                act ( buf, FALSE, ch, cont_data, 0, TO_CHAR );
+                act ( buf, FALSE, ch, cont, 0, TO_CHAR );
                 if ( !slipping )
                 {
                     snprintf ( buf, sizeof ( buf ), "$n puts everything $e can into $p." );
-                    act ( buf, FALSE, ch, cont_data, 0, TO_ROOM );
+                    act ( buf, FALSE, ch, cont, 0, TO_ROOM );
                 }
             }
             else
             {
                 snprintf ( buf, sizeof ( buf ), "You put %d %s into $p.", processed_put_counter, obj_desc );
-                act ( buf, FALSE, ch, cont_data, 0, TO_CHAR );
+                act ( buf, FALSE, ch, cont, 0, TO_CHAR );
                 if ( !slipping && *arg2 )
                 {
                     snprintf ( buf, sizeof ( buf ), "$n puts all the %s $e can into $p.", arg1 );
-                    act ( buf, FALSE, ch, cont_data, 0, TO_ROOM );
+                    act ( buf, FALSE, ch, cont, 0, TO_ROOM );
                 }
             }
         }
