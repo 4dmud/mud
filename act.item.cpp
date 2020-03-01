@@ -3219,29 +3219,19 @@ OBJ_DATA * create_vial ( void )
 
 void update_timer ( struct obj_data *obj )
 {
-    struct timer_event_data *tmr;
-    unsigned long t;
-    time_t ct = 0;
-
-    if ( !obj )
+    if ( !obj || GET_OBJ_TIMER ( obj ) == -1 )
         return;
-    if ( GET_OBJ_TIMER ( obj ) != -1 )
-        GET_OBJ_EXPIRE ( obj ) = ( GET_OBJ_TIMER ( obj ) * SECS_PER_MUD_HOUR ) + time ( 0 );
 
-    ct = time ( 0 );
+    time_t ct = time ( 0 );
+    GET_OBJ_EXPIRE ( obj ) = ( GET_OBJ_TIMER ( obj ) * SECS_PER_MUD_HOUR ) + ct;
+    unsigned long t = PASSES_PER_SEC * ( GET_OBJ_EXPIRE ( obj ) - ct );
 
-    t = PASSES_PER_SEC * ( GET_OBJ_EXPIRE ( obj ) - ct );
+    /* take off old event, create updated event */
+    if ( GET_TIMER_EVENT ( obj ) != NULL )
+        event_cancel ( GET_TIMER_EVENT ( obj ) );
 
-    if ( GET_TIMER_EVENT ( obj ) == NULL ||
-            ( t < event_time ( GET_TIMER_EVENT ( obj ) ) ) )
-    {
-        /* take off old event, create updated event */
-        if ( GET_TIMER_EVENT ( obj ) != NULL )
-            event_cancel ( GET_TIMER_EVENT ( obj ) );
-
-        tmr = new timer_event_data ( obj );
-        GET_TIMER_EVENT ( obj ) = event_create ( timer_event, tmr, t, EVENT_TYPE_TIMER );
-    }
+    timer_event_data *tmr = new timer_event_data ( obj );
+    GET_TIMER_EVENT ( obj ) = event_create ( timer_event, tmr, t, EVENT_TYPE_TIMER );
 }
 
 
@@ -5020,31 +5010,21 @@ ACMD ( do_fuel )
 
 void check_timer ( obj_data *obj )
 {
-    time_t ct = 0;
-    unsigned long t;
-
     if ( obj == NULL || GET_OBJ_TIMER ( obj ) == -1 )
         return;
 
-    ct = time ( 0 );
+    time_t ct = time ( 0 );
 
     if ( GET_OBJ_EXPIRE ( obj ) == 0 )
         GET_OBJ_EXPIRE ( obj ) = ( GET_OBJ_TIMER ( obj ) * SECS_PER_MUD_HOUR ) + ct;
 
-    t = PASSES_PER_SEC * ( GET_OBJ_EXPIRE ( obj ) - ct );
+    unsigned long t = PASSES_PER_SEC * ( GET_OBJ_EXPIRE ( obj ) - ct );
 
-    if ( GET_TIMER_EVENT ( obj ) == NULL ||
-            ( t < event_time ( GET_TIMER_EVENT ( obj ) ) ) )
-    {
+    /* take off old event, create updated event */
+    if ( GET_TIMER_EVENT ( obj ) != NULL )
+        event_cancel ( GET_TIMER_EVENT ( obj ) );
 
-        /* take off old event, create updated event */
-        if ( GET_TIMER_EVENT ( obj ) != NULL )
-            event_cancel ( GET_TIMER_EVENT ( obj ) );
-        else
-            GET_TIMER_EVENT ( obj ) = NULL;
-
-        GET_TIMER_EVENT ( obj ) = event_create ( timer_event, new timer_event_data ( obj ), t, EVENT_TYPE_TIMER );
-    }
+    GET_TIMER_EVENT ( obj ) = event_create ( timer_event, new timer_event_data ( obj ), t, EVENT_TYPE_TIMER );
 }
 /*
  void FillNames() {
