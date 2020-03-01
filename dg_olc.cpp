@@ -955,13 +955,13 @@ void dg_script_menu(Descriptor *d) {
                 continue;
             }
             i++;
-            it++;
             d->Output ( "     %2d) [%s%d%s] %s%s%s", i, cyn, *it, nrm, cyn,
                 trig_index[ rnum ]->proto->name, nrm);
             if (trig_index[ rnum ]->proto->attach_type != OLC_ITEM_TYPE(d))
                 d->Output( "   %s** Mis-matched Trigger Type **%s\r\n", grn, nrm );
             else
                 d->Output( "\r\n");
+            it++;
         }
     }
 
@@ -1035,12 +1035,8 @@ int dg_script_edit_parse(Descriptor *d, char *arg) {
             pos = 999;
         }
 
-        if (pos<0)
+        if (pos < 1)
             break; /* this aborts a new trigger entry */
-        if (!OLC_SCRIPT(d))
-            pos = 0;
-        else if (pos > OLC_SCRIPT(d)->size())
-            pos = OLC_SCRIPT(d)->size();
 
         if (vnum==0)
             break; /* this aborts a new trigger entry */
@@ -1054,10 +1050,10 @@ int dg_script_edit_parse(Descriptor *d, char *arg) {
         /* add the new info in position */
         if (!OLC_SCRIPT(d))
             OLC_SCRIPT(d) = new vector<int>(1, vnum);
-        else if (pos == OLC_SCRIPT(d)->size())
+        else if (pos > OLC_SCRIPT(d)->size())
             OLC_SCRIPT(d)->push_back(vnum);
         else
-            OLC_SCRIPT(d)->insert(OLC_SCRIPT(d)->begin() + pos, vnum);
+            OLC_SCRIPT(d)->insert(OLC_SCRIPT(d)->begin() + pos - 1, vnum); // Trigger List starts with 1
         OLC_VAL(d)++;
         break;
 
@@ -1065,13 +1061,11 @@ int dg_script_edit_parse(Descriptor *d, char *arg) {
         if (!is_number(arg))
             break;
         pos = atoi(arg);
-        if (pos<0)
+        if ( pos <= 0 || pos > OLC_SCRIPT(d)->size() )
             break;
         if (!OLC_SCRIPT(d))
             break;
-        if (pos>=OLC_SCRIPT(d)->size())
-            break;
-        OLC_SCRIPT(d)->erase(OLC_SCRIPT(d)->begin() + pos);
+        OLC_SCRIPT(d)->erase(OLC_SCRIPT(d)->begin() + pos - 1); // Trigger List starts with 1
         if (OLC_SCRIPT(d)->size() == 0) {
             delete OLC_SCRIPT(d);
             OLC_SCRIPT(d) = NULL;
