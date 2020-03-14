@@ -457,9 +457,9 @@ void function_script(void *go, struct script_data *sc, trig_data *parent, int ty
 /* player id's: 0 to MOB_ID_BASE - 1            */
 /* mob id's: MOB_ID_BASE to ROOM_ID_BASE - 1      */
 /* room id's: ROOM_ID_BASE to OBJ_ID_BASE - 1    */
-#define MOB_ID_BASE	  50000  /* 50000 player IDNUMS should suffice */
-#define ROOM_ID_BASE    1050000 /* 1000000 Mobs */
-#define OBJ_ID_BASE     1300000 /* 250000 Rooms */
+#define MOB_ID_BASE	  50000     /* 50000 player IDNUMS should suffice */
+#define ROOM_ID_BASE  105000000 /* 100 million Mobs */
+#define OBJ_ID_BASE   105250000 /* 250000 Rooms */
 
 #define SCRIPT(o)		  ((o)->script)
 #define SCRIPT_MEM(c)             ((c)->memory)
