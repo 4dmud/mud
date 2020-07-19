@@ -574,7 +574,7 @@ bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
         }
         else if ( ( value + plussage ) > capa )
         {
-            ch->Send ( "That container's items would push your house capacity of %d over it's limit by %d.\r\n",capa, capa - ( value+plussage ) );
+            ch->Send ( "That container's items would push your house capacity of %d over its limit by %d.\r\n", capa, value + plussage - capa );
             return FALSE;
         }
     }
@@ -1745,7 +1745,7 @@ int perform_drop ( Character *ch, struct obj_data *obj, sbyte mode, const char *
         }
         else if ( ( value + plussage ) > capa )
         {
-            ch->Send ( "That container's items would push your house capacity of %d over it's limit by %d.\r\n",capa, capa - ( value+plussage ) );
+            ch->Send ( "That container's items would push your house capacity of %d over its limit by %d.\r\n", capa, value + plussage - capa );
             return FALSE;
         }
     }
