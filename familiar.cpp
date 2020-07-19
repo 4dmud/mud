@@ -39,6 +39,7 @@ ASKILL(skill_backstab);
 ASKILL(skill_grapple);
 ASKILL(skill_encircle);
 ASKILL(skill_disarm);
+ASKILL(skill_kick);
 
 /* NPC -- AI stuff -- mord*/
 void parse_mob_commands(Character *ch); // this gets called for all mobs.
@@ -303,6 +304,9 @@ void parse_rogue_commands(Character *ch) {
                 case 6:
                     skill_snare(ch, vict, NULL, NULL);
                     return;
+                default:
+                    skill_kick(ch, vict, NULL, NULL);
+                    return;
             }
         }
     }
@@ -332,8 +336,11 @@ void parse_rogue_commands(Character *ch) {
                 skill_grapple(ch, vict, NULL, NULL);
                 return;
             case 6:
-                 skill_snare(ch, vict, NULL, NULL);
-                 return;
+                skill_snare(ch, vict, NULL, NULL);
+                return;
+            default:
+                skill_kick(ch, vict, NULL, NULL);
+                return;
         }
     }
 }

@@ -1982,7 +1982,7 @@ int fight_event_hit ( Character* ch, Character* vict, short type, short num )
         if ( GET_MOB_WAIT ( ch ) > 0 )
         {
             GET_MOB_WAIT ( ch ) -= ( 1 RL_SEC );
-            if ( ( GET_POS ( ch ) < POS_FIGHTING ) &&GET_MOB_WAIT ( ch ) == ( 1 RL_SEC ) )
+            if ( ( GET_POS ( ch ) < POS_FIGHTING ) && GET_MOB_WAIT ( ch ) == ( 1 RL_SEC ) )
                 act ( "$n gets on $s knees!", TRUE, ch, 0, 0, TO_ROOM );
             return 0;
         }

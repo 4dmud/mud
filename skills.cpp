@@ -929,15 +929,19 @@ ASKILL ( skill_kick )
         *ch << "You are far too exhausted!";
         return 0;
     }
-    /* 101% is a complete failure */
+
     if ( is_fused ( vict ) )
         AC = fused_AC ( vict );
-    else AC = vict->compute_armor_class();
+    else
+        AC = vict->compute_armor_class();
+
     percent = ( ( 10 - ( AC / 10 ) ) * 2 ) + number ( 1, 70 );
-    prob = total_chance ( ch, SKILL_KICK );
+    prob = 100;
+    if ( !IS_NPC ( ch ) )
+        prob = total_chance ( ch, SKILL_KICK );
     WAIT_STATE ( ch, FTOI ( 1.5 RL_SEC ) );
 
-    skill_attack ( ch, vict, SKILL_KICK, ( percent < prob ) );
+    skill_attack ( ch, vict, SKILL_KICK, percent < prob );
 
     return SKILL_KICK;
 }
@@ -1283,7 +1287,7 @@ ASKILL ( skill_disarm )
     {
         act ( "$N is too wary to be disarmed!", FALSE, ch, 0, vict, TO_CHAR );
     }
-    else if ( number ( 0, 101 ) >= total_chance ( ch, SKILL_DISARM ) )
+    else if ( !IS_NPC ( ch ) && number ( 0, 101 ) >= total_chance ( ch, SKILL_DISARM ) )
     {
         act ( "You failed to disarm $N!", FALSE, ch, 0, vict, TO_CHAR );
         damage ( vict, ch, number ( 1, GET_LEVEL ( vict ) ), TYPE_HIT );
@@ -1291,10 +1295,8 @@ ASKILL ( skill_disarm )
     else if ( dice ( 2, GET_STR ( ch ) ) + GET_LEVEL ( ch ) <=
               dice ( 2, GET_STR ( vict ) ) + GET_LEVEL ( vict ) )
     {
-        act ( "You almost succeed in disarming $N", FALSE, ch, 0, vict,
-              TO_CHAR );
-        act ( "You were almost disarmed by $N!", FALSE, vict, 0, ch,
-              TO_CHAR );
+        act ( "You almost succeed in disarming $N", FALSE, ch, 0, vict, TO_CHAR );
+        act ( "You were almost disarmed by $N!", FALSE, vict, 0, ch, TO_CHAR );
         damage ( vict, ch, number ( 1, GET_LEVEL ( vict ) / 2 ), TYPE_HIT );
     }
     else
@@ -1303,12 +1305,9 @@ ASKILL ( skill_disarm )
         obj_to_char ( unequip_char ( vict, WEAR_WIELD ), vict );
         if ( GET_EQ ( vict, WEAR_WIELD_2 ) )
             equip_char ( vict, unequip_char ( vict, WEAR_WIELD_2 ), WEAR_WIELD );
-        act ( "You succeed in disarming your enemy!", FALSE, ch, 0, 0,
-              TO_CHAR );
-        act ( "Your $p flies from your hands!", FALSE, vict, obj, 0,
-              TO_CHAR );
-        act ( "$n disarms $N, $p is fumbled from being wielded.", FALSE, ch, obj, vict,
-              TO_NOTVICT );
+        act ( "You succeed in disarming your enemy!", FALSE, ch, 0, 0, TO_CHAR );
+        act ( "$p flies from your hands!", FALSE, vict, obj, 0, TO_CHAR );
+        act ( "$n disarms $N, $p is fumbled from being wielded.", FALSE, ch, obj, vict, TO_NOTVICT );
         yesno = 1;
     }
     start_fighting ( vict, ch );
