@@ -1160,7 +1160,7 @@ void parse_note ( Character *ch, char *argument, int type )
             return;
         }
 
-        if ( !str_cmp ( ch->pnote->to_list,"" ) )
+        if ( !ch->pnote->to_list || !str_cmp ( ch->pnote->to_list,"" ) )
         {
             send_to_char (
                 "You need to provide a recipient (name, all, or immortal, clan name, admin, hero).\r\n",
@@ -1168,7 +1168,7 @@ void parse_note ( Character *ch, char *argument, int type )
             return;
         }
 
-        if ( !str_cmp ( ch->pnote->subject,"" ) )
+        if ( !ch->pnote->subject || !str_cmp ( ch->pnote->subject,"" ) )
         {
             send_to_char ( "You need to provide a subject.\r\n",ch );
             return;
