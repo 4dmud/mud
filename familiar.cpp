@@ -267,46 +267,42 @@ void parse_caster_commands(Character *ch) {
     }
 }
 void parse_rogue_commands(Character *ch) {
-    //find_usable_weapon(ch);
     Character *vict,  *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
     find_usable_weapon(ch);
-
 
     if (FIGHTING(ch) && HERE(FIGHTING(ch), ch)) {
         if (GET_POS(ch) < POS_FIGHTING)
             return;
+
         if (FIGHTING(master))
-            master = FIGHTING(master);
+            vict = FIGHTING(master);
         else
-            master = FIGHTING(ch);
+            vict = FIGHTING(ch);
 
         if (number(0, 200) <= GET_LEVEL(ch)) {
             switch (number(0, GET_LEVEL(ch)/20)) {
-            case 0:
-        if (GET_POS(master) == POS_SITTING)
-            return;
+                case 0:
+                    if (GET_POS(vict) == POS_SITTING)
+                        return;
 
-                act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, master, TO_VICT);
-                act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, master, TO_NOTVICT);
-                GET_POS(master) = POS_SITTING;
-                return;
-            case 1:
-                act("$n ducks, sidesteps and stabs you in the back!!", FALSE, ch, 0, master, TO_VICT);
-                act("$n ducks, sidesteps and stabs $M in the back!!", FALSE, ch, 0, master, TO_NOTVICT);
-                fe_solo_damage(ch, master, FTOI(dice(ch->mob_specials.damnodice,ch->mob_specials.damsizedice) * (GET_LEVEL(ch)*0.1)), MOB_BACKSTAB);
-                return;
-            case 2:
-            case 3:
-            case 4:
-                skill_disarm(ch, master, NULL, NULL);
-                return;
-            case 5:
-                skill_grapple(ch, master, NULL, NULL);
-                return;
-            case 6:
-                skill_snare(ch, master, NULL, NULL);
-                return;
-
+                    act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, vict, TO_VICT);
+                    act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, vict, TO_NOTVICT);
+                    GET_POS(vict) = POS_SITTING;
+                    return;
+                case 1:
+                    fe_solo_damage(ch, vict, FTOI(dice(ch->mob_specials.damnodice,ch->mob_specials.damsizedice) * (GET_LEVEL(ch)*0.1)), MOB_BACKSTAB);
+                    return;
+                case 2:
+                case 3:
+                case 4:
+                    skill_disarm(ch, vict, NULL, NULL);
+                    return;
+                case 5:
+                    skill_grapple(ch, vict, NULL, NULL);
+                    return;
+                case 6:
+                    skill_snare(ch, vict, NULL, NULL);
+                    return;
             }
         }
     }
@@ -315,32 +311,33 @@ void parse_rogue_commands(Character *ch) {
         if (GET_POS(ch) < POS_FIGHTING)
             return;
         switch (number(0, GET_LEVEL(ch)/20)) {
-        case 0:
-        if (GET_POS(master) == POS_SITTING)
-        return;
+            case 0:
+                if (GET_POS(vict) == POS_SITTING)
+                    return;
 
-            act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, vict, TO_VICT);
-            act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, vict, TO_NOTVICT);
-            set_fighting(ch, vict);
-            GET_POS(vict) = POS_SITTING;
-            return;
-        case 1:
-            if (GET_EQ(ch, WEAR_WIELD))
-                skill_backstab(ch, vict, NULL, NULL);
-            return;
-        case 2:
-        case 3:
-        case 4:
-            skill_disarm(ch, vict, NULL, NULL);
-            return;
-        case 5:
-            skill_grapple(ch, vict, NULL, NULL);
-            return;
-
+                act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, vict, TO_VICT);
+                act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, vict, TO_NOTVICT);
+                set_fighting(ch, vict);
+                GET_POS(vict) = POS_SITTING;
+                return;
+            case 1:
+                fe_solo_damage(ch, vict, FTOI(dice(ch->mob_specials.damnodice,ch->mob_specials.damsizedice) * (GET_LEVEL(ch)*0.1)), MOB_BACKSTAB);
+                return;
+            case 2:
+            case 3:
+            case 4:
+                skill_disarm(ch, vict, NULL, NULL);
+                return;
+            case 5:
+                skill_grapple(ch, vict, NULL, NULL);
+                return;
+            case 6:
+                 skill_snare(ch, vict, NULL, NULL);
+                 return;
         }
     }
-
 }
+
 void parse_fighter_commands(Character *ch) {
     parse_rogue_commands(ch);
     if (GET_POS(ch) < POS_FIGHTING)

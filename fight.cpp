@@ -2830,7 +2830,7 @@ int steal_affects ( Character *ch, int dam, int w_type, Character *vict )
 
 }
 
-void reduce_quality ( Character *ch, Character *vict, int damage, int w_type, obj_data *shield )
+void reduce_quality ( Character *ch, Character *vict, int damage, int w_type, obj_data *shield, int location = -1 )
 {
     obj_data *weapon, *focus, *eq;
     vector< vector<int> > loc;
@@ -2865,11 +2865,18 @@ void reduce_quality ( Character *ch, Character *vict, int damage, int w_type, ob
         return;
     }
 
-    /* damage all eq of vict in the area */
+    /* damage one piece of eq of vict in the area */
     if ( IS_WEAPON ( w_type ) )
         area = GET_ATTACK_POS ( ch );
-    else area = number ( PART_HEAD, PART_RIGHT_LEG );
+    else
+        area = number ( PART_HEAD, PART_RIGHT_LEG );
 
+    if ( location > -1 )
+    {
+        loc = {{ location }};
+        area = 0;
+    }
+    else
     loc = { { WEAR_HEAD, WEAR_HORNS, WEAR_ANTENNA },
             { WEAR_FACE, WEAR_EYES, WEAR_EAR_L, WEAR_EAR_R },
             { WEAR_NECK_1, WEAR_NECK_2 },
@@ -2882,17 +2889,25 @@ void reduce_quality ( Character *ch, Character *vict, int damage, int w_type, ob
             { WEAR_LEGS, WEAR_FEET, WEAR_ANKLE_L, WEAR_THIGH_L, WEAR_KNEE_L },
             { WEAR_LEGS, WEAR_FEET_2, WEAR_ANKLE_R, WEAR_THIGH_R, WEAR_KNEE_R } };
 
-    for ( int part : loc[ area ] )
+    eq = GET_EQ ( vict, loc[ area ][ number ( 0, loc[ area ].size()-1 ) ] );
+    if ( eq && GET_OBJ_QUALITY ( eq ) > 0 )
     {
-        eq = GET_EQ ( vict, part );
-        if ( eq && GET_OBJ_QUALITY ( eq ) > 0 )
-        {
-            GET_OBJ_QUALITY ( eq ) -= damage / 10000.0 * ( 1 + GET_OBJ_REPAIRS ( eq ) / 5.0 );
-            if ( GET_OBJ_QUALITY ( eq ) < 0 )
-                GET_OBJ_QUALITY ( eq ) = 0;
-            update_affects ( eq );
-        }
+        GET_OBJ_QUALITY ( eq ) -= damage / 10000.0 * ( 1 + GET_OBJ_REPAIRS ( eq ) / 5.0 );
+        if ( GET_OBJ_QUALITY ( eq ) < 0 )
+            GET_OBJ_QUALITY ( eq ) = 0;
+        update_affects ( eq );
     }
+}
+
+bool wearing_antibackstab ( Character *ch )
+{
+    // ch is wearing the Fenizian anti-backstab shirt?
+    const obj_vnum shirt = 7951;
+    if ( ch && HAS_BODY ( ch, WEAR_BODY ) && GET_EQ ( ch, WEAR_BODY ) &&
+        GET_OBJ_VNUM ( GET_EQ ( ch, WEAR_BODY ) ) == shirt &&
+        GET_OBJ_QUALITY ( GET_EQ ( ch, WEAR_BODY ) ) > 0 )
+        return true;
+    return false;
 }
 
 /* Right now this function is still really really dirty, and needs
@@ -2912,22 +2927,13 @@ int fe_after_damage ( Character* ch, Character* vict,
     gold_int local_gold = 0, bonus_gold = 0;
     char local_buf[100] = "";
     int partial = 0;
-    //int dam_exp = 0;
-    //Character *victnext;
-    //int sweeping;
-
-    //victnext = NULL;
-    //sweeping = FALSE;
 
     if ( IS_NPC ( vict ) && ( vict->master || vict->followers ) )
         if ( followers_assisting ( vict ) == 0 )
             dam = 100 + ( dam*2 );
 
     if ( !can_fight ( ch, vict, FALSE ) )
-    {
-        //stop_fighting(ch);
         return -1;
-    }
 
     if ( GET_POS ( vict ) <= POS_DEAD  || DEAD ( vict ) )
     {
@@ -2981,10 +2987,21 @@ int fe_after_damage ( Character* ch, Character* vict,
 
         } */
 
-        if ( w_type == MOB_BACKSTAB && IS_NPC ( ch ) && !IS_NPC( vict ) )
-            partial = MIN ( partial, (int) ( 0.75 * GET_MAX_HIT ( vict ) ) );
-
-        reduce_quality ( ch, vict, partial, w_type, NULL );
+        if ( w_type == MOB_BACKSTAB || w_type == SKILL_BACKSTAB )
+        {
+            if ( wearing_antibackstab ( vict ) )
+            {
+                reduce_quality ( ch, vict, partial, w_type, NULL, WEAR_BODY );
+                partial = 0;
+            }
+            else if ( IS_NPC ( ch ) && !IS_NPC ( vict ) )
+            {
+                partial = MIN ( partial, (int) ( 0.75 * GET_MAX_HIT ( vict ) ) );
+                reduce_quality ( ch, vict, partial, w_type, NULL );
+            }
+        }
+        else
+            reduce_quality ( ch, vict, partial, w_type, NULL );
 
         alter_hit ( vict, partial );
         if ( w_type == SPELL_LIFESUCK )
@@ -3044,7 +3061,7 @@ int fe_after_damage ( Character* ch, Character* vict,
       * dam_message. Otherwise, always send a dam_message.
       */
 
-    if ( w_type != TYPE_UNDEFINED && w_type != MOB_BACKSTAB )
+    if ( w_type != TYPE_UNDEFINED )
     {
         if ( IS_SPELL_CAST ( w_type ) || IS_SKILL ( w_type ) || IS_OTHERDAM ( w_type ) )
             skill_message ( partial, ch, vict, w_type );
@@ -4904,6 +4921,20 @@ void dam_message ( int dam, Character *ch, Character *victim,
     Character *people;
     int type_save = w_type;
 
+    if ( w_type == MOB_BACKSTAB )
+    {
+        if ( dam == 0 )
+        {
+            act ( "$n tried to stab you in the back, but your armor saves the day!", FALSE, ch, 0, victim, TO_VICT );
+            act ( "$n tried to stab $N in the back, but $S armor doesn't buckle.", FALSE, ch, 0, victim, TO_NOTVICT );
+        }
+        else
+        {
+            act ( "$n ducks, sidesteps and stabs you in the back!!", FALSE, ch, 0, victim, TO_VICT );
+            act ( "$n ducks, sidesteps and stabs $N in the back!!", FALSE, ch, 0, victim, TO_NOTVICT );
+        }
+        return;
+    }
 
     static  struct dam_size_data
     {
@@ -6012,9 +6043,15 @@ int skill_message ( int dam, Character *ch, Character *vict, int attacktype )
     struct message_type *msg = NULL;
     Character *people = NULL;
     Character *victim = vict;
-    ;
-
     struct obj_data *weap = GET_EQ ( ch, WEAR_WIELD );
+
+    if ( attacktype == SKILL_BACKSTAB && dam == 0 && wearing_antibackstab ( vict ) )
+    {
+        act ( "You try to stab $N in the back, but $S armor absorbs the hit.", FALSE, ch, 0, vict, TO_CHAR );
+        act ( "$n tried to stab you in the back, but your armor saves the day!", FALSE, ch, 0, vict, TO_VICT );
+        act ( "$n tried to stab $N in the back, but $S armor doesn't buckle.", FALSE, ch, 0, vict, TO_NOTVICT );
+        return 1;
+    }
 
     for ( i = 0; i < MAX_MESSAGES; i++ )
     {
