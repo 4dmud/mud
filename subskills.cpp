@@ -1171,7 +1171,12 @@ void improve_sub(Character *ch, subskill_list sub, int amount) {
         MOB_SUBSKILL(ch) = sub;
         return;
     }
+
+    int prev_level = SAVED(ch).GetSubLearn ( sub );
     SAVED(ch).UpdateSubLearn ( sub, amount );
+    if ( prev_level == SAVED(ch).GetSubLearn ( sub ) )
+        return; // no change
+
     SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
 
     if ( amount > 0 )
