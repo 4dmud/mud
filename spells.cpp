@@ -262,7 +262,7 @@ ASPELL ( spell_teleport )
                     "Type NOTELEPORT to allow the spell to work.\r\n",
                     GET_NAME ( ch ),
                     HSSH ( ch ) );
-                ch->Send ( "You failed the teleport spell because %s has teleport protection on.\r\n", GET_NAME ( victim ) );
+                ch->Send ( "You failed the teleport spell because %s has teleport protection on.\r\n", GET_NAME ( c ) );
                 continue;
             }
 
