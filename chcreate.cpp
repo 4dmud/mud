@@ -285,7 +285,7 @@ void con_character_creation ( Descriptor *d, char *arg )
                 REMOVE_BIT_AR ( PLR_FLAGS ( d->character ), PLR_NEEDS_CLASS );
                 d->character->save();
                 enter_player_game ( d );
-                new_mudlog ( NRM, LVL_GOD, TRUE, "%s has just chosen to be class %s.", GET_NAME ( d->character ), class_selection );
+                new_mudlog ( NRM, LVL_GOD, TRUE, "%s has just chosen to be class %s.", GET_NAME ( d->character ), pc_class_types[ GET_CLASS ( d->character ) ] );
 
             }
             else

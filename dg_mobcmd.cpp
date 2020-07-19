@@ -344,7 +344,7 @@ ACMD(do_mlag) {
     two_arguments(argument, arg, arg2);
 
     if (!*arg) {
-        mob_log(ch, "mkill called with no argument");
+        mob_log(ch, "mlag called with no argument");
         return;
     }
 
