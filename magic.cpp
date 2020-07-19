@@ -558,6 +558,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
                 af[0].expire = HOURS_TO_EXPIRE ( 18*staff );
             accum_duration = FALSE;
             to_vict = "You feel someone protecting you.";
+            to_room = "$n is armored.";
             break;
         case SPELL_ENERGY_DRAIN:
             af[0].location = APPLY_HITROLL;
@@ -578,7 +579,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
             accum_duration =FALSE;
             to_vict = "You feel drained.";
-
+            to_room = "$n is drained.";
             break;
         case SPELL_BLESS:
             af[0].location = APPLY_HITROLL;
@@ -599,6 +600,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
             accum_duration =FALSE;
             to_vict = "You feel righteous.";
+            to_room = "$n is blessed.";
             break;
 
         case SPELL_BLINDNESS:
@@ -668,8 +670,8 @@ void mag_affects ( int level, Character *ch, Character *victim,
                 af[0].expire = HOURS_TO_EXPIRE ( 12 + level );
             af[0].bitvector = AFF_DETECT_ALIGN;
             accum_duration =FALSE;
-            to_vict =
-                "Your eyes tingle and people move into a different focus.";
+            to_vict = "Your eyes tingle and people move into a different focus.";
+            to_room = "$n's eyes tingle and move into a different focus.";
             break;
 
         case SPELL_MANA_REGEN:
@@ -682,8 +684,8 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_MANA_REGEN;
             accum_duration = FALSE;
             accum_affect = FALSE;
-            to_vict =
-                "You ask for the blessings of Kellindil and feel the mana flowing through you.";
+            to_vict = "You ask for the blessings of Kellindil and feel the mana flowing through you.";
+            to_room = "$n asks for the blessings of Kellindil.";
             break;
 
         case SPELL_DETECT_INVIS:
@@ -694,6 +696,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_DETECT_INVIS;
             accum_duration =FALSE;
             to_vict = "You start to see things that never used to be there.";
+            to_room = "$n starts to see things that never used to be there.";
             break;
 
             case SPELL_DETECT_INVIS_OTHER:
@@ -704,6 +707,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_DETECT_INVIS;
             accum_duration =FALSE;
             to_vict = "You start to see things that never used to be there.";
+            to_room = "$n starts to see things that never used to be there.";
             break;
 
         case SPELL_DETECT_MAGIC:
@@ -714,6 +718,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_DETECT_MAGIC;
             accum_duration =FALSE;
             to_vict = "Things start to take on a hazy purple hue.";
+            to_room = "$n starts seeing things take on a hazy purple hue.";
             break;
 
         case SPELL_EVIL_EYE:
@@ -733,7 +738,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_HOLD;
 
             to_vict = "A magical force holds you firm.";
-            to_room = "A magical force hold $n firm.";
+            to_room = "A magical force holds $n firm.";
             break;
 
         case SPELL_PARALYZE:
@@ -910,6 +915,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
             accum_duration =FALSE;
             to_vict = "You feel your skin as tough as steel.";
+            to_room = "$n's skin turns to steel.";
             break;
 
         case SPELL_STONESKIN:
@@ -922,6 +928,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_STONESKIN;
             accum_duration =FALSE;
             to_vict = "You feel your skin turn into granite.";
+            to_room = "$n's skin turns into granite.";
             break;
 
         case SPELL_STRENGTH:
@@ -937,12 +944,15 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_HOLY_STRENGTH;
             accum_duration = FALSE;
             accum_affect = TRUE;
-            if ( GET_ADD ( victim ) < 100 )
+            if ( GET_ADD ( victim ) < 100 ) {
                 to_vict = "You feel stronger!";
+                to_room = "$n just got stronger.";
+            }
             break;
 
         case SPELL_SENSE_LIFE:
             to_vict = "You feel your awareness improve.";
+            to_room = "$n becomes more aware.";
             if ( OBJ_INNATE )
                 af[0].expire = -2;
             else
@@ -959,6 +969,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_WATERWALK;
             accum_duration =FALSE;
             to_vict = "You feel webbing between your toes.";
+            to_room = "Webbing forms between $n's toes.";
             break;
 
         case SPELL_HASTE:
@@ -972,6 +983,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
             accum_duration =FALSE;
             to_vict = "You feel yourself moving with unnatural speed.";
+            to_room = "$n starts moving with unnatural speed.";
             break;
 
         case SPELL_SHIELD:
@@ -1000,6 +1012,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_PROT_FIRE;
             accum_duration =FALSE;
             to_vict = "You feel a shell of insulation form around your body.";
+            to_room = "An insulating shell forms around $n.";
             break;
 
         case SPELL_PROT_COLD:
@@ -1010,32 +1023,41 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_PROT_COLD;
             accum_duration =FALSE;
             to_vict = "You feel a shell of warmth form around your body.";
+            to_room = "A shell of warmth forms around $n.";
             break;
 
-                case SPELL_RESIST_COLD:
-                    if (OBJ_INNATE) af[0].expire = -2;
-                    else            af[0].expire = HOURS_TO_EXPIRE(10 + level);
-                    af[0].bitvector = AFF_RESIST_COLD;
-                    accum_duration = FALSE;
-                    to_vict = "Your body suddenly erupts with thousands of tiny flames.";
-                    to_room = "$n's body suddenly erupts with thousands of tiny flames.";
-                    break;
-                case SPELL_RESIST_FIRE:
-                    if (OBJ_INNATE) af[0].expire = -2;
-                    else            af[0].expire = HOURS_TO_EXPIRE(10 + level);
-                    af[0].bitvector = AFF_RESIST_FIRE;
-                    accum_duration = FALSE;
-                    to_vict = "Water begins to continuously flow around your body.";
-                    to_room = "Water begins to flow continuously around $n's body.";
-                    break;
-                case SPELL_RESIST_ELEC:
-                    if (OBJ_INNATE) af[0].expire = -2;
-                    else            af[0].expire = HOURS_TO_EXPIRE(10 + level);
-                    af[0].bitvector = AFF_RESIST_ELEC;
-                    accum_duration = FALSE;
-                    to_vict = "Your skin takes on a glass-like quality.";
-                    to_room = "$n's skin takes on a glass-like quality.";
-                    break;
+        case SPELL_RESIST_COLD:
+            if (OBJ_INNATE)
+                af[0].expire = -2;
+            else
+                af[0].expire = HOURS_TO_EXPIRE(10 + level);
+            af[0].bitvector = AFF_RESIST_COLD;
+            accum_duration = FALSE;
+            to_vict = "Your body suddenly erupts with thousands of tiny flames.";
+            to_room = "$n's body suddenly erupts with thousands of tiny flames.";
+            break;
+
+        case SPELL_RESIST_FIRE:
+            if (OBJ_INNATE)
+                af[0].expire = -2;
+            else
+                af[0].expire = HOURS_TO_EXPIRE(10 + level);
+            af[0].bitvector = AFF_RESIST_FIRE;
+            accum_duration = FALSE;
+            to_vict = "Water begins to continuously flow around your body.";
+            to_room = "Water begins to flow continuously around $n's body.";
+            break;
+
+        case SPELL_RESIST_ELEC:
+            if (OBJ_INNATE)
+                af[0].expire = -2;
+            else
+                af[0].expire = HOURS_TO_EXPIRE(10 + level);
+            af[0].bitvector = AFF_RESIST_ELEC;
+            accum_duration = FALSE;
+            to_vict = "Your skin takes on a glass-like quality.";
+            to_room = "$n's skin takes on a glass-like quality.";
+            break;
 
         case SPELL_CONE_OF_COLD:
             if ( number ( 1, 30 ) <= level && !AFF_FLAGGED ( victim, AFF_PROT_COLD )
@@ -1156,7 +1178,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
                 af[0].expire = HOURS_TO_EXPIRE ( tier * 11 );
             af[0].bitvector = AFF_FIRE_SHIELD;
             to_vict = "You are surrounded by a flaming red aura.";
-            to_room = "$n is suddenly surrounded by flaming red aura.";
+            to_room = "$n is suddenly surrounded by a flaming red aura.";
             break;
 
         case SPELL_FIRE_BREATH:
@@ -1203,7 +1225,9 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_MIND_FIRE;
             accum_duration =TRUE;
             to_vict = "Your mind becomes alive with thoughts of fire!";
+            to_room = "$n can't stop thinking about fire.";
             break;
+
         case SPELL_MIND_ELEC:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1212,7 +1236,9 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_MIND_ELEC;
             accum_duration =TRUE;
             to_vict = "Your mind becomes alive with thoughts of electricity!";
+            to_room = "$n can't stop thinking about electricity.";
             break;
+
         case SPELL_MIND_WATER:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1221,7 +1247,9 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_MIND_WATER;
             accum_duration =TRUE;
             to_vict = "Your mind becomes alive with thoughts of water!";
+            to_room = "$n can't stop thinking about water.";
             break;
+
         case SPELL_MIND_ICE:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1230,6 +1258,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_MIND_ICE;
             accum_duration =TRUE;
             to_vict = "Your mind becomes alive with thoughts of ice!";
+            to_room = "$n can't stop thinking about ice.";
             break;
 
         case SPELL_PROT_FROM_GOOD:
@@ -1243,6 +1272,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             to_vict = "A dark aura flickers into existence around you.";
             to_room = "A dark aura flickers into existence around $n.";
             break;
+
         case SPELL_SHIELD_ICE:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1254,6 +1284,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             to_vict = "A cold shield of ice forms around you.";
             to_room = "A cold shield of ice forms around $n.";
             break;
+
         case SPELL_SHIELD_THORN:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1265,6 +1296,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             to_vict = "A spinning haze of sharp thorns circles you.";
             to_room = "A spinning haze of sharp thorns circles around $n.";
             break;
+
         case SPELL_SHIELD_MANA:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1277,7 +1309,6 @@ void mag_affects ( int level, Character *ch, Character *victim,
             to_room = "A humming shield of magical energy covers $n.";
             break;
 
-
         case SPELL_SHIELD_MIRROR:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1289,15 +1320,13 @@ void mag_affects ( int level, Character *ch, Character *victim,
             to_vict = "A metallic, glassy orb expands around you.";
             to_room = "A metallic, glassy orb expands around $n.";
             break;
+
         case SPELL_SHIELD_HOLY:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
             else
                 af[0].expire = HOURS_TO_EXPIRE ( 24 );
             af[0].bitvector = AFF_SHIELD_HOLY;
-
-
-
 
             accum_duration =FALSE;
             to_vict = "You are touched by a holy light.";
@@ -1313,7 +1342,9 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
             accum_duration =FALSE;
             to_vict = "You tingle as a wave of static energy washes over you.";
+            to_room = "A wave of static energy washes over $n.";
             break;
+
         case SPELL_FORTIFY_MIND:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1325,6 +1356,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
             accum_duration =FALSE;
             to_vict = "You feel more sure of your thoughts.";
+            to_room = "$n feels more sure of $s thoughts.";
             break;
 
         case SPELL_FORTIFY_BODY:
@@ -1338,6 +1370,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
             accum_duration =FALSE;
             to_vict = "You feel more sure of your actions.";
+            to_room = "$n feels more sure of $s actions.";
             break;
 
         case SPELL_SWEET_DREAMS:
@@ -1355,6 +1388,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             to_vict = "Happy thoughts fill your mind as you drift off to sleep.";
             to_room = "$n smiles and collapses.";
             break;
+
         case SPELL_DIVINE_MIND:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1366,7 +1400,9 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
             accum_duration =FALSE;
             to_vict = "Focus and determination fills your mind.";
+            to_room = "Focus and determination fills $n's mind.";
             break;
+
         case SPELL_NUMB_MIND:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1380,6 +1416,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             to_vict = "Your thoughts slow.";
             to_room = "$n staggers.";
             break;
+
         case SPELL_SLOW:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1393,6 +1430,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             to_vict = "Your body moves as if in jelly.";
             to_room = "$n moves as if in jelly.";
             break;
+
         case SPELL_FLIGHT:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1404,6 +1442,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             to_vict = "With a rustle enormous wings sprout from your back and unfurl.";
             to_room = "With a rustle enormous wings sprout from $n's back and unfurl.";
             break;
+
         case SPELL_BATTLE_RAGE:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1415,7 +1454,9 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
             accum_duration =FALSE;
             to_vict = "You bare your teeth as the fire of anger runs through your veins.";
+            to_room = "$n bares $s teeth.";
             break;
+
         case SPELL_MAGIC_BUBBLE:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1427,6 +1468,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             to_vict = "A bubble forms around you.";
             to_room = "A bubble forms around $n.";
             break;
+
         case SPELL_FORSEE:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1435,8 +1477,10 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].bitvector = AFF_FORSEE;
 
             accum_duration =FALSE;
-            to_vict = "You start anticipating everyones movements.";
+            to_vict = "You start anticipating everyone's movements.";
+            to_room = "$n starts anticipating everyone's movements.";
             break;
+
         case SPELL_CONFUSE:
             if ( OBJ_INNATE )
                 af[0].expire = -2;
@@ -1461,6 +1505,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             to_room = "$n gags and starts clawing at the air around $s neck.";
             start_fighting (victim, ch);
             break;
+
         case SPELL_CORRUPT_ARMOR:
             af[0].expire = HOURS_TO_EXPIRE ( 24 + chcha );
             af[0].location = APPLY_AC;
@@ -1488,6 +1533,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
             af[0].expire = HOURS_TO_EXPIRE ( 5 );
             af[0].bitvector = AFF_BLEEDING;
             break;
+
         case SPELL_BOWEL:
             af[0].expire = HOURS_TO_EXPIRE ( 5);
             af[0].bitvector = AFF_DISEMBOWEL;
