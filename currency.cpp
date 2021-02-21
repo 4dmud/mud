@@ -217,12 +217,6 @@ ACMD ( do_convey )
     }
     amount = atoll ( arg1 );
 
-    if ( amount <= 0 && !isname ( arg1, "maxmove" ) && !isname ( arg2, "gold" ) )
-    {
-        *ch << "Your usage is wrong.\r\n";
-        return;
-    }
-
     if ( isname ( arg2, "tokens" ) )
     {
         if ( amount > 50 )
@@ -326,17 +320,15 @@ ACMD ( do_convey )
 //	{
     else if ( isname ( arg2, "maxmove" ) )
         {
-
-            if ( ch->Gold ( 0, GOLD_ALL ) >= 10000000 * GET_CONVERSIONS (ch))
+            gold_int cost = 10000000LL * GET_CONVERSIONS ( ch );
+            if ( ch->Gold ( 0, GOLD_ALL ) >= cost)
             {
-                log ( "INFO: %s conveyed %lld gold into %d maxmove", GET_NAME ( ch ), ( gold_int ) ( 10000000 * GET_CONVERSIONS ( ch ) ), 100 );
-                ch->Send ( "You convey %lld gold to %d maxmove.\r\n",
-                           ( gold_int ) ( 10000000 * GET_CONVERSIONS(ch)), 100 );
+                log ( "INFO: %s conveyed %lld gold into 100 maxmove", GET_NAME ( ch ), cost );
+                ch->Send ( "You convey %lld gold to 100 maxmove.\r\n", cost );
                 GET_MAX_MOVE ( ch ) += 100;
-                ch->Gold ( -10000000 * GET_CONVERSIONS(ch), GOLD_ALL );
+                ch->Gold ( -cost, GOLD_ALL );
                 GET_CONVERSIONS ( ch ) ++;
                 ch->affect_total();
-
             }
             else
             {
@@ -426,7 +418,7 @@ ACMD ( do_convey )
         // Changed this to fixed value
         // Since code isn't getting value.
         //gain_exp ( ch, amount * mob_stats[30].exp );
-        gold_int gain = amount * 1100000;
+        gold_int gain = amount * 1100000LL;
         gain_exp (ch, gain);
         TRADEPOINTS ( ch ) -= amount;
         new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s conveyed %lld tradepoints to %lld xp. (%d tradepoints remaining)",  GET_NAME ( ch ), amount, gain, TRADEPOINTS(ch));
