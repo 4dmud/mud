@@ -348,7 +348,7 @@ extern const char *wiz_groups[];
 extern socket_t mother_desc;
 extern ush_int port;
 extern map<mob_vnum, Character *> mob_proto;
-extern struct obj_data *obj_proto;
+extern map<obj_rnum, obj_data> obj_proto;
 extern map < room_vnum, plrshop* > player_shop;
 extern map <int, questcard> questcards;
 
@@ -7582,10 +7582,10 @@ void show_door_errors ( Character *ch )
                 {
                     if ( ( rkey = real_object ( vkey ) ) != NOTHING )
                     {
-                        if ( GET_OBJ_TYPE ( obj_proto + rkey ) != ITEM_KEY )
+                        if ( GET_OBJ_TYPE ( &obj_proto[rkey] ) != ITEM_KEY )
                         {
                             found++;
-                            snprintf ( buf, sizeof ( buf ), "Room [%5d] Dir [%5s] Key [%5d] - {cCKEY is not of type key (%s).{c0\r\n", i, dirs[door], vkey, item_types[ ( int ) GET_OBJ_TYPE ( obj_proto + rkey ) ] );
+                            snprintf ( buf, sizeof ( buf ), "Room [%5d] Dir [%5s] Key [%5d] - {cCKEY is not of type key (%s).{c0\r\n", i, dirs[door], vkey, item_types[ ( int ) GET_OBJ_TYPE ( &obj_proto[rkey] ) ] );
                             DYN_RESIZE ( buf );
                         }
                     }

@@ -100,7 +100,7 @@ public:
             s << i;
             Output((string&)s.str());
         }
-        return this;
+        return *this;
     };
     protocol_t *pProtocol; /* @TODO:PROTOCOL */
     /*private:*/

@@ -318,7 +318,7 @@ void list_objects ( Character *ch, zone_rnum rnum, room_vnum vmin, room_vnum vma
                        QCYN, obj_proto[i].short_description, QYEL,
                        item_types[ ( int ) obj_proto[i].obj_flags.type_flag], QNRM,
                        obj_proto[i].proto_script ? " [TRIG]" : "",
-                       QYEL, material_name ( GET_OBJ_MATERIAL ( obj_proto + i ) ), QNRM
+                       QYEL, material_name ( GET_OBJ_MATERIAL ( &obj_proto[i] ) ), QNRM
                      );
             DYN_RESIZE ( buf );
         }

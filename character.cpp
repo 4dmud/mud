@@ -1033,13 +1033,9 @@ Character *Character::assign ( Character *b )
     if ( b->player_specials )
     {
         if ( b->player_specials == &dummy_mob )
-        {
-            player_specials = &dummy_mob;  /* PC specials            */
-        }
+            player_specials = &dummy_mob;  /* NPC specials            */
         else
-        {
-            memcpy ( player_specials, b->player_specials, sizeof ( player_special_data ) );
-        }
+            ; /* Players are never assigned */
     }
 
     mob_specials = b->mob_specials;    /* NPC specials           */

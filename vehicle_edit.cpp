@@ -180,19 +180,19 @@ void load_vehicles(void)
       vehicles = temp;
 
       if ((rnum = real_object(temp->vehicle)) != NOTHING)
-        if (GET_OBJ_TYPE(obj_proto + rnum) == ITEM_VEHICLE)
+        if (GET_OBJ_TYPE(&obj_proto[rnum]) == ITEM_VEHICLE)
           ASSIGNOBJ(temp->vehicle, vehicle);
 
       if ((rnum = real_object(temp->controls)) != NOTHING)
-        if (GET_OBJ_TYPE(obj_proto + rnum) == ITEM_V_CONTROLS)
+        if (GET_OBJ_TYPE(&obj_proto[rnum]) == ITEM_V_CONTROLS)
           ASSIGNOBJ(temp->controls, vehicle_controls);
 
       if ((rnum = real_object(temp->hatch)) != NOTHING)
-        if (GET_OBJ_TYPE(obj_proto + rnum) == ITEM_V_HATCH)
+        if (GET_OBJ_TYPE(&obj_proto[rnum]) == ITEM_V_HATCH)
           ASSIGNOBJ(temp->hatch, vehicle_hatch);
 
       if ((rnum = real_object(temp->window)) != NOTHING)
-        if (GET_OBJ_TYPE(obj_proto + rnum) == ITEM_V_WINDOW)
+        if (GET_OBJ_TYPE(&obj_proto[rnum]) == ITEM_V_WINDOW)
           ASSIGNOBJ(temp->window, vehicle_window);
     }
   }
@@ -545,7 +545,7 @@ void vedit_parse(Descriptor *d,char *arg)
       vehicle_menu(d);
       return;
     }
-    else if (GET_OBJ_TYPE(obj_proto + rnum) != ITEM_VEHICLE)
+    else if (GET_OBJ_TYPE(&obj_proto[rnum]) != ITEM_VEHICLE)
     {
       d->Output( "\r\nThat is not a vehicle object!\r\n");
       vehicle_menu(d);
@@ -573,7 +573,7 @@ void vedit_parse(Descriptor *d,char *arg)
       vehicle_menu(d);
       return;
     }
-    else if (GET_OBJ_TYPE(obj_proto + rnum) != ITEM_V_CONTROLS)
+    else if (GET_OBJ_TYPE(&obj_proto[rnum]) != ITEM_V_CONTROLS)
     {
       d->Output( "\r\nThat is not a vehicle controls object!\r\n");
       vehicle_menu(d);
@@ -601,7 +601,7 @@ void vedit_parse(Descriptor *d,char *arg)
       vehicle_menu(d);
       return;
     }
-    else if (GET_OBJ_TYPE(obj_proto + rnum) != ITEM_V_HATCH)
+    else if (GET_OBJ_TYPE(&obj_proto[rnum]) != ITEM_V_HATCH)
     {
       d->Output( "\r\nThat is not a vehicle hatch object!\r\n");
       vehicle_menu(d);
@@ -629,7 +629,7 @@ void vedit_parse(Descriptor *d,char *arg)
       vehicle_menu(d);
       return;
     }
-    else if (GET_OBJ_TYPE(obj_proto + rnum) != ITEM_V_WINDOW)
+    else if (GET_OBJ_TYPE(&obj_proto[rnum]) != ITEM_V_WINDOW)
     {
       d->Output( "\r\nThat is not a vehicle object!\r\n");
       vehicle_menu(d);

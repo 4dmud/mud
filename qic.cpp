@@ -226,7 +226,7 @@ void qic_scan_file(char *name, long id) {
 
     if (!(fl = fopen(qicfname, "r+b"))) {
         if (errno != ENOENT) {	/* if it fails, NOT because of no file */
-            sprintf(buf1, "SYSERR: OPENING OBJECT FILE %s (4)", qicfname);
+            snprintf(buf1, sizeof buf1, "SYSERR: OPENING OBJECT FILE %s (4)", qicfname);
             perror(buf1);
         }
         return;
@@ -366,7 +366,7 @@ ACMD(do_qicinfo) {
         if (obj_index[i].qic != NULL) {
             strcpy(buf2, obj_proto[i].short_description);
             strip_colour(buf2, sizeof(buf2));
-            sprintf(buf,
+            snprintf(buf, sizeof buf,
                     "%s[%s%5d%s]%s %-50s %-2sIn:%s %2d%s, Lim: %s%2d%s\r\n",
                     CBBLU(ch, C_NRM), CBWHT(ch, C_NRM), obj_index[i].vnum,
                     CBBLU(ch, C_NRM), CCCYN(ch, C_NRM),

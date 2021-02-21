@@ -140,8 +140,8 @@ map<mob_vnum, Character *> mob_proto;  /* prototypes for mobs           */
 map <obj_vnum,obj_rnum> obj_vTor;
 obj_list_type  object_list;
 obj_list_type  dead_obj;  /* delayed obj removal   */
-struct index_data *obj_index; /* index table for object file   */
-struct obj_data *obj_proto;   /* prototypes for objs           */
+map<obj_rnum, struct index_data> obj_index; /* index table for object file   */
+map<obj_rnum, struct obj_data> obj_proto;   /* prototypes for objs           */
 obj_rnum top_of_objt = 0;     /* top of object index table     */
 struct zone_list_data *zone_list = NULL;
 
@@ -434,15 +434,15 @@ int check_dir ( const string &dirname )
             return 0;
         }
     }
-    catch ( file::file_not_found e )
+    catch ( file::file_not_found &e )
     {
         log ( "check_dir: file not found or accessable: %s", e.info.c_str() );
     }
-    catch ( directory::dir_not_found e )
+    catch ( directory::dir_not_found &e )
     {
         log ( "check_dir: dir not found or accessable: %s", e.info.c_str() );
     }
-    catch ( directory::listing_error e )
+    catch ( directory::listing_error &e )
     {
         log ( "check_dir: listing error: %s",  e.info.c_str() );
     }
@@ -623,15 +623,15 @@ int create_zone_index ( void )
         sort_zone_list ( total );
         return 0;
     }
-    catch ( file::file_not_found e )
+    catch ( file::file_not_found &e )
     {
         log ( "Create_zone_index: file not found or accessable: %s", e.info.c_str() );
     }
-    catch ( directory::dir_not_found e )
+    catch ( directory::dir_not_found &e )
     {
         log ( "Create_zone_index: dir not found or accessable: %s",e.info.c_str() );
     }
-    catch ( directory::listing_error e )
+    catch ( directory::listing_error &e )
     {
         log ( "Create_zone_index: listing error: %s", e.info.c_str() );
     }
@@ -1014,11 +1014,11 @@ void destroy_db ( void )
     top_of_world = 0;
     /* Objects */
     struct vehicle_attachment_data *att, *tmp;
-    for ( cnt = 0; cnt <= top_of_objt; cnt++ )
+    for ( auto &op : obj_proto )
     {
-        free_object_strings ( obj_proto + cnt );
+        free_object_strings ( &(op.second) );
 
-        att = (obj_proto + cnt )->attachment;
+        att = op.second.attachment;
         while ( att )
         {
             tmp = att->next;
@@ -1026,17 +1026,10 @@ void destroy_db ( void )
             att = tmp;
         }
 
-        if ( obj_index[cnt].qic )
-            delete obj_index[cnt].qic;
-
         /* free script proto list */
-        free_proto_script ( &obj_proto[cnt], OBJ_TRIGGER );
+        free_proto_script ( &obj_proto[op.first], OBJ_TRIGGER );
     }
 
-    free ( obj_proto );
-    obj_proto = NULL;
-    free ( obj_index );
-    obj_index = NULL;
     //    htree_free(obj_htree);
 
     /* Mobiles */
@@ -1807,8 +1800,6 @@ void index_boot ( int mode )
                   rec_count, bytesToSize ( size[0] ), bytesToUnit ( size[0] ), bytesToSize ( size[1] ), bytesToUnit ( size[1] ) );
             break;
         case DB_BOOT_OBJ:
-            CREATE ( obj_proto, struct obj_data, rec_count );
-            CREATE ( obj_index, struct index_data, rec_count );
             size[0] = sizeof ( struct index_data ) * rec_count;
             size[1] = sizeof ( struct obj_data ) * rec_count;
             log ( "   %d objs, %.2f %s in index, %.2f %s in prototypes.",
@@ -3301,7 +3292,7 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
     //    htree_add(obj_htree, nr, i);
     obj_vTor[nr]=i;
 
-    clear_object ( obj_proto + i );
+    clear_object ( &obj_proto[i] );
     obj_proto[i].in_room = NULL;
     obj_proto[i].item_number = i;
 
@@ -3388,7 +3379,7 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
     obj_proto[i].obj_flags.wear_flags[3] = t[8];
 
     check_item_hack_invis ( &obj_proto[i], TRUE );
-    tmpptr =obj_proto[i].description;
+    tmpptr = obj_proto[i].description;
     if ( tmpptr && *tmpptr )
         CAP ( tmpptr );
 
@@ -3422,7 +3413,7 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
     }
 
     if ( ( retval =
-           sscanf ( line, "%d %lld %d %d %d %d %s %s %s %s", t, &GET_OBJ_COST(obj_proto+i), t + 2, t + 3,
+           sscanf ( line, "%d %lld %d %d %d %d %s %s %s %s", t, &GET_OBJ_COST(&obj_proto[i]), t + 2, t + 3,
                          t + 4, t + 5, f1, f2, f3, f4 ) ) != 10 )
     {
         if ( retval == 5 )
@@ -3440,31 +3431,31 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
         }
     }
 
-    GET_OBJ_WEIGHT ( obj_proto + i ) = t[0];
-    //	GET_OBJ_COST ( obj_proto + i ) = t[1];
-    GET_OBJ_RENT ( obj_proto + i ) = t[2];
+    GET_OBJ_WEIGHT ( &obj_proto[i] ) = t[0];
+    //	GET_OBJ_COST ( &obj_proto[i] ) = t[1];
+    GET_OBJ_RENT ( &obj_proto[i] ) = t[2];
     obj_proto[i].obj_flags.obj_innate = t[3];
     obj_proto[i].obj_flags.timer = t[4];
-    GET_OBJ_LEVEL ( obj_proto + i ) = t[5];
-    GET_OBJ_PERM ( obj_proto + i ) [0] = asciiflag_conv ( f1 );
-    GET_OBJ_PERM ( obj_proto + i ) [1] = asciiflag_conv ( f2 );
-    GET_OBJ_PERM ( obj_proto + i ) [2] = asciiflag_conv ( f3 );
-    GET_OBJ_PERM ( obj_proto + i ) [3] = asciiflag_conv ( f4 );
+    GET_OBJ_LEVEL ( &obj_proto[i] ) = t[5];
+    GET_OBJ_PERM ( &obj_proto[i] ) [0] = asciiflag_conv ( f1 );
+    GET_OBJ_PERM ( &obj_proto[i] ) [1] = asciiflag_conv ( f2 );
+    GET_OBJ_PERM ( &obj_proto[i] ) [2] = asciiflag_conv ( f3 );
+    GET_OBJ_PERM ( &obj_proto[i] ) [3] = asciiflag_conv ( f4 );
 
 
 
 
 
     /* check to make sure that weight of containers exceeds curr. quantity */
-    if ( GET_OBJ_TYPE ( obj_proto + i ) == ITEM_DRINKCON || GET_OBJ_TYPE ( obj_proto + i ) == ITEM_FOUNTAIN )
+    if ( GET_OBJ_TYPE ( &obj_proto[i] ) == ITEM_DRINKCON || GET_OBJ_TYPE ( &obj_proto[i] ) == ITEM_FOUNTAIN )
     {
-        if ( GET_OBJ_WEIGHT ( obj_proto + i ) < GET_OBJ_VAL ( obj_proto + i, 1 ) )
-            GET_OBJ_WEIGHT ( obj_proto + i ) = GET_OBJ_VAL ( obj_proto + i, 1 ) + 5;
-        GET_OBJ_VAL ( ( obj_proto + i ), 3 ) = 0; //unpoison it
+        if ( GET_OBJ_WEIGHT ( &obj_proto[i] ) < GET_OBJ_VAL ( &obj_proto[i], 1 ) )
+            GET_OBJ_WEIGHT ( &obj_proto[i] ) = GET_OBJ_VAL ( &obj_proto[i], 1 ) + 5;
+        GET_OBJ_VAL ( ( &obj_proto[i] ), 3 ) = 0; //unpoison it
     }
 
-    if ( GET_OBJ_TYPE ( obj_proto + i ) == ITEM_DRINKCON )
-        GET_OBJ_VAL ( ( obj_proto + i ), 3 ) = 0; //unpoison it
+    if ( GET_OBJ_TYPE ( &obj_proto[i] ) == ITEM_DRINKCON )
+        GET_OBJ_VAL ( ( &obj_proto[i] ), 3 ) = 0; //unpoison it
 
     /* *** extra descriptions and affect fields *** */
 
@@ -3480,7 +3471,7 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
     obj_proto[i].ex_description = NULL;
     obj_proto[i].proto_script = NULL;
 
-    if ( GET_OBJ_TYPE ( obj_proto + i ) == ITEM_BANKBOOK )
+    if ( GET_OBJ_TYPE ( &obj_proto[i] ) == ITEM_BANKBOOK )
         ASSIGNOBJ ( nr, bank );
 
     j = 0;
@@ -5311,7 +5302,7 @@ int store_to_char ( const char *name, Character *ch )
         }
 
     }
-    catch ( MudException e )
+    catch ( MudException &e )
     {
         log ( "Name: '%s' unfound in player index", name );
         return -1;
@@ -6335,7 +6326,7 @@ ch->MakeClothed();
     {
         id = pi.TableIndexByName ( GET_NAME ( ch ) );
     }
-    catch ( MudException e )
+    catch ( MudException &e )
     {
         return;
     }

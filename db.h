@@ -486,7 +486,7 @@ extern obj_rnum top_of_objt;
 //extern mob_rnum top_of_mobt;
 extern zone_rnum top_of_zone_table;
 extern map<mob_vnum, struct index_data*> mob_index;
-extern struct index_data *obj_index;
+extern map<obj_rnum, struct index_data> obj_index;
 extern struct shop_data *shop_index;
 extern int top_shop;
 extern index_data **trig_index;
@@ -497,7 +497,7 @@ extern long max_obj_id;
 extern int dg_owner_purged;
 extern vector <Room *> world_vnum;
 //extern map<mob_vnum, Character *> mob_proto;
-extern struct obj_data *obj_proto;
+extern map<obj_rnum, struct obj_data> obj_proto;
 //extern Zone *zone_table;
 extern vector <Zone> zone_table;
 

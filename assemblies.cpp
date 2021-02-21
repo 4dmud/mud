@@ -158,7 +158,7 @@ void assemblyListToChar( Character *pCharacter ) {
             log( "SYSERR: assemblyListToChar(): Invalid vnum #%ld in assembly table.", g_pAssemblyTable[i].lVnum);
         } else {
             sprinttype(g_pAssemblyTable[ i ].uchAssemblyType, AssemblyTypes, szAssmType, sizeof(szAssmType));
-            sprintf( szBuffer, "[%5ld] %s (%s)\r\n", g_pAssemblyTable[ i ].lVnum,
+            snprintf( szBuffer, sizeof szBuffer, "[%5ld] %s (%s)\r\n", g_pAssemblyTable[ i ].lVnum,
                      obj_proto[ lRnum ].short_description, szAssmType );
             pCharacter->Send( "%s", szBuffer);
 

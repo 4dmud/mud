@@ -286,8 +286,6 @@ obj_rnum insert_object(struct obj_data *obj, obj_vnum ovnum)
   obj_rnum i;
 
   top_of_objt++;
-  RECREATE(obj_index, struct index_data, top_of_objt + 1);
-  RECREATE(obj_proto, struct obj_data, top_of_objt + 1);
 
   /*
    * Start counting through both tables.

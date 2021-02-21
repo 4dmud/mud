@@ -223,7 +223,7 @@ char *numlineas( char *string )
   while ( *string )
   {
     string = getline( string, tmpb , sizeof(tmpb));
-    sprintf( buf2, "%2d. %s\r\n", cnt++, tmpb );
+    snprintf( buf2, sizeof buf2, "%2d. %s\r\n", cnt++, tmpb );
     strcat( buf, buf2 );
   }
 

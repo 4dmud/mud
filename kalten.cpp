@@ -250,7 +250,7 @@ void do_objstat ( Character *ch, struct obj_data *j )
               ( ( j->short_description ) ? j->short_description : "<None>" ) );
     fprintf ( fp, "%s", buf );
     sprinttype ( GET_OBJ_TYPE ( j ), item_types, buf1, sizeof ( buf1 ) );
-    sprintf ( buf, "VNum: [%5d], Type: %s\n", vnum, buf1 );
+    snprintf ( buf, sizeof buf, "VNum: [%5d], Type: %s\n", vnum, buf1 );
     fprintf ( fp, "%s", buf );
 
     fprintf ( fp, "Can be worn on: " );
@@ -304,7 +304,7 @@ void do_objstat ( Character *ch, struct obj_data *j )
             break;
         case ITEM_CONTAINER:
             sprintbit ( GET_OBJ_VAL ( j, 1 ), container_bits, buf2, sizeof ( buf2 ) );
-            sprintf ( buf,
+            snprintf ( buf, sizeof buf,
                       "Weight capacity: %d, Lock Type: %s, Key Num: %d, Corpse: %s",
                       GET_OBJ_VAL ( j, 0 ), buf2, GET_OBJ_VAL ( j, 2 ),
                       YESNO ( GET_OBJ_VAL ( j, 3 ) ) );
@@ -312,7 +312,7 @@ void do_objstat ( Character *ch, struct obj_data *j )
         case ITEM_DRINKCON:
         case ITEM_FOUNTAIN:
             sprinttype ( GET_OBJ_VAL ( j, 2 ), drinks, buf2, sizeof ( buf2 ) );
-            sprintf ( buf,
+            snprintf ( buf, sizeof buf,
                       "Capacity: %d, Contains: %d, Poisoned: %s, Liquid: %s",
                       GET_OBJ_VAL ( j, 0 ), GET_OBJ_VAL ( j, 1 ),
                       YESNO ( GET_OBJ_VAL ( j, 3 ) ), buf2 );
@@ -344,7 +344,7 @@ void do_objstat ( Character *ch, struct obj_data *j )
         if ( j->affected[i].modifier )
         {
             sprinttype ( j->affected[i].location, apply_types, buf2, sizeof ( buf2 ) );
-            sprintf ( buf, "%s %+d to %s", found++ ? "," : "",
+            snprintf ( buf, sizeof buf, "%s %+d to %s", found++ ? "," : "",
                       j->affected[i].modifier, buf2 );
             fprintf ( fp, "%s", buf );
         }
@@ -403,7 +403,7 @@ void script_stat_dump ( Character * ch, struct script_data *sc )
         if ( tv->value[0] == UID_CHAR )
         {
             find_uid_name ( tv->value, name, sizeof ( name ) );
-            sprintf ( buf, "    %20s:  %20s\n",
+            snprintf ( buf, sizeof buf, "    %20s:  %20s\n",
                       tv->context ? namebuf : tv->name.c_str(), name );
         }
         else
@@ -434,7 +434,7 @@ void script_stat_dump ( Character * ch, struct script_data *sc )
             sprintbit ( GET_TRIG_TYPE ( t ), mtrig_types, buf1, sizeof ( buf1 ) );
         }
 
-        sprintf ( buf, "  Trigger Type: %s, Numeric Arg: %d, Arg list: %s\n",
+        snprintf ( buf, sizeof buf, "  Trigger Type: %s, Numeric Arg: %d, Arg list: %s\n",
                   buf1, GET_TRIG_NARG ( t ),
                   ( ( GET_TRIG_ARG ( t ) && *GET_TRIG_ARG ( t ) ) ? GET_TRIG_ARG ( t ) :
                     "None" ) );
