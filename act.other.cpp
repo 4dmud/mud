@@ -179,6 +179,7 @@
 #include "dg_scripts.h"
 #include "descriptor.h"
 #include <regex>
+#include <memory>
 
 /* extern variables */
 extern Descriptor *descriptor_list;
@@ -2444,6 +2445,23 @@ ACMD ( do_automap )
         ch->Send ( "Usage: automap off|left|right|up|down\r\n" );
 }
 
+void wire_tps ( Character *ch, Character *player, int tps )
+{
+    TRADEPOINTS ( player ) += tps;
+    ch->Send ( "You wire %d tradepoints to %s.\r\n", tps, GET_NAME ( player ) );
+    player->Send ( "%s wired %d tradepoints to your account.\r\n", GET_NAME ( ch ), tps );
+
+    if ( IS_IMM ( ch ) )
+        new_mudlog ( CMP, LVL_IMMORT, TRUE, "%s wired %d tradepoints to %s (%d)", GET_NAME ( ch ),
+            tps, GET_NAME ( player ), TRADEPOINTS ( player ) );
+    else
+    {
+        TRADEPOINTS ( ch ) -= tps;
+        new_mudlog ( CMP, LVL_IMMORT, TRUE, "%s (%d) wired %d tradepoints to %s (%d)", GET_NAME ( ch ),
+            TRADEPOINTS ( ch ), tps, GET_NAME ( player ), TRADEPOINTS ( player ) );
+    }
+}
+
 ACMD ( do_wire )
 {
     skip_spaces ( &argument );
@@ -2487,23 +2505,30 @@ ACMD ( do_wire )
 
     if ( !player )
     {
-        ch->Send ( "There's no player called %s online.\r\n", argument );
+        try // to load offline player
+        {
+            int idx = pi.TableIndexByName ( argument );
+            long uid = pi.IdByIndex ( idx );
+            Character *offline_player = new Character ( FALSE );
+            offline_player->loader = uid;
+            if ( pi.LoadChar ( argument, offline_player ) < 0 )
+                ch->Send ( "Error: couldn't load offline player %s.\r\n", argument );
+            else
+            {
+                wire_tps ( ch, offline_player, tps );
+                char_to_store ( offline_player );
+            }
+            delete offline_player;
+        }
+        catch ( MudException &e )
+        {
+            ch->Send ( "Player %s doesn't exist.\r\n", argument );
+        }
         return;
     }
 
-    TRADEPOINTS ( player ) += tps;
-    ch->Send ( "You wire %d tradepoints to %s.\r\n", tps, GET_NAME ( player ) );
-    player->Send ( "%s wired %d tradepoints to your account.\r\n", GET_NAME ( ch ), tps );
-
-    if ( IS_IMM ( ch ) )
-        new_mudlog ( CMP, LVL_IMMORT, TRUE, "%s wired %d tradepoints to %s (%d)", GET_NAME ( ch ),
-            tps, GET_NAME ( player ), TRADEPOINTS ( player ) );
-    else
-    {
-        TRADEPOINTS ( ch ) -= tps;
-        new_mudlog ( CMP, LVL_IMMORT, TRUE, "%s (%d) wired %d tradepoints to %s (%d)", GET_NAME ( ch ),
-            TRADEPOINTS ( ch ), tps, GET_NAME ( player ), TRADEPOINTS ( player ) );
-    }
+    wire_tps ( ch, player, tps );
+    SET_BIT_AR ( PLR_FLAGS ( player ), PLR_CRASH );
 }
 
 // System use only!!!
