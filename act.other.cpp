@@ -1811,26 +1811,32 @@ ACMD ( do_file )
     char buf[MAX_STRING_LENGTH];
     if ( !strcmp ( arg2, "search" ) )
     {
-        // case insensitive pattern matching, skip the leading space
-        regex re ( *arg3 == ' ' ? arg3+1 : arg3, regex::icase );
         string text = "";
         int i = 1;
-        for ( const auto &e : entries )
-            if ( regex_search ( e, re ) )
-            {
-                if ( fields[l].cmd == "syslog" )
-                    text += "\r\n" + to_string ( i++ ) + ". " + e;
-                else if ( has_tags )
+        try {
+            // case insensitive pattern matching, skip the leading space
+            regex re ( *arg3 == ' ' ? arg3+1 : arg3, regex::icase );
+            for ( const auto &e : entries )
+                if ( regex_search ( e, re ) )
                 {
-                    strlcpy ( buf, e.c_str(), sizeof buf );
-                    remove_tags ( buf );
-                    text += "\r\n" + string ( buf );
+                    if ( fields[l].cmd == "syslog" )
+                        text += "\r\n" + to_string ( i++ ) + ". " + e;
+                    else if ( has_tags )
+                    {
+                        strlcpy ( buf, e.c_str(), sizeof buf );
+                        remove_tags ( buf );
+                        text += "\r\n" + string ( buf );
+                    }
+                    else
+                        text += "\r\n" + e;
                 }
                 else
-                    text += "\r\n" + e;
-            }
-            else
-                i++;
+                    i++;
+        }
+        catch ( const regex_error &e ) {
+            ch->Send ( "Error: '%s' is not a valid regular expression.\r\n", arg3 );
+            return;
+        }
 
         if ( text == "" )
             ch->Send ( "No matches found.\r\n" );
