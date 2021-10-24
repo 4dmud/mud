@@ -4435,7 +4435,7 @@ trig_rnum real_trigger ( int vnum )
         if ( trig_index[ mid ]->vnum > vnum )
         {
             top = mid - 1;
-            if ( top == 0 )
+            if ( top <= 0 )
                 return NOTHING;
         }
         else if ( trig_index[ mid ]->vnum == vnum )
