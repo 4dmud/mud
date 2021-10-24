@@ -12,11 +12,12 @@ Unpack world.tar in the /src dir:
 
 `$ make`
 
-`cd ..`
+`$ cd ..`
 
-`bin/circle&` (this will start the mud)
+`$ bin/circle&` (this will start the mud)
 
 Now you can connect with your mudclient to localhost port 6000.
+
 There are two characters available: 'imm', an implementor, and 'mortal'.
 Both of their passwords are set to 'password'.
 
