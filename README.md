@@ -15,6 +15,8 @@ Note we have a [code of conduct](./CODE_OF_CONDUCT.md), please follow it in all 
 3. Commit your changes (`git commit -am 'Add new feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull/Merge Request
+Note: If you need to edit a header (.h) file, then you need to 'make clean'
+      before doing 'make'.
 
 
 >Credits: This code is based on CircleMUD 3.1 by Jeremy "Ras" Elson, who based it on DikuMUD.
