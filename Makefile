@@ -24,13 +24,13 @@ ifeq ($(ECL),1)
 endif
 
 #flags for profiling (see hacker.doc for more information)
-PROFILE = 
+PROFILE =
 
 ##############################################################################
 # Do Not Modify Anything Below This Line (unless you know what you're doing) #
 ##############################################################################
 
-BINDIR = ../bin
+BINDIR = bin
 
 CPPFLAGS = $(MYFLAGS) $(PROFILE)
 
@@ -46,7 +46,7 @@ $(BINDIR)/circle : $(OBJFILES)
 	$(CC) -o $(BINDIR)/circle $(PROFILE) $(OBJFILES) $(LIBS)
 
 $%.o: %.cpp
-	$(CC) $< $(CFLAGS) -c -o $@ 
+	$(CC) $< $(CFLAGS) -c -o $@
 
 %.obj: %.lisp
 	echo compiling $< >>lisp-output.txt

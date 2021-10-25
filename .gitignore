@@ -6,3 +6,6 @@ TAGS
 *.a
 *.data
 config.log
+lib/
+log/
+bin/
