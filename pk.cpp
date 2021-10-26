@@ -73,7 +73,7 @@ ACMD(do_register) {
 }
 
 // Checks if both characters in a fight have the PK flag.
-// Why is this function not using a bool?
+// TODO: why is this function not using a bool?
 int both_pk(Character *a, Character *b) {
     // If either is a mob, it's not a PK fight.
     if (IS_NPC(a) || IS_NPC(b)) return 0;
@@ -87,9 +87,6 @@ int both_pk(Character *a, Character *b) {
 
 // Calculates how many PK points to assigns to winner and loser.
 // Also incremenets the PK kill counter and decrements the PK RIP counter.
-//
-// TODO: detect who is the attacker and remove points if attacker fights
-// a lower tier player. e.g. Your cowardice has lost you 500 PK points.
 void kill_points(Character *winner, Character *loser) {
     if (both_pk(winner, loser) == 0) {
         return;
