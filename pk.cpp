@@ -24,8 +24,7 @@ ACMD(do_register) {
             return;
         }
         if (GET_GOLD_TOKEN_COUNT(ch) >= 1) {
-            GET_GOLD_TOKEN_COUNT(ch)
-            --;
+            GET_GOLD_TOKEN_COUNT(ch)--;
             REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_PK);
             ch->Send(
                 "You are charged 1 Gold Token, and have had your PK flag "
@@ -85,28 +84,34 @@ int both_pk(Character *a, Character *b) {
         return 0;
 }
 
+// interface
+void kill_points(Character *ch, Character *vict);
 // Calculates how many PK points to assigns to winner and loser.
 // Also incremenets the PK kill counter and decrements the PK RIP counter.
 void kill_points(Character *winner, Character *loser) {
+    // General
+    if (IS_NPC(winner) && IS_NPC(loser)) return;
+
+    if (!IS_NPC(winner)) {
+        GET_KILL_CNT(winner)++;
+        kill_list(winner, loser);
+    }
+    if (!IS_NPC(loser)) GET_RIP_CNT(loser)++;
+
+    // PK only
     if (both_pk(winner, loser) == 0) {
         return;
     }
 
-    // increase KILL && PK KILL counter for winner
-    GET_KILL_CNT(winner) += 1;
-    GET_PK_CNT(winner) += 1;
-    kill_list(winner, loser);
+    // increase PK KILL counter for winner
+    GET_PK_CNT(winner)++;
+    // increase PK RIP counter for loser
+    GET_PK_RIP(loser)++;
 
-    // increase RIP && PK RIP counter for loser
-    GET_RIP_CNT(loser) += 1;
-    GET_PK_RIP(loser) += 1;
-
-    int points;
+    int points = 50;
     // if the KILL happened in arena reduce points awarded
     if (ROOM_FLAGGED(IN_ROOM(winner), ROOM_ARENA)) {
         points = 25;
-    } else {
-        points = 50;
     }
 
     LAST_PK = strdup(GET_NAME(winner));
@@ -120,11 +125,8 @@ void kill_points(Character *winner, Character *loser) {
         GET_PK_POINTS(winner) += points;
         GET_PK_POINTS(loser) -= points;
     } else {
-        if (player1 > player2) {  // unfair fight | half points
+        if (player1 > player2) {  // unfair fight | remove half points
             GET_PK_POINTS(winner) -= points / 2
-        } else {  // weaker player wins: should never happen
-            GET_PK_POINTS(winner) -= points / 2;
-            GET_PK_POINTS(loser) += points / 2;
         }
     }
 }
