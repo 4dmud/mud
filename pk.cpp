@@ -117,8 +117,8 @@ void kill_points(Character *winner, Character *loser) {
     LAST_PK = strdup(GET_NAME(winner));
     CHAMPION = GET_IDNUM(winner);
 
-    player1 = current_class_is_tier_num(winner) * GET_LEVEL(winner);
-    player2 = current_class_is_tier_num(loser) * GET_LEVEL(loser);
+    auto player1 = current_class_is_tier_num(winner) * GET_LEVEL(winner);
+    auto player2 = current_class_is_tier_num(loser) * GET_LEVEL(loser);
 
     // assign points
     if (player1 % player2 == 0) {  // it's a fair fight
