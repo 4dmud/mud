@@ -11,7 +11,7 @@
 #ifndef BOARDS_H
 #define BOARDS_H
 
-#define NUM_OF_BOARDS		34	/* change if needed! */
+#define NUM_OF_BOARDS		35	/* change if needed! */
 #define MAX_BOARD_MESSAGES 	80	/* arbitrary -- change if needed */
 #define MAX_MESSAGE_LENGTH	4096	/* arbitrary -- change if needed */
 

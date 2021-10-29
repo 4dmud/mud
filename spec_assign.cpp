@@ -343,6 +343,7 @@ void assign_objects(void)
     ASSIGNOBJ(10233, gen_board);
     ASSIGNOBJ(26708, gen_board);	/* board for the gladiator school */
     ASSIGNOBJ(28799, gen_board);	// Vampire elder board
+    ASSIGNOBJ(20186, gen_board);    // Tocharae's board
 
 #endif
 

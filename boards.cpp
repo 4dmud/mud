@@ -68,8 +68,7 @@ TO ADD A NEW BOARD, simply follow our easy 4-step program:
 format:	vnum, read lvl, write lvl, remove lvl, filename, 0 at end
 Be sure to also change NUM_OF_BOARDS in board.h
 */
- struct board_info_type board_info[NUM_OF_BOARDS] =
-   {
+struct board_info_type board_info[NUM_OF_BOARDS] = {
     {590, 0, 0, LVL_GOD, LIB_ETC "board.newbie", 0},
     {1315, 0, 0, LVL_GOD, LIB_ETC "board.sicilian", 0},
     {1360, 0, 0, LVL_GOD, LIB_ETC "board.sicilian2", 0},
@@ -103,7 +102,8 @@ Be sure to also change NUM_OF_BOARDS in board.h
     {28736, 0, 0, LVL_GOD, LIB_ETC "board.vampire", 0},
     {10233, 0, 0, LVL_GOD, LIB_ETC "board.qual", 0},
     {26708, 0, 0, LVL_GOD, LIB_ETC "board.gladiators", 0},
-    {28799, 0, 0, LVL_GOD, LIB_ETC "board.vampire2", 0}
+    {28799, 0, 0, LVL_GOD, LIB_ETC "board.vampire2", 0},
+    {20186, 0, 0, LVL_GOD, LIB_ETC "board.tocharaeh", 0}
   };
 
 /* local functions */
@@ -747,4 +747,3 @@ void Board_reset_board(int board_type)
     remove(FILENAME(board_type));
 }
 */
-
