@@ -2,7 +2,7 @@
 
 ## Compile and run in container
 ```bash
-$ docker built -t 4dmud .
+$ docker build -t 4dmud .
 $ docker run -d --rm -p6000:6000 --name 4d 4dmud
 $ telnet localhost 6000
 
