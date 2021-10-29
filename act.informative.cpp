@@ -2902,7 +2902,7 @@ ACMD ( do_score )
                                        ch->player.time.played, 0 );
     ch->Send (
         "{cg| |-------------------------------------------------------------------| |\r\n"
-        "| | {cwAge: {cy%-3d{cg  --  {cwYou have been playing for [{cy%3d{cw] day%s and [{cy%2d{cw] hour%s%s{cg | |\r\n",
+        "| | {cwAge: {cy %-3d{cg  --  {cwPlaying for [ {cy%3d{cw] day%s and [ {cy%2d{cw] hour%s%s{cg            | |\r\n",
         GET_AGE ( ch ),
         playing_time.day, playing_time.day == 1 ? "" : "s",
         playing_time.hours,
