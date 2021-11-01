@@ -1384,7 +1384,7 @@ void oedit_parse ( Descriptor *d, char *arg )
                 case 'f':
                 case 'F':
                     /* Object innate spell */
-                    if ( GET_LEVEL ( d->character ) == LVL_IMPL )
+                    if ( GET_LEVEL ( d->character ) >= LVL_SEN )
                     {
                         oedit_disp_spells_menu ( d );
                         d->Output ( "Enter spell # : " );
