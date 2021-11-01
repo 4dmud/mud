@@ -318,7 +318,7 @@ bool Descriptor::pending_output() {
 
 Descriptor::Descriptor() {
     showstr_count = 0;
-    telnet_capable = 0;
+    telnet_capable = 1;
     locked = 0;
     close_me = 0;
     host[0] = '\0';
@@ -622,4 +622,3 @@ size_t Descriptor::Output(stringstream &i) {
     return output.size();
 
 }
-
