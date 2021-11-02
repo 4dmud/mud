@@ -183,7 +183,7 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] =
    { eMSDP_AREA_NAME,        "AREA_NAME",        STRING_READ_ONLY },
    { eMSDP_ROOM_EXITS,       "ROOM_EXITS",       STRING_READ_ONLY },
    { eMSDP_ROOM_NAME,        "ROOM_NAME",        STRING_READ_ONLY },
-// { eMSDP_ROOM_VNUM,        "ROOM_VNUM",        NUMBER_READ_ONLY },
+   { eMSDP_ROOM_VNUM,        "ROOM_VNUM",        NUMBER_READ_ONLY },
    { eMSDP_LOCATION_MAP,     "LOCATION_MAP",     STRING_READ_ONLY },
    { eMSDP_WORLD_TIME,       "WORLD_TIME",       NUMBER_READ_ONLY },
    { eMSDP_MOON_PHASE,       "MOON_PHASE",       STRING_READ_ONLY },

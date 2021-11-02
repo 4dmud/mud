@@ -142,7 +142,7 @@ typedef enum
    eMSDP_AREA_NAME,
    eMSDP_ROOM_EXITS,
    eMSDP_ROOM_NAME,
-//   eMSDP_ROOM_VNUM,  // giving this would make mazes too easy
+   eMSDP_ROOM_VNUM,  // giving this would make mazes too easy
    eMSDP_LOCATION_MAP,
    eMSDP_WORLD_TIME,
    eMSDP_MOON_PHASE,
