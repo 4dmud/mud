@@ -55,16 +55,15 @@ void remort_char ( Character *ch )
     GET_EXP ( ch ) = 1;
     GET_GROUP_EXP ( ch ) = 1;
     REMORTS ( ch ) ++;
-    int remorts = REMORTS(ch);
 
     // limit HP bonus to maximum 50 remorts (GM).
-    const int maxRemortsBonus = 50;
-    if (remorts >= maxRemortsBonus) {
-        GET_MAX_HIT(ch) = 30 + maxRemortsBonus;
+    bool already_gm = grand_master(ch);
+    int remorts = REMORTS(ch);
+    if (already_gm || remorts >= 500) {
+        GET_MAX_HIT(ch) = 30 + 500;
     } else {
         GET_MAX_HIT(ch) = 30 + remorts;
     }
-
 
     GET_MAX_STAMINA ( ch ) = 100 + remorts;
     if ( GET_CLAN ( ch ) == 12 && !PLR_FLAGGED(ch, PLR_NEWBIE_HLPR))
