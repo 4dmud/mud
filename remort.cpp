@@ -68,7 +68,11 @@ void remort_char(Character *ch)
     }
 
     // Stamina remort bonus.
-    GET_MAX_STAMINA (ch) = 100 + remorts;
+    if (already_gm || remorts >= 500) {
+        GET_MAX_STAMINA(ch) = 100 + 500;
+    } else {
+        GET_MAX_STAMINA(ch) = 100 + remorts;
+    }
 
     // Handle new players Seekers expulsion on remort.
     if (GET_CLAN(ch) == 12 && !PLR_FLAGGED(ch, PLR_NEWBIE_HLPR))
