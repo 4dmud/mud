@@ -56,10 +56,14 @@ void remort_char(Character *ch)
     GET_LEVEL(ch) = 1;
     GET_EXP(ch) = 1;
     GET_GROUP_EXP(ch) = 1;
-    REMORTS(ch)++;
+    int remorts = REMORTS(ch);
+    if (remorts >= 500) {
+        REMORTS(ch) = 500;
+    } else {
+        REMORTS(ch)++;
+    }
 
     // HP remort bonus, capped at GM level or 500 remorts.
-    int remorts = REMORTS(ch);
     bool already_gm = grand_master(ch);
     if (already_gm || remorts >= 500) {
         GET_MAX_HIT(ch) = 30 + 500;
