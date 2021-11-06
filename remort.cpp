@@ -51,13 +51,21 @@ int num_casting ( Character *ch );
 
 void remort_char ( Character *ch )
 {
-    int remorts = REMORTS ( ch );
     GET_LEVEL ( ch ) = 1;
     GET_EXP ( ch ) = 1;
     GET_GROUP_EXP ( ch ) = 1;
-
     REMORTS ( ch ) ++;
-    GET_MAX_HIT ( ch ) = 30 + remorts;
+    int remorts = REMORTS(ch);
+
+    // limit HP bonus to maximum 50 remorts (GM).
+    const int maxRemortsBonus = 50;
+    if (remorts >= maxRemortsBonus) {
+        GET_MAX_HIT(ch) = 30 + maxRemortsBonus;
+    } else {
+        GET_MAX_HIT(ch) = 30 + remorts;
+    }
+
+
     GET_MAX_STAMINA ( ch ) = 100 + remorts;
     if ( GET_CLAN ( ch ) == 12 && !PLR_FLAGGED(ch, PLR_NEWBIE_HLPR))
     {
@@ -78,9 +86,6 @@ void remort_char ( Character *ch )
 
     if ( siteok_everyone )
         SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_SITEOK );
-
-
-
 }
 
 ACMD ( do_remort )
@@ -455,4 +460,3 @@ int num_melee_tier ( Character *ch )
 
     return count;
 }
-
