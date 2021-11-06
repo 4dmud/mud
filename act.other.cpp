@@ -935,7 +935,7 @@ ACMD ( do_report )
 {
     char buf[MAX_INPUT_LENGTH];
 
-    sprintf ( buf, "$n reports: %d/%dH, %d/%dM, %d/%dV %d/%dS\r\n",
+    sprintf ( buf, "$n reports: %d/%dH, %d/%dM, %d/%dV, %d/%dS\r\n",
                GET_HIT ( ch ),  GET_MAX_HIT ( ch ),
                GET_MANA ( ch ), GET_MAX_MANA ( ch ),
                GET_MOVE ( ch ), GET_MAX_MOVE ( ch ),
@@ -949,7 +949,7 @@ ACMD ( do_report )
     }
 
     act ( buf, FALSE, ch, 0, 0, TO_ROOM );
-    sprintf ( buf, "You report: %d/%dH, %d/%dM, %d/%dV %d/%dS\r\n",
+    sprintf ( buf, "You report: %d/%dH, %d/%dM, %d/%dV, %d/%dS\r\n",
                GET_HIT ( ch ),  GET_MAX_HIT ( ch ),
                GET_MANA ( ch ), GET_MAX_MANA ( ch ),
                GET_MOVE ( ch ), GET_MAX_MOVE ( ch ),
