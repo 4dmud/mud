@@ -48,43 +48,49 @@ int current_class_is_tier ( Character *ch );	/* returns 0 or 1 */
 int current_class_is_tier_num ( Character *ch );	/* returns 0 to 4 */
 int num_casting ( Character *ch );
 
-
-void remort_char ( Character *ch )
+// remort_char sets up the remort bonuses for players based on the numbers
+// of remorts, and handles Seeker clan explusion for new players.
+// Also updates wimpy to reflect the new maxhit of the player.
+void remort_char(Character *ch)
 {
-    GET_LEVEL ( ch ) = 1;
-    GET_EXP ( ch ) = 1;
-    GET_GROUP_EXP ( ch ) = 1;
-    REMORTS ( ch ) ++;
+    GET_LEVEL(ch) = 1;
+    GET_EXP(ch) = 1;
+    GET_GROUP_EXP(ch) = 1;
+    REMORTS(ch)++;
 
-    // limit HP bonus to maximum 50 remorts (GM).
-    bool already_gm = grand_master(ch);
+    // HP remort bonus, capped at GM level or 500 remorts.
     int remorts = REMORTS(ch);
+    bool already_gm = grand_master(ch);
     if (already_gm || remorts >= 500) {
         GET_MAX_HIT(ch) = 30 + 500;
     } else {
         GET_MAX_HIT(ch) = 30 + remorts;
     }
 
-    GET_MAX_STAMINA ( ch ) = 100 + remorts;
-    if ( GET_CLAN ( ch ) == 12 && !PLR_FLAGGED(ch, PLR_NEWBIE_HLPR))
+    // Stamina remort bonus.
+    GET_MAX_STAMINA (ch) = 100 + remorts;
+
+    // Handle new players Seekers expulsion on remort.
+    if (GET_CLAN(ch) == 12 && !PLR_FLAGGED(ch, PLR_NEWBIE_HLPR))
     {
-        GET_CLAN ( ch ) = 0;
-        GET_CLAN_RANK ( ch ) = 0;
+        GET_CLAN (ch) = 0;
+        GET_CLAN_RANK (ch) = 0;
         if (REMORTS(ch) <= 4)
           ch->Send("You were removed from the Seekers clan, because the time has come to move on.\r\n");
         else
           ch->Send("You were removed from the Seekers clan, because you're just too old!\r\n");
     }
-        if ( GET_CLAN ( ch ) == 12 )
+        if (GET_CLAN(ch) == 12)
       ch->Send("Because you were a helper in Seekers, you were not booted upon remorting like non-helpers.\r\nIf you wish to leave Seekers you can go 2 south from recall and say, 'I want to leave Seekers'.\r\n");
 
+    // update player stats: maxmove,maxmana,maxhp,...
+    advance_level(ch);
 
+    // update wimpy to reflect new maxhit
+    GET_WIMP_LEV(ch) = GET_MAX_HIT(ch) /2;
 
-    advance_level ( ch );
-    GET_WIMP_LEV ( ch ) = GET_MAX_HIT ( ch ) /2;
-
-    if ( siteok_everyone )
-        SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_SITEOK );
+    if (siteok_everyone)
+        SET_BIT_AR (PLR_FLAGS(ch), PLR_SITEOK);
 }
 
 ACMD ( do_remort )
