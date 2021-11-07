@@ -1197,7 +1197,6 @@ ACMD ( do_atlvl )
 {
     char command[MAX_INPUT_LENGTH];
     char buf[MAX_INPUT_LENGTH];
-    int lev;
 
     half_chop ( argument, buf, command );
     if ( !*buf )
@@ -1212,9 +1211,7 @@ ACMD ( do_atlvl )
         return;
     }
 
-
-
-    lev = atoi ( buf );
+    int lev = atoi ( buf );
     if ( lev < 1 || lev >= GET_LEVEL ( ch ) )
     {
         send_to_char ( "That is an invalid level.\r\n", ch );
@@ -1225,11 +1222,13 @@ ACMD ( do_atlvl )
     GET_ORIG_LEV ( ch ) = GET_LEVEL ( ch );
     GET_LEVEL ( ch ) = lev;
     if ( *command )
+    {
         command_interpreter ( ch, command );
-
-    /*if (GET_LEVEL(ch) != orig)
-    GET_LEVEL(ch) = orig;*/
-
+        // auto-return
+        ch->Send ( "You return to your original level.\r\n" );
+        GET_LEVEL ( ch ) = GET_ORIG_LEV ( ch );
+        GET_ORIG_LEV  (ch ) = 0;
+    }
 }
 
 
