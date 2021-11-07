@@ -2915,14 +2915,26 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         else
                         {
                             *str = '\0';
-                            for ( int i = 0; i < colour_names.size(); ++i )
-                                if ( !strcasecmp ( colour_names[i], subfield ) )
-                                {
-                                    GET_OBJ_COLOUR ( o ) = i;
-                                    return;
-                                }
-                            script_log ( "Trigger %d: unknown colour '%s'. Line %d: %s", GET_TRIG_VNUM ( trig ),
-                                subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            if ( is_number ( subfield ))
+                            {
+                                int c = atoi ( subfield );
+                                if ( c < 0 || c >= colour_names.size() )
+                                    script_log ( "Trigger %d: colour setting of [%d] %s is out of range: %d",
+                                    GET_TRIG_VNUM ( trig ), GET_OBJ_VNUM ( o ), o->short_description, c );
+                                else
+                                    GET_OBJ_COLOUR ( o ) = c;
+                            }
+                            else
+                            {
+                                for ( int i = 0; i < colour_names.size(); ++i )
+                                    if ( !strcasecmp ( colour_names[i], subfield ) )
+                                    {
+                                        GET_OBJ_COLOUR ( o ) = i;
+                                        return;
+                                    }
+                                script_log ( "Trigger %d: unknown colour '%s'. Line %d: %s", GET_TRIG_VNUM ( trig ),
+                                    subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            }
                         }
                     }
 
