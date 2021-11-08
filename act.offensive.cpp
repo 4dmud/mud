@@ -580,7 +580,7 @@ ACMD ( do_shoot )
 
     }
 
-    if ( !holding || holding < 0 )
+    if ( !holding || holding == NULL )
     {
         ch->Send ( "Snap it's broken! It probably has the wrong kinda ammo in it.\r\n" );
         return;
@@ -809,4 +809,3 @@ ACMD ( do_ignore )
      gain += (GET_MANA(ch) / 2);
    }
 */
-

@@ -225,7 +225,7 @@ ACMD ( do_chaos )
         ch->Send ( "Please choose a hi_lim under the Imps level\r\n" );
         return;
     }
-    if ( lolimit < 0 )
+    if (*lolimit < 0)
         silent_end();
     if ( !*lolimit || !*hilimit || !*start_delay || !*cost || !*length )
     {

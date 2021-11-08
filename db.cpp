@@ -1322,7 +1322,7 @@ void load_explored ( const Character *ch )
         return;
 
     int i = 0;
-    ulong x;
+    unsigned long x;
     while ( i < SPECIALS ( ch )->explored.size() )
     {
         f >> x;

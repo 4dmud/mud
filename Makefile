@@ -14,7 +14,14 @@ CC = g++
 
 # Any special flags you want to pass to the compiler
 MYFLAGS = -Wall -Wno-sign-compare -Wunused -Wno-unused-local-typedefs -Wno-format-truncation -Wformat -O0 -ggdb3 -fno-inline -std=c++11
-LIBS = -lz -lpthread -lnsl -lm -lc -lcrypt
+
+LIBS =
+ifeq ($(UNAME_S),Darwin)
+	LIBS = -lz -lpthread -lm -lc -lcrypt
+else
+	LIBS = -lz -lpthread -lnsl -lm -lc -lcrypt
+endif
+
 SRCFILES := $(wildcard *.cpp)
 OBJFILES := $(patsubst %.cpp,%.o,$(SRCFILES))
 ifeq ($(ECL),1)

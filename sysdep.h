@@ -250,8 +250,12 @@ extern void abort (), exit ();
 #include <sys/errno.h>
 #endif
 
+#if defined(__APPLE__)
+#include <unistd.h>
+#else
 #ifdef HAVE_CRYPT_H
 #include <crypt.h>
+#endif
 #endif
 
 #ifdef TIME_WITH_SYS_TIME
@@ -350,7 +354,13 @@ extern void abort (), exit ();
 
 
 /* Basic system dependencies *******************************************/
+
+
+#if defined (__APPLE__)
+#include <mach/error.h>
+#else
 #include <mcheck.h>
+#endif
 
 #if CIRCLE_GNU_LIBC_MEMORY_TRACK && !defined(HAVE_MCHECK_H)
 #error "Cannot use GNU C library memory tracking without <mcheck.h>"
@@ -426,11 +436,11 @@ extern void abort (), exit ();
 #ifdef CIRCLE_WINDOWS
 # define CLOSE_SOCKET(sock)	closesocket(sock)
 
-typedef SOCKET		socket_t;
+    typedef SOCKET socket_t;
 #else
 # define CLOSE_SOCKET(sock)	close(sock)
 
-typedef int			socket_t;
+    typedef int socket_t;
 #endif
 
 #if defined(__cplusplus)	/* C++ */

@@ -4636,4 +4636,3 @@ void mccp_off(Descriptor *d) {
 #include "dlib/dir_nav/dir_nav_kernel_1.cpp"
 #include "dlib/dir_nav/dir_nav_kernel_2.cpp"
 //#include "dlib/linker/linker_kernel_1.cpp"
-
