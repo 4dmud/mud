@@ -30,7 +30,7 @@ PROFILE =
 # Do Not Modify Anything Below This Line (unless you know what you're doing) #
 ##############################################################################
 
-BINDIR = bin
+BINDIR = ../bin
 
 CPPFLAGS = $(MYFLAGS) $(PROFILE)
 

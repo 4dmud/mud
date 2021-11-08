@@ -2915,14 +2915,26 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         else
                         {
                             *str = '\0';
-                            for ( int i = 0; i < colour_names.size(); ++i )
-                                if ( !strcasecmp ( colour_names[i], subfield ) )
-                                {
-                                    GET_OBJ_COLOUR ( o ) = i;
-                                    return;
-                                }
-                            script_log ( "Trigger %d: unknown colour '%s'. Line %d: %s", GET_TRIG_VNUM ( trig ),
-                                subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            if ( is_number ( subfield ))
+                            {
+                                int c = atoi ( subfield );
+                                if ( c < 0 || c >= colour_names.size() )
+                                    script_log ( "Trigger %d: colour setting of [%d] %s is out of range: %d",
+                                    GET_TRIG_VNUM ( trig ), GET_OBJ_VNUM ( o ), o->short_description, c );
+                                else
+                                    GET_OBJ_COLOUR ( o ) = c;
+                            }
+                            else
+                            {
+                                for ( int i = 0; i < colour_names.size(); ++i )
+                                    if ( !strcasecmp ( colour_names[i], subfield ) )
+                                    {
+                                        GET_OBJ_COLOUR ( o ) = i;
+                                        return;
+                                    }
+                                script_log ( "Trigger %d: unknown colour '%s'. Line %d: %s", GET_TRIG_VNUM ( trig ),
+                                    subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            }
                         }
                     }
 
@@ -3361,7 +3373,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             GET_OBJ_COLOUR ( o ) = 0;
                         }
                         if ( GET_OBJ_COLOUR ( o ) == 0 )
-                            break;
+                            return;
 
                         bool colour_set = FALSE;
                         string desc = string ( o->short_description );
@@ -3374,7 +3386,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                                 if ( p > o->short_description && *(p-1) != ' ' )
                                     continue;
                                 if ( i == GET_OBJ_COLOUR ( o ) )
-                                    return;
+                                    return; // same colour already
                                 desc.replace ( p - o->short_description, strlen ( colour_names[i] ), new_colour );
                                 colour_set = TRUE;
                                 break;
@@ -3393,30 +3405,11 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         }
                         else
                         {
-                            if ( tolower ( desc.substr ( 0, 2 ) ) == "a " )
-                            {
-                                pos = 2;
-                                if ( !strcmp ( AN ( new_colour.c_str() ), "an" ) )
-                                {
-                                    desc.insert ( 1, "n" );
-                                    pos++;
-                                }
-                            }
-                            else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " )
-                            {
-                                pos = 3;
-                                if ( !strcmp ( AN ( new_colour.c_str() ), "a" ) )
-                                {
-                                    desc.erase ( 1, 1 );
-                                    pos--;
-                                }
-                            }
-                            else if ( tolower ( desc.substr ( 0, 4 ) ) == "the " )
-                                pos = 4;
-                            else if ( tolower ( desc.substr ( 0, 5 ) ) == "some " )
-                                pos = 5;
-                            else pos = 0;
-
+                            if ( tolower ( desc.substr ( 0, 2 ) ) == "a " && !strcmp ( AN ( new_colour.c_str() ), "an" ) )
+                                desc.insert ( 1, "n" );
+                            else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " && !strcmp ( AN ( new_colour.c_str() ), "a" ) )
+                                desc.erase ( 1, 1 );
+                            pos = desc.find ( ' ' ) + 1;
                             desc.insert ( pos, new_colour + " " );
                         }
 

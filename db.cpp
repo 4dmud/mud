@@ -8665,8 +8665,14 @@ void load_crashproof_objects()
             log ( "Error reading crashproof file %s: %s", ep->d_name, strerror ( errno ) );
             continue;
         }
+
         if ( S_ISREG ( st_buf.st_mode ) )
-            load_crashproof_file ( ep->d_name );
+        {
+            if ( !st_buf.st_size )
+                remove ( ep->d_name ); // the file is empty, remove it
+            else
+                load_crashproof_file ( ep->d_name );
+        }
     }
     closedir ( dp );
     chdir ( cwd );

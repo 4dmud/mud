@@ -2212,7 +2212,7 @@ int enter_player_game ( Descriptor *d )
 
 
     /* put character to their loadroom before autoequipping them */
-    if ( GET_LOADROOM ( ch ) != NOWHERE )
+    if ( real_room ( GET_LOADROOM ( ch ) ) )
         load_room = real_room ( GET_LOADROOM ( ch ) );
     if ( GET_LEVEL ( ch ) < 1 )
         load_room = real_room ( 3081 );
