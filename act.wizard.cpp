@@ -3185,6 +3185,7 @@ ACMD(do_copyover) {
     char arg[MAX_INPUT_LENGTH];
     one_arg(argument, arg);
     if (string(arg) == "now") {
+        send_to_all("{cyCopyover starting now!.{c0\r\n");
         copyover(ch);
         return;
     }
