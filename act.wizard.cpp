@@ -3180,20 +3180,29 @@ ACMD ( do_syslog )
     ch->Send ( "Your syslog is now %s.\r\n", logtypes[tp] );
 }
 
-ACMD ( do_copyover )
-{
-    for ( Descriptor *d = descriptor_list; d; d = d->next )
-        if ( d->character->HasMessageEvent ( ME_COPYOVER ) )
-        {
-            d->character->CancelMessageEvent ( ME_COPYOVER );
-            send_to_all ( "{cyCopyover cancelled.{c0\r\n" );
-            log ( "%s cancelled the copyover.", GET_NAME ( ch ) );
+void copyover(Character *ch);
+ACMD(do_copyover) {
+    char arg[MAX_INPUT_LENGTH];
+    one_arg(argument, arg);
+    if (string(arg) == "now") {
+        copyover(ch);
+        return;
+    }
+
+    for (Descriptor *d = descriptor_list; d; d = d->next) {
+        if (d->character->HasMessageEvent(ME_COPYOVER)) {
+            d->character->CancelMessageEvent(ME_COPYOVER);
+            send_to_all("{cyCopyover cancelled.{c0\r\n");
+            log("%s cancelled the copyover.", GET_NAME(ch));
             return;
         }
+    }
 
-    struct message_event_obj *msg = new message_event_obj ( ch, 0, THING_COPYOVER, 11, NOBODY, ( char * ) "" );
-    ch->AddMessageEvent ( event_create ( message_event, msg, 0, EVENT_TYPE_MESSAGE ), ME_COPYOVER );
-    log ( "%s initiated a copyover.", GET_NAME ( ch ) );
+    struct message_event_obj *msg =
+        new message_event_obj(ch, 0, THING_COPYOVER, 11, NOBODY, (char *)"");
+    ch->AddMessageEvent(event_create(message_event, msg, 0, EVENT_TYPE_MESSAGE),
+                        ME_COPYOVER);
+    log("%s initiated a copyover.", GET_NAME(ch));
 }
 
 extern int mother_desc;
