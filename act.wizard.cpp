@@ -1237,7 +1237,8 @@ ACMD ( do_goto )
     room_rnum location;
     char buf[MAX_INPUT_LENGTH];
 
-    if ( ( location = find_target_room ( ch, argument ) ) < 0 )
+    location = find_target_room ( ch, argument );
+    if ( !location )
         return;
 
     if ( location == IN_ROOM ( ch ) )
@@ -1368,7 +1369,7 @@ ACMD ( do_teleport )
         send_to_char ( "Maybe you shouldn't do that.\r\n", ch );
     else if ( !*buf2 )
         send_to_char ( "Where do you wish to send this person?\r\n", ch );
-    else if ( ( target = find_target_room ( ch, buf2 ) ) >= 0 )
+    else if ( ( target = find_target_room ( ch, buf2 ) ) )
     {
         ch->Send ( "%s", CONFIG_OK );
         act ( "$n disappears in a puff of smoke.", FALSE, victim, 0, 0,  TO_ROOM );
@@ -4015,6 +4016,7 @@ ACMD ( do_wiznet )
         {
             case '*':
                 emote = TRUE;
+                // fall-through
             case '#':
                 one_argument ( argument + 1, buf1 );
                 if ( is_number ( buf1 ) )

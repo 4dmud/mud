@@ -212,9 +212,9 @@ size_t strlcpy ( char *dest, const char *src, size_t copylen )
 #else
 size_t strlcpy ( char *dest, const char *src, size_t copylen )
 {
-    register char *d = dest;
-    register const char *s = src;
-    register size_t n = copylen;
+    char *d = dest;
+    const char *s = src;
+    size_t n = copylen;
 
     if ( dest == NULL || src == NULL )
         return 0;
@@ -222,7 +222,7 @@ size_t strlcpy ( char *dest, const char *src, size_t copylen )
     /* Copy as many bytes as will fit */
     if ( n != 0 && --n != 0 )
     {
-        register char c;
+        char c;
         do
         {
             c = *d++ = *s++;

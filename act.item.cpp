@@ -3191,7 +3191,7 @@ OBJ_DATA * create_vial ( void )
     struct obj_data *vial;
     int type = VIAL_NONE;
     int size = 0;
-    register int i;
+    int i;
 
     for ( i = 0; i < 2000;i++ )
     {

@@ -225,7 +225,7 @@ ACMD ( do_chaos )
         ch->Send ( "Please choose a hi_lim under the Imps level\r\n" );
         return;
     }
-    if ( lolimit < 0 )
+    if ( lo_lim < 0 )
         silent_end();
     if ( !*lolimit || !*hilimit || !*start_delay || !*cost || !*length )
     {
@@ -295,7 +295,7 @@ void show_jack_pot ( void )
 
 void start_game ( void )
 {
-    register Character *i;
+    Character *i;
     Descriptor *d;
 
     for ( d = descriptor_list; d; d = d->next )
@@ -358,7 +358,7 @@ void do_game ( void )
 
 void find_game_winner ( void )
 {
-    register Character *i;
+    Character *i;
     Descriptor *d;
     struct hall_of_fame_element *fame_node;
 
@@ -423,7 +423,7 @@ void silent_end ( void )
 
 void do_end_game ( void )
 {
-    register Character *i;
+    Character *i;
     Descriptor *d;
 
     for ( d = descriptor_list; d; d = d->next )
@@ -454,7 +454,7 @@ void do_end_game ( void )
 
 int num_in_arena ( void )
 {
-    register Character *i;
+    Character *i;
     Descriptor *d;
     int num = 0;
 
@@ -615,7 +615,7 @@ void write_one_fame_node ( FILE * fp, struct hall_of_fame_element *node )
 
 void find_bet_winners ( Character *winner )
 {
-    register Character *i;
+    Character *i;
     Descriptor *d;
 
 

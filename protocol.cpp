@@ -15,7 +15,11 @@
 #include <string.h>
 #include <arpa/telnet.h>
 #include <time.h>
+
+#ifndef __APPLE__
 #include <malloc.h>
+#endif
+
 #include <ctype.h>
 
 #include <string>

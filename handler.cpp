@@ -93,7 +93,7 @@ void save_artifacts(Room* room);
 char *fname ( const char *namelist )
 {
     static char holder[READ_SIZE];
-    register char *point;
+    char *point;
 
     for ( point = holder; isalpha ( *namelist ); namelist++, point++ )
         *point = *namelist;
@@ -109,8 +109,7 @@ char *fname ( const char *namelist )
 int isname ( const char *str, const char *namelist )
 {
     char *newlist;
-    register char *curtok;
-    //register char *lp;
+    char *curtok;
     static char newlistbuf[MAX_INPUT_LENGTH];
 
     if ( !str || !*str || !namelist || !*namelist )
@@ -118,22 +117,18 @@ int isname ( const char *str, const char *namelist )
     if ( !strcasecmp ( str, namelist ) ) /* the easy way */
         return 1;
 
-    //lp = newlist = strdup(namelist); /* make a copy since strtok 'modifies' strings */
     strlcpy ( newlistbuf, namelist, sizeof ( newlistbuf ) );
     newlist = newlistbuf;
     for ( curtok = strsep ( &newlist, WHITESPACE ); curtok; curtok = strsep ( &newlist, WHITESPACE ) )
         if ( curtok && is_abbrev ( str, curtok ) )
-        {
-            //free(lp);
             return 1;
-        }
-    //free(lp);
+
     return 0;
 }
 int isname ( const char *str, string &namelist )
 {
     char *newlist;
-    register char *curtok;
+    char *curtok;
     static char newlistbuf[MAX_INPUT_LENGTH];
 
     if ( !str || !*str )
@@ -153,8 +148,7 @@ int isname ( const char *str, string &namelist )
 int isname_hard ( const char *str, const char *namelist )
 {
     char *newlist;
-    register char *curtok;
-    //register char *lp;
+    char *curtok;
     static char newlistbuf[MAX_INPUT_LENGTH];
 
     if ( !str || !*str || !namelist || !*namelist )
@@ -162,16 +156,12 @@ int isname_hard ( const char *str, const char *namelist )
     if ( !strcasecmp ( str, namelist ) ) /* the easy way */
         return 1;
 
-    //lp = newlist = strdup(namelist); /* make a copy since strtok 'modifies' strings */
     strlcpy ( newlistbuf, namelist, sizeof ( newlistbuf ) );
     newlist = newlistbuf;
     for ( curtok = strsep ( &newlist, WHITESPACE ); curtok; curtok = strsep ( &newlist, WHITESPACE ) )
         if ( curtok && !strcasecmp ( str, curtok ) )
-        {
-            //free(lp);
             return 1;
-        }
-    //free(lp);
+
     return 0;
 }
 
@@ -3179,12 +3169,10 @@ void remove_hunter ( Character *ch )
 
 Character *check_ch ( Character *ch )
 {
-    register Character *tch;
-
     if ( !ch )
         return NULL;
 
-    for ( tch = character_list; tch; tch = tch->next )
+    for ( Character *tch = character_list; tch; tch = tch->next )
         if ( ch == tch )
             return tch;
 

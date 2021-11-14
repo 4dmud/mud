@@ -3101,6 +3101,7 @@ int fe_after_damage ( Character* ch, Character* vict,
                                 improve_skill ( ch, SKILL_SHORT_BLADE );
                         }
                         improve_skill ( ch, SKILL_DUAL );
+                        // fall-through
                     case 1:
                         if ( !is_short_wep ( GET_EQ ( ch, WEAR_WIELD ) ) )
                         {
@@ -7650,6 +7651,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
             {
                 case SECT_MOUNTAIN:
                 {	dam = 1.3; ch->Send("+Mountains "); }
+                    break;
                 case SECT_SNOW:
                 case SECT_ICE:
                 {	dam = 1.3; ch->Send("+Ice "); }

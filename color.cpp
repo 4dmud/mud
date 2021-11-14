@@ -196,9 +196,9 @@ int count_chars(const char *txt, char character)
 
 void strip_colour(char *inbuf, size_t i_buf) {
 char *out_buf = NULL, insert_text[10];
-    register unsigned int inpos = 0, outpos = 0;
+    unsigned int inpos = 0, outpos = 0;
     int remaining, colour = -2;
-    register int i;
+    int i;
     size_t b_len;
 
 

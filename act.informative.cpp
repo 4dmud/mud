@@ -4567,8 +4567,8 @@ ACMD ( do_gen_ps )
 
 void perform_mortal_where ( Character *ch, char *arg )
 {
-    register Character *i;
-    register Descriptor *d;
+    Character *i;
+    Descriptor *d;
     struct clan_deed_type *cl;
     int found = -1, clan_num;
 
@@ -4687,8 +4687,8 @@ void print_object_location ( int num, struct obj_data *obj,
 
 void perform_immort_where ( Character *ch, char *arg )
 {
-    register Character *i;
-    register struct obj_data *k;
+    Character *i;
+    struct obj_data *k;
     Descriptor *d;
     int num = 0, counter = 0, found = 0;
 
@@ -4780,8 +4780,7 @@ void perform_immort_where ( Character *ch, char *arg )
         if ( !found )
         {
             if ( dynbuf )
-                ;
-            free ( dynbuf );
+                free ( dynbuf );
             dynbuf = NULL;
             ch->Send ( "Couldn't find any such thing.\r\n" );
         }

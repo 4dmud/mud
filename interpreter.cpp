@@ -1513,7 +1513,7 @@ int perform_alias ( Descriptor *d, char *orig, size_t maxlen )
  */
 int search_block ( char *arg, const char **list, int exact )
 {
-    register int i, l;
+    int i, l;
 
     /* Make into lower case, and get length of string */
     for ( l = 0; * ( arg + l ); l++ )
@@ -1781,8 +1781,8 @@ int find_command ( const char *command )
 
 int special ( Character *ch, int cmd, char *arg, char *cmd_arg )
 {
-    register struct obj_data *i;
-    register Character *k;
+    struct obj_data *i;
+    Character *k;
     int j;
 
     /* special in room? */
@@ -2384,8 +2384,7 @@ int enter_player_game ( Descriptor *d )
             case CLASS_WARRIOR:
                 //long sword
                 if ( ( obj = read_object ( 3022, VIRTUAL ) ) != NULL )
-                    ;
-                perform_wear ( ch, obj, WEAR_WIELD );
+                    perform_wear ( ch, obj, WEAR_WIELD );
                 //cape
                 if ( ( obj = read_object ( 3183, VIRTUAL ) ) != NULL )
                     perform_wear ( ch, obj, WEAR_ABOUT );

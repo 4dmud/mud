@@ -61,7 +61,7 @@ void clean_string(char *buffer);
 /* Tada! THE FUNCTIONS ! Yaaa! */
 
 void clean_string(char *buffer) {
-    register char *ptr, *str;
+    char *ptr, *str;
 
     ptr = buffer;
     str = ptr;

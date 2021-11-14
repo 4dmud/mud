@@ -1322,7 +1322,7 @@ void load_explored ( const Character *ch )
         return;
 
     int i = 0;
-    ulong x;
+    unsigned long x;
     while ( i < SPECIALS ( ch )->explored.size() )
     {
         f >> x;
@@ -1968,7 +1968,7 @@ bitvector_t asciiflag_conv ( char *flag )
 {
     bitvector_t flags = 0;
     int num_true = TRUE;
-    register char *p;
+    char *p;
 
     for ( p = flag; *p; p++ )
     {
@@ -2390,7 +2390,7 @@ void setup_dir ( FILE * fl, room_rnum room, int dir )
 /* resolve all vnums into rnums in the world */
 void renum_world ( void )
 {
-    register int door;
+    int door;
     room_vnum room;
 
     for ( room = 0; room <= top_of_world; room++ )

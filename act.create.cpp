@@ -980,7 +980,8 @@ EVENTFUNC ( message_event )
         {}
     else if ( ( vict = find_char ( uid ) ) )
         {}
-    else if ( ( obj = find_obj ( uid ) ) );
+    else if ( ( obj = find_obj ( uid ) ) )
+        {}
 
     if ( type == THING_SKILL )
     {
