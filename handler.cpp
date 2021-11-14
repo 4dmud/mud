@@ -93,7 +93,7 @@ void save_artifacts(Room* room);
 char *fname ( const char *namelist )
 {
     static char holder[READ_SIZE];
-    register char *point;
+    char *point;
 
     for ( point = holder; isalpha ( *namelist ); namelist++, point++ )
         *point = *namelist;
@@ -109,8 +109,7 @@ char *fname ( const char *namelist )
 int isname ( const char *str, const char *namelist )
 {
     char *newlist;
-    register char *curtok;
-    //register char *lp;
+    char *curtok;
     static char newlistbuf[MAX_INPUT_LENGTH];
 
     if ( !str || !*str || !namelist || !*namelist )
@@ -118,22 +117,18 @@ int isname ( const char *str, const char *namelist )
     if ( !strcasecmp ( str, namelist ) ) /* the easy way */
         return 1;
 
-    //lp = newlist = strdup(namelist); /* make a copy since strtok 'modifies' strings */
     strlcpy ( newlistbuf, namelist, sizeof ( newlistbuf ) );
     newlist = newlistbuf;
     for ( curtok = strsep ( &newlist, WHITESPACE ); curtok; curtok = strsep ( &newlist, WHITESPACE ) )
         if ( curtok && is_abbrev ( str, curtok ) )
-        {
-            //free(lp);
             return 1;
-        }
-    //free(lp);
+
     return 0;
 }
 int isname ( const char *str, string &namelist )
 {
     char *newlist;
-    register char *curtok;
+    char *curtok;
     static char newlistbuf[MAX_INPUT_LENGTH];
 
     if ( !str || !*str )
@@ -153,8 +148,7 @@ int isname ( const char *str, string &namelist )
 int isname_hard ( const char *str, const char *namelist )
 {
     char *newlist;
-    register char *curtok;
-    //register char *lp;
+    char *curtok;
     static char newlistbuf[MAX_INPUT_LENGTH];
 
     if ( !str || !*str || !namelist || !*namelist )
@@ -162,16 +156,12 @@ int isname_hard ( const char *str, const char *namelist )
     if ( !strcasecmp ( str, namelist ) ) /* the easy way */
         return 1;
 
-    //lp = newlist = strdup(namelist); /* make a copy since strtok 'modifies' strings */
     strlcpy ( newlistbuf, namelist, sizeof ( newlistbuf ) );
     newlist = newlistbuf;
     for ( curtok = strsep ( &newlist, WHITESPACE ); curtok; curtok = strsep ( &newlist, WHITESPACE ) )
         if ( curtok && !strcasecmp ( str, curtok ) )
-        {
-            //free(lp);
             return 1;
-        }
-    //free(lp);
+
     return 0;
 }
 
@@ -1913,7 +1903,7 @@ void extract_obj ( struct obj_data *obj, bool show_warning /* = true */ )
 
 void crumble_obj ( Character *ch, struct obj_data *obj )
 {
-    struct obj_data *loop;
+    struct obj_data *loop, *next_obj;
     int index;
 
     if ( IN_ROOM ( obj ) != NULL )
@@ -1937,8 +1927,6 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
         {
             obj_from_char ( obj );
         }
-        extract_obj ( obj );
-
     }
     else if ( IN_ROOM ( obj ) != NULL )    /* In a room */
     {
@@ -1952,55 +1940,65 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
             act ( "A quivering horde of maggots consumes $p.",
                   TRUE, IN_ROOM ( obj )->people, obj, 0, TO_CHAR );
         }
-        for ( loop = obj->contains; loop; loop = obj->contains )
+
+        // If it's a container, put the contents in the room
+        for ( loop = obj->contains; loop; loop = next_obj )
         {
+            next_obj = loop->next_content;
             obj_from_obj ( loop );
             obj_to_room ( loop, IN_ROOM ( obj ) );
         }
 
         obj_from_room ( obj );
-
     }
     else if ( obj->in_locker )
     {
         item_from_locker ( obj->in_locker, obj );
     }
-    else if ( !obj->in_obj && obj->carried_by )  /* Worn or inventory */
+    else    /* Worn or inventory */
     {
-
-        for ( loop = obj->contains; loop; loop = obj->contains )
+        if ( obj->in_obj )    /* In an object */
         {
-            obj_from_obj ( loop );
-            obj_to_char ( loop, ch );
+            if ( OBJ_FLAGGED ( obj, ITEM_ARTIFACT ) && IN_ROOM ( obj->in_obj ) && ROOM_FLAGGED ( IN_ROOM ( obj->in_obj ), ROOM_ARTISAVE ) )
+            log ( "SYSERR: Arti %s crumbled in artisave container in room %d ", obj->name, IN_ROOM ( obj->in_obj )->number );
+
+            // If it's a container, put the contents in the outer container
+            for ( loop = obj->contains; loop; loop = next_obj )
+            {
+                next_obj = loop->next_content;
+                obj_from_obj ( loop );
+                obj_to_obj ( loop, obj->in_obj );
+            }
+            obj_from_obj ( obj );
         }
-        if (!obj->carried_by)     /* Equipped */
+        else if ( !obj->carried_by )     /* Equipped */
         {
             for ( index = 0; index < NUM_WEARS; index++ )
                 if ( GET_EQ ( ch, index ) == obj )
                 {
+                    // If it's a container, put the contents in inv
+                    for ( loop = obj->contains; loop; loop = next_obj )
+                    {
+                        next_obj = loop->next_content;
+                        obj_from_obj ( loop );
+                        obj_to_char ( loop, ch );
+                    }
                     obj = unequip_char ( ch, index );
-                    act ( "$p decays in your hands.", FALSE, ch, obj, 0, TO_CHAR );
-                    act ( "$p decays in $n's hands.", FALSE, ch, obj, 0, TO_ROOM );
-                    obj_from_char(obj); // Once's fix for decaying items
+                    act ( "$p disintegrates into nothingness.", FALSE, ch, obj, 0, TO_CHAR );
                 }
         }
-        else
+        else    /* Inventory */
         {
+            // If it's a container, put the contents in inv
+            for ( loop = obj->contains; loop; loop = next_obj )
+            {
+                next_obj = loop->next_content;
+                obj_from_obj ( loop );
+                obj_to_char ( loop, ch );
+            }
             act ( "$p crumbles into dust.", FALSE, ( obj->carried_by ), obj, 0, TO_CHAR );
             obj_from_char ( obj );
         }
-    }
-    else if ( obj->in_obj )            /* In an object */
-    {
-        if ( OBJ_FLAGGED ( obj, ITEM_ARTIFACT ) && IN_ROOM ( obj->in_obj ) && ROOM_FLAGGED ( IN_ROOM ( obj->in_obj ), ROOM_ARTISAVE ) )
-            log ( "SYSERR: Arti %s crumbled in artisave container in room %d ", obj->name, IN_ROOM ( obj->in_obj )->number );
-
-        for ( loop = obj->contains; loop; loop = obj->contains )
-        {
-            obj_from_obj ( loop );
-            obj_to_obj ( loop, obj->in_obj );
-        }
-        obj_from_obj ( obj );
     }
     extract_obj ( obj );
 }
@@ -3171,12 +3169,10 @@ void remove_hunter ( Character *ch )
 
 Character *check_ch ( Character *ch )
 {
-    register Character *tch;
-
     if ( !ch )
         return NULL;
 
-    for ( tch = character_list; tch; tch = tch->next )
+    for ( Character *tch = character_list; tch; tch = tch->next )
         if ( ch == tch )
             return tch;
 

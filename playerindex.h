@@ -43,7 +43,7 @@ struct player_index_element
     short rank;
     bool repair;
     gold_int gc_amount;
-    short gt_amount;
+    int gt_amount, gtp_amount;
 
     player_index_element()
     {
@@ -58,6 +58,7 @@ struct player_index_element
         repair = ( bool ) 0;
         gc_amount = 0;
         gt_amount = 0;
+        gtp_amount = 0;
     }
 }
 ;
@@ -203,17 +204,30 @@ class PlayerIndex
             player_table[idx].gc_amount = l;
         }
         /** Tokens **/
-        short TokensByIndex ( int idx )
+        int TokensByIndex ( int idx )
         {
             if ( !ValidIndex ( idx ) )
                 throw ( MudException ( "Index out of range in TokensByIndex" ) );
             return player_table[idx].gt_amount;
         }
-        void SetTokens ( int idx, short l )
+        void SetTokens ( int idx, int l )
         {
             if ( !ValidIndex ( idx ) )
                 throw ( MudException ( "Index out of range in SetTokens" ) );
             player_table[idx].gt_amount = l;
+        }
+        /** Tradepoints **/
+        int TradepointsByIndex ( int idx )
+        {
+            if ( !ValidIndex ( idx ) )
+                throw ( MudException ( "Index out of range in TradepointsByIndex" ) );
+            return player_table[idx].gtp_amount;
+        }
+        void SetTradepoints ( int idx, int l )
+        {
+            if ( !ValidIndex ( idx ) )
+                throw ( MudException ( "Index out of range in SetTradepoints" ) );
+            player_table[idx].gtp_amount = l;
         }
         /** Rank **/
         short RankByIndex ( int idx )
@@ -320,6 +334,13 @@ struct tokenSort
     bool operator() ( const player_index_element &a, const player_index_element &b )
     {
         return a.gt_amount > b.gt_amount;
+    }
+};
+struct tradepointSort
+{
+    bool operator() ( const player_index_element &a, const player_index_element &b )
+    {
+        return a.gtp_amount > b.gtp_amount;
     }
 };
 

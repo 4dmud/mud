@@ -51,36 +51,30 @@ int num_casting ( Character *ch );
 
 void remort_char ( Character *ch )
 {
-    int remorts = REMORTS ( ch );
     GET_LEVEL ( ch ) = 1;
     GET_EXP ( ch ) = 1;
     GET_GROUP_EXP ( ch ) = 1;
 
-    REMORTS ( ch ) ++;
-    GET_MAX_HIT ( ch ) = 30 + remorts;
-    GET_MAX_STAMINA ( ch ) = 100 + remorts;
+    REMORTS ( ch ) = min ( 1000, REMORTS ( ch ) + 1 );
+    GET_MAX_HIT ( ch ) = 30 + REMORTS ( ch );
+    GET_MAX_STAMINA ( ch ) = 100 + REMORTS ( ch );
     if ( GET_CLAN ( ch ) == 12 && !PLR_FLAGGED(ch, PLR_NEWBIE_HLPR))
     {
         GET_CLAN ( ch ) = 0;
         GET_CLAN_RANK ( ch ) = 0;
-        if (REMORTS(ch) <= 4)
+        if ( REMORTS ( ch ) <= 4 )
           ch->Send("You were removed from the Seekers clan, because the time has come to move on.\r\n");
         else
           ch->Send("You were removed from the Seekers clan, because you're just too old!\r\n");
     }
-        if ( GET_CLAN ( ch ) == 12 )
-      ch->Send("Because you were a helper in Seekers, you were not booted upon remorting like non-helpers.\r\nIf you wish to leave Seekers you can go 2 south from recall and say, 'I want to leave Seekers'.\r\n");
-
-
+    if ( GET_CLAN ( ch ) == 12 )
+        ch->Send("Because you were a helper in Seekers, you were not booted upon remorting like non-helpers.\r\nIf you wish to leave Seekers you can go 2 south from recall and say, 'I want to leave Seekers'.\r\n");
 
     advance_level ( ch );
     GET_WIMP_LEV ( ch ) = GET_MAX_HIT ( ch ) /2;
 
     if ( siteok_everyone )
         SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_SITEOK );
-
-
-
 }
 
 ACMD ( do_remort )

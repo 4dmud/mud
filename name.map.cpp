@@ -26,7 +26,7 @@ allows object and mob names to have a smaller search distance.
 void NameIndexer::addNamelist ( const char * namelist, long id )
 {
     char *newlist;
-    register char *curtok;
+    char *curtok;
 
     if ( !namelist || id == -1 )
         return;

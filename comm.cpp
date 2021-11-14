@@ -2007,7 +2007,7 @@ int set_sendbuf(socket_t s) {
  *
  */
 static void get_lookup_reply(void) {
-    register Descriptor *d;
+    Descriptor *d;
     struct message msg;
 
     /* get the reply */
@@ -3885,8 +3885,8 @@ void zlib_free(void *opaque, void *address) {
 
 /*
 void send_to_prf(char *messg, Character *nosend, int prf_flags) {
-  register Descriptor *i;
-  register Character *ch;
+  Descriptor *i;
+  Character *ch;
   int to_sleeping = 1;
 
 
@@ -4165,7 +4165,7 @@ char * parse_prompt(Character *ch, char *str, size_t lenn) {
     //static char prompt[MAX_STRING_LENGTH + 1] = "";
     char out_buf[MAX_INPUT_LENGTH + 1] = "";
     char ptemp[MAX_PROMPT_LENGTH * 5] = "";
-    register unsigned int inpos = 0, outpos = 0;
+    unsigned int inpos = 0, outpos = 0;
 
     time_t ct = time(0);
     bool def = FALSE;

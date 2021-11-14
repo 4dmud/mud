@@ -351,6 +351,7 @@ extern map<mob_vnum, Character *> mob_proto;
 extern map<obj_rnum, obj_data> obj_proto;
 extern map < room_vnum, plrshop* > player_shop;
 extern map <int, questcard> questcards;
+extern string last_compiled;
 
 /* for chars */
 extern char *credits;
@@ -1237,7 +1238,8 @@ ACMD ( do_goto )
     room_rnum location;
     char buf[MAX_INPUT_LENGTH];
 
-    if ( ( location = find_target_room ( ch, argument ) ) < 0 )
+    location = find_target_room ( ch, argument );
+    if ( !location )
         return;
 
     if ( location == IN_ROOM ( ch ) )
@@ -1368,7 +1370,7 @@ ACMD ( do_teleport )
         send_to_char ( "Maybe you shouldn't do that.\r\n", ch );
     else if ( !*buf2 )
         send_to_char ( "Where do you wish to send this person?\r\n", ch );
-    else if ( ( target = find_target_room ( ch, buf2 ) ) >= 0 )
+    else if ( ( target = find_target_room ( ch, buf2 ) ) )
     {
         ch->Send ( "%s", CONFIG_OK );
         act ( "$n disappears in a puff of smoke.", FALSE, victim, 0, 0,  TO_ROOM );
@@ -3822,34 +3824,26 @@ char * the_date_now ( char * buf, size_t len )
 
 ACMD ( do_date )
 {
-    char *tmstr;
-    time_t mytime;
-    time_t ourtime;
-    time_t login;
-    int d, h, m;
-
-
-    mytime = time ( 0 );
-    ourtime = boot_time;
-
-    tmstr = ( char * ) asctime ( localtime ( &mytime ) );
+    time_t mytime = time ( 0 );
+    char *tmstr = ( char * ) asctime ( localtime ( &mytime ) );
     * ( tmstr + strlen ( tmstr ) - 1 ) = '\0';
 
-
     ch->Send ( "Current machine time: {cy%s{c0\r\n", tmstr );
+
+    ch->Send ( "Last compile time: {cy%s{c0\r\n", last_compiled.c_str() );
+
+    time_t ourtime = time ( 0 ) - boot_time;
+    int d = ourtime / 86400;
+    int h = ( ourtime / 3600 ) % 24;
+    int m = ( ourtime / 60 ) % 60;
 
     tmstr = ( char * ) asctime ( localtime ( &ourtime ) );
     * ( tmstr + strlen ( tmstr ) - 1 ) = '\0';
 
-    ourtime = time ( 0 ) - boot_time;
-    d = ourtime / 86400;
-    h = ( ourtime / 3600 ) % 24;
-    m = ( ourtime / 60 ) % 60;
-
     ch->Send ( "Up since {cC%s{c0: %d day%s, %d:%02d\r\n", tmstr,
                d, ( ( d == 1 ) ? "" : "s" ), h, m );
 
-    login = ch->player.time.logon;
+    time_t login = ch->player.time.logon;
     tmstr = ( char * ) asctime ( localtime ( &login ) );
     * ( tmstr + strlen ( tmstr ) - 1 ) = '\0';
 
@@ -4015,6 +4009,7 @@ ACMD ( do_wiznet )
         {
             case '*':
                 emote = TRUE;
+                // fall-through
             case '#':
                 one_argument ( argument + 1, buf1 );
                 if ( is_number ( buf1 ) )
@@ -4520,28 +4515,56 @@ int silence_affect ( Character *ch, Character *vict, char *argument )
 
 ACMD ( do_topgold )
 {
-    int i,j = 20;
+    int j = 20;
     plrindx pindex ( *pi.PlayerTable() );
+    char line[MAX_INPUT_LENGTH];
+
     skip_spaces ( &argument );
     if ( *argument )
         j = atoi ( argument );
     if ( j < 1 || j > 100 )
         j = 20;
 
-    ch->Send ( "Members of the top %d Gold Coin Tycoons\r\n", j );
-    ch->Send ( "------------------------------------------\r\n" );
+    DYN_DEFINE;
+    DYN_CREATE;
+
+    snprintf ( line, sizeof line, "Members of the top %d Gold Coin Tycoons\r\n", j );
+    DYN_RESIZE ( line );
+    snprintf ( line, sizeof line, "------------------------------------------\r\n" );
+    DYN_RESIZE ( line );
+
     sort ( pindex.begin(), pindex.end(), goldSort() );
+    for ( uint i = 0; i < pindex.size() && i < j; i++ )
+    {
+        snprintf ( line, sizeof line, "%-20s -- Gold Coins: %6lld million.\r\n", pindex[i].name, pindex[i].gc_amount/1000000 );
+        DYN_RESIZE ( line );
+    }
 
-    for ( i = 0; i < ( int ) pindex.size() && i < j; i++ )
-        ch->Send ( "%-20s -- Gold Coins: %5lld million.\r\n", pindex[i].name,  pindex[i].gc_amount/1000000 );
+    snprintf ( line, sizeof line, "\r\nMembers of the top %d Gold Token Tycoons\r\n", j );
+    DYN_RESIZE ( line );
+    snprintf ( line, sizeof line, "------------------------------------------\r\n" );
+    DYN_RESIZE ( line );
 
-    ch->Send ( "\r\nMembers of the top %d Gold Token Tycoons\r\n", j );
-    ch->Send ( "------------------------------------------\r\n" );
     sort ( pindex.begin(), pindex.end(), tokenSort() );
+    for ( uint i = 0; i < pindex.size() && i < j; i++ )
+    {
+        snprintf ( line, sizeof line, "%-20s -- Gold Tokens: %d.\r\n", pindex[i].name,  pindex[i].gt_amount );
+        DYN_RESIZE ( line );
+    }
 
-    for ( i = 0; i < ( int ) pindex.size() && i < j; i++ )
-        ch->Send ( "%-20s -- Gold Tokens: %d.\r\n", pindex[i].name,  pindex[i].gt_amount );
+    snprintf ( line, sizeof line, "\r\nMembers of the top %d Tradepoint Tycoons\r\n", j );
+    DYN_RESIZE ( line );
+    snprintf ( line, sizeof line, "------------------------------------------\r\n" );
+    DYN_RESIZE ( line );
 
+    sort ( pindex.begin(), pindex.end(), tradepointSort() );
+    for ( uint i = 0; i < pindex.size() && i < j; i++ )
+    {
+        snprintf ( line, sizeof line, "%-20s -- Tradepoints: %d.\r\n", pindex[i].name,  pindex[i].gtp_amount );
+        DYN_RESIZE ( line );
+    }
+
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
 #if 0
 class hosts_lookup : public threaded_object

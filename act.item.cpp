@@ -625,16 +625,15 @@ bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
 
     obj_from_char ( obj );
     obj_to_obj ( obj, cont );
+
+    // If ch is wearing cont then add obj's weight to carried weight since obj_from_char deducted it
+    if ( cont->worn_by == ch )
+        IS_CARRYING_W ( ch ) += GET_OBJ_WEIGHT ( obj );
+
     if ( !wearall && !slipping )
         act ( "$n puts $p in $P.", TRUE, ch, obj, cont, TO_ROOM );
 
-    /* Yes, I realize this is strange until we have auto-equip on rent. -gg */
-    if ( OBJ_FLAGGED ( obj, ITEM_NODROP ) && !OBJ_FLAGGED ( cont, ITEM_NODROP ) )
-    {
-        SET_BIT_AR ( GET_OBJ_EXTRA ( cont ), ITEM_NODROP );
-        act ( "You get a strange feeling as you put $p in $P.", FALSE, ch, obj, cont, TO_CHAR );
-    }
-    else if ( !wearall || ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) ) )
+    if ( !wearall || ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) ) )
     {
         act ( "You put $p in $P.", FALSE, ch, obj, cont, TO_CHAR );
     }
@@ -3192,7 +3191,7 @@ OBJ_DATA * create_vial ( void )
     struct obj_data *vial;
     int type = VIAL_NONE;
     int size = 0;
-    register int i;
+    int i;
 
     for ( i = 0; i < 2000;i++ )
     {

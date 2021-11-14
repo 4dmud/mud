@@ -162,6 +162,7 @@ extern int no_specials;
 extern int scheck;
 int zone_count = 0;
 int sunlight;
+string last_compiled; /* used by do_date */
 
 // Declare real-nums of battle-rooms
 //room_vnum r_battle_start_room;   /* rnum of battle start room     */
@@ -1322,7 +1323,7 @@ void load_explored ( const Character *ch )
         return;
 
     int i = 0;
-    ulong x;
+    unsigned long x;
     while ( i < SPECIALS ( ch )->explored.size() )
     {
         f >> x;
@@ -1347,6 +1348,15 @@ void save_explored ( const Character *ch )
         f << e.to_ulong() << " ";
 }
 
+void read_last_compiled()
+{
+    string filename = string ( LIB_ETC ) + "last_compiled";
+    ifstream f ( filename );
+    if ( !f.good() )
+        return;
+    getline ( f, last_compiled );
+}
+
 /* body of the booting system */
 void boot_db ( void )
 {
@@ -1356,6 +1366,9 @@ void boot_db ( void )
 
     log ( "Resetting the game time:" );
     reset_time();
+
+    log ( "Reading last compile time.");
+    read_last_compiled();
 
     log ( "Reading news, credits, help, bground, info & motds." );
     file_to_string_alloc ( NEWS_FILE, &news );
@@ -1968,7 +1981,7 @@ bitvector_t asciiflag_conv ( char *flag )
 {
     bitvector_t flags = 0;
     int num_true = TRUE;
-    register char *p;
+    char *p;
 
     for ( p = flag; *p; p++ )
     {
@@ -2390,7 +2403,7 @@ void setup_dir ( FILE * fl, room_rnum room, int dir )
 /* resolve all vnums into rnums in the world */
 void renum_world ( void )
 {
-    register int door;
+    int door;
     room_vnum room;
 
     for ( room = 0; room <= top_of_world; room++ )
@@ -6365,6 +6378,11 @@ ch->MakeClothed();
     {
         save_index = TRUE;
         pi.SetTokens ( id, GET_GOLD_TOKEN_COUNT ( ch ) );
+    }
+    if ( pi.TradepointsByIndex ( id ) != TRADEPOINTS ( ch ) )
+    {
+        save_index = TRUE;
+        pi.SetTradepoints ( id, TRADEPOINTS ( ch ) );
     }
 
     i = pi.FlagsByIndex ( id );

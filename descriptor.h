@@ -95,11 +95,9 @@ public:
     int process_input();
     template<typename T>
     Descriptor & operator<< (const T & i) {
-        if (this) {
-            stringstream s;
-            s << i;
-            Output((string&)s.str());
-        }
+        stringstream s;
+        s << i;
+        Output(s);
         return *this;
     };
     protocol_t *pProtocol; /* @TODO:PROTOCOL */

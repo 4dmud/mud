@@ -580,7 +580,7 @@ ACMD ( do_shoot )
 
     }
 
-    if ( !holding || holding < 0 )
+    if ( !holding )
     {
         ch->Send ( "Snap it's broken! It probably has the wrong kinda ammo in it.\r\n" );
         return;
