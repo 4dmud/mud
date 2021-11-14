@@ -3003,6 +3003,10 @@ int fe_after_damage ( Character* ch, Character* vict,
         else
             reduce_quality ( ch, vict, partial, w_type, NULL );
 
+        // Divide pk damage by 10
+        if ( !IS_NPC ( ch ) && !IS_NPC ( vict ) )
+            partial *= 0.1;
+
         alter_hit ( vict, partial );
         if ( w_type == SPELL_LIFESUCK )
             alter_hit ( ch, -partial * 0.05 );
