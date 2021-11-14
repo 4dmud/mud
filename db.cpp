@@ -162,6 +162,7 @@ extern int no_specials;
 extern int scheck;
 int zone_count = 0;
 int sunlight;
+string last_compiled; /* used by do_date */
 
 // Declare real-nums of battle-rooms
 //room_vnum r_battle_start_room;   /* rnum of battle start room     */
@@ -1347,6 +1348,15 @@ void save_explored ( const Character *ch )
         f << e.to_ulong() << " ";
 }
 
+void read_last_compiled()
+{
+    string filename = string ( LIB_ETC ) + "last_compiled";
+    ifstream f ( filename );
+    if ( !f.good() )
+        return;
+    getline ( f, last_compiled );
+}
+
 /* body of the booting system */
 void boot_db ( void )
 {
@@ -1356,6 +1366,9 @@ void boot_db ( void )
 
     log ( "Resetting the game time:" );
     reset_time();
+
+    log ( "Reading last compile time.");
+    read_last_compiled();
 
     log ( "Reading news, credits, help, bground, info & motds." );
     file_to_string_alloc ( NEWS_FILE, &news );

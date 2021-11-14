@@ -351,6 +351,7 @@ extern map<mob_vnum, Character *> mob_proto;
 extern map<obj_rnum, obj_data> obj_proto;
 extern map < room_vnum, plrshop* > player_shop;
 extern map <int, questcard> questcards;
+extern string last_compiled;
 
 /* for chars */
 extern char *credits;
@@ -3823,34 +3824,26 @@ char * the_date_now ( char * buf, size_t len )
 
 ACMD ( do_date )
 {
-    char *tmstr;
-    time_t mytime;
-    time_t ourtime;
-    time_t login;
-    int d, h, m;
-
-
-    mytime = time ( 0 );
-    ourtime = boot_time;
-
-    tmstr = ( char * ) asctime ( localtime ( &mytime ) );
+    time_t mytime = time ( 0 );
+    char *tmstr = ( char * ) asctime ( localtime ( &mytime ) );
     * ( tmstr + strlen ( tmstr ) - 1 ) = '\0';
 
-
     ch->Send ( "Current machine time: {cy%s{c0\r\n", tmstr );
+
+    ch->Send ( "Last compile time: {cy%s{c0\r\n", last_compiled.c_str() );
+
+    time_t ourtime = time ( 0 ) - boot_time;
+    int d = ourtime / 86400;
+    int h = ( ourtime / 3600 ) % 24;
+    int m = ( ourtime / 60 ) % 60;
 
     tmstr = ( char * ) asctime ( localtime ( &ourtime ) );
     * ( tmstr + strlen ( tmstr ) - 1 ) = '\0';
 
-    ourtime = time ( 0 ) - boot_time;
-    d = ourtime / 86400;
-    h = ( ourtime / 3600 ) % 24;
-    m = ( ourtime / 60 ) % 60;
-
     ch->Send ( "Up since {cC%s{c0: %d day%s, %d:%02d\r\n", tmstr,
                d, ( ( d == 1 ) ? "" : "s" ), h, m );
 
-    login = ch->player.time.logon;
+    time_t login = ch->player.time.logon;
     tmstr = ( char * ) asctime ( localtime ( &login ) );
     * ( tmstr + strlen ( tmstr ) - 1 ) = '\0';
 
