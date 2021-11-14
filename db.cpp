@@ -6366,6 +6366,11 @@ ch->MakeClothed();
         save_index = TRUE;
         pi.SetTokens ( id, GET_GOLD_TOKEN_COUNT ( ch ) );
     }
+    if ( pi.TradepointsByIndex ( id ) != TRADEPOINTS ( ch ) )
+    {
+        save_index = TRUE;
+        pi.SetTradepoints ( id, TRADEPOINTS ( ch ) );
+    }
 
     i = pi.FlagsByIndex ( id );
     if ( PLR_FLAGGED ( ch, PLR_DELETED ) )

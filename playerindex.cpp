@@ -78,9 +78,9 @@ void PlayerIndex::Build() {
     int id_zero = 0;
     for (i = 0; i < rec_count; i++) {
         get_line(plr_index, line);
-        if ((retval = sscanf(line, "%ld %s %d %s %ld %ld %hd %hd %lld %hd", &pte.id, arg2,
+        if ((retval = sscanf(line, "%ld %s %d %s %ld %ld %hd %hd %lld %d %d", &pte.id, arg2,
                              &pte.level, bits,  &pte.last, &pte.account,
-                             &pte.clan, &pte.rank, &pte.gc_amount, &pte.gt_amount)) < 10) {
+                             &pte.clan, &pte.rank, &pte.gc_amount, &pte.gt_amount, &pte.gtp_amount)) < 11) {
             if (pte.id <= 0)
                 id_zero++;
             if (id_zero >= 1)
@@ -88,7 +88,7 @@ void PlayerIndex::Build() {
             if (retval == 5) {
                 pte.account = pte.id;
                 save_index = TRUE;
-            } else if (retval < 10)
+            } else if (retval < 11)
                 save_index = TRUE;
             else {
                 log("Player Index Error! Line %d.", i);
@@ -160,11 +160,12 @@ void PlayerIndex::Save() {
                     cnt++;
                     sprintbits((*ptvi).flags, bits);
                     *(*ptvi).name = LOWER(*(*ptvi).name);
-                    fprintf(index_file, "%ld %s %d %s %ld %ld %hd %hd %lld %hd\n",
+                    fprintf(index_file, "%ld %s %d %s %ld %ld %hd %hd %lld %d %d\n",
                             (*ptvi).id, (*ptvi).name,
                             (*ptvi).level, *bits ? bits : "0",
                             (*ptvi).last, (*ptvi).account,
-                            (*ptvi).clan, (*ptvi).rank, (*ptvi).gc_amount, (*ptvi).gt_amount);
+                            (*ptvi).clan, (*ptvi).rank,
+                            (*ptvi).gc_amount, (*ptvi).gt_amount, (*ptvi).gtp_amount);
                 }
             }
         }

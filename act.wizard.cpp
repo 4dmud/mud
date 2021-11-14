@@ -4520,28 +4520,56 @@ int silence_affect ( Character *ch, Character *vict, char *argument )
 
 ACMD ( do_topgold )
 {
-    int i,j = 20;
+    int j = 20;
     plrindx pindex ( *pi.PlayerTable() );
+    char line[MAX_INPUT_LENGTH];
+
     skip_spaces ( &argument );
     if ( *argument )
         j = atoi ( argument );
     if ( j < 1 || j > 100 )
         j = 20;
 
-    ch->Send ( "Members of the top %d Gold Coin Tycoons\r\n", j );
-    ch->Send ( "------------------------------------------\r\n" );
+    DYN_DEFINE;
+    DYN_CREATE;
+
+    snprintf ( line, sizeof line, "Members of the top %d Gold Coin Tycoons\r\n", j );
+    DYN_RESIZE ( line );
+    snprintf ( line, sizeof line, "------------------------------------------\r\n" );
+    DYN_RESIZE ( line );
+
     sort ( pindex.begin(), pindex.end(), goldSort() );
+    for ( uint i = 0; i < pindex.size() && i < j; i++ )
+    {
+        snprintf ( line, sizeof line, "%-20s -- Gold Coins: %6lld million.\r\n", pindex[i].name, pindex[i].gc_amount/1000000 );
+        DYN_RESIZE ( line );
+    }
 
-    for ( i = 0; i < ( int ) pindex.size() && i < j; i++ )
-        ch->Send ( "%-20s -- Gold Coins: %5lld million.\r\n", pindex[i].name,  pindex[i].gc_amount/1000000 );
+    snprintf ( line, sizeof line, "\r\nMembers of the top %d Gold Token Tycoons\r\n", j );
+    DYN_RESIZE ( line );
+    snprintf ( line, sizeof line, "------------------------------------------\r\n" );
+    DYN_RESIZE ( line );
 
-    ch->Send ( "\r\nMembers of the top %d Gold Token Tycoons\r\n", j );
-    ch->Send ( "------------------------------------------\r\n" );
     sort ( pindex.begin(), pindex.end(), tokenSort() );
+    for ( uint i = 0; i < pindex.size() && i < j; i++ )
+    {
+        snprintf ( line, sizeof line, "%-20s -- Gold Tokens: %d.\r\n", pindex[i].name,  pindex[i].gt_amount );
+        DYN_RESIZE ( line );
+    }
 
-    for ( i = 0; i < ( int ) pindex.size() && i < j; i++ )
-        ch->Send ( "%-20s -- Gold Tokens: %d.\r\n", pindex[i].name,  pindex[i].gt_amount );
+    snprintf ( line, sizeof line, "\r\nMembers of the top %d Tradepoint Tycoons\r\n", j );
+    DYN_RESIZE ( line );
+    snprintf ( line, sizeof line, "------------------------------------------\r\n" );
+    DYN_RESIZE ( line );
 
+    sort ( pindex.begin(), pindex.end(), tradepointSort() );
+    for ( uint i = 0; i < pindex.size() && i < j; i++ )
+    {
+        snprintf ( line, sizeof line, "%-20s -- Tradepoints: %d.\r\n", pindex[i].name,  pindex[i].gtp_amount );
+        DYN_RESIZE ( line );
+    }
+
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
 #if 0
 class hosts_lookup : public threaded_object
