@@ -2273,22 +2273,21 @@ int enter_player_game ( Descriptor *d )
     if ( LOCKER ( ch ) )
         new_mudlog ( NRM, GET_LEVEL ( ch ), TRUE, "  -- with %d items in locker", count_locker ( ch ) );
 
-
-    for (j = 0; j < NUM_WEARS; j++)
-      {
+    // Check for expired equipment
+    for (j = 0; j < NUM_WEARS; j++) {
         if (GET_EQ(ch, j) == NULL)
-          continue;
+            continue;
 
-        if (!(GET_OBJ_EXPIRE(GET_EQ(ch, j)) > time ( 0 ))) {
-        if (GET_OBJ_EXPIRE(GET_EQ(ch, j)) == 0)
-                 continue;
-        // Typo fix disintegates -> disintegrates --> Prom
-               ch->Send ( "A piece of expired equipment disintegrates into nothingness.\r\n");
-         crumble_obj(ch, GET_EQ(ch,j));
-               }
+        if ( GET_OBJ_EXPIRE ( GET_EQ ( ch, j )) > 0 && GET_OBJ_EXPIRE ( GET_EQ ( ch, j )) < time ( 0 ))
+            crumble_obj ( ch, GET_EQ ( ch,j ));
     }
 
-
+    // Check for expired objects held
+    for ( obj = ch->carrying; obj; obj = obj->next_content )
+    {
+        if ( GET_OBJ_EXPIRE ( obj ) > 0 && GET_OBJ_EXPIRE ( obj ) < time ( 0 ))
+            crumble_obj ( ch, obj );
+    }
 
     if ( GET_CLAN_RANK ( ch ) < 0 )
     {
