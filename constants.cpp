@@ -398,17 +398,18 @@ const vector<int> material_groups =
 const vector<const char*> colour_names =
 {
     "none",
-    "white",
-    "black",
-    "red",
-    "yellow",
-    "blue",
-    "green",
-    "orange",
-    "violet",
-    "emerald",
-    "firecoloured",
-    "purple"         // 11
+    "{cWwhite{cx",
+    "{cLblack{cx",
+    "{crred{cx",
+    "{cyyellow{cx",
+    "{cbblue{cx",
+    "{cggreen{cx",
+    "{coorange{cx",
+    "{cMviolet{cx",
+    "{cGemerald{cx",
+    "{cOfirecoloured{cx",
+    "{cmpurple{cx",
+    "{cLdeep black{cx"     // 12
 };
 
 const vector<const char*> quality_names =

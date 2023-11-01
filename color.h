@@ -16,27 +16,27 @@
 #define CNUL  ""
 
 /*             Plain Colours            has the CNRM before it to reset color!*/
-#define CNRM  "\x1B[0;0m"     /* &n */
-#define CRED  "\x1B[0;0m\x1B[31m"  /* &r */
-#define CGRN  "\x1B[0;0m\x1B[32m"  /* &g */
-#define CYEL  "\x1B[0;0m\x1B[33m"  /* &y */
-#define CBLU  "\x1B[0;0m\x1B[34m"  /* &b */
-#define CMAG  "\x1B[0;0m\x1B[35m"  /* &m */
-#define CCYN  "\x1B[0;0m\x1B[36m"  /* &c */
-#define CWHT  "\x1B[0;0m\x1B[37m"  /* &w */
-#define CBLK  "\x1B[0;0m\x1B[30m"  /* &l */
-#define CORA  "\x1B[0;0m\x1B[38;5;172m" /* &o */
+#define CNRM  "\x1B[0;0m"                /* &n */
+#define CRED  "\x1B[0;0m\x1B[38;5;160m"  /* &r */
+#define CGRN  "\x1B[0;0m\x1B[32m"        /* &g */
+#define CYEL  "\x1B[0;0m\x1B[33m"        /* &y */
+#define CBLU  "\x1B[0;0m\x1B[38;5;21m"   /* &b */
+#define CMAG  "\x1B[0;0m\x1B[38;5;128m"  /* &m */
+#define CCYN  "\x1B[0;0m\x1B[36m"        /* &c */
+#define CWHT  "\x1B[0;0m\x1B[37m"        /* &w */
+#define CBLK  "\x1B[0;0m\x1B[30m"        /* &l */
+#define CORA  "\x1B[0;0m\x1B[38;5;172m"  /* &o */
 
 /*              Bold Colors            */
-#define BRED  "\x1B[1;31m"    /* &R */
-#define BGRN  "\x1B[1;32m"    /* &G */
-#define BYEL  "\x1B[1;33m"    /* &Y */
-#define BBLU  "\x1B[1;34m"    /* &B */
-#define BMAG  "\x1B[1;35m"    /* &M */
-#define BCYN  "\x1B[1;36m"    /* &C */
-#define BWHT  "\x1B[1;37m"    /* &W */
-#define BBLK  "\x1B[1;30m"    /* &L */
-#define BORA  "\x1B[1;38;5;214m" /* &O */
+#define BRED  "\x1B[1;31m"        /* &R */
+#define BGRN  "\x1B[1;32m"        /* &G */
+#define BYEL  "\x1B[1;33m"        /* &Y */
+#define BBLU  "\x1B[1;38;5;33m"   /* &B */
+#define BMAG  "\x1B[1;38;5;165m"  /* &M */
+#define BCYN  "\x1B[1;36m"        /* &C */
+#define BWHT  "\x1B[1;37m"        /* &W */
+#define BBLK  "\x1B[1;30m"        /* &L */
+#define BORA  "\x1B[1;38;5;214m"  /* &O */
 
 /*             Backgrounds             */
 #define BKRED  "\x1B[41m"     /* &e */
