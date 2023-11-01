@@ -2708,7 +2708,7 @@ struct game_data {
     int immort_level_ok;    /* Automatically level mortals to imm?  */
     int double_exp;	    /* Is it double experience time?		*/
     long pk_champion;         /* The current Champion */
-
+    int reset_mine;         /* Reset the mine after the next reboot? */
     char *LAST_PK_WIN;       /* Last Player to win in PK */
     char *OK;               /* When player receives 'Okay.' text.       */
     char *NOPERSON;         /* 'No-one by that name here.'    */

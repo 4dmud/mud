@@ -139,6 +139,10 @@ const char *LAST_PK = "None";
 int track_through_doors = YES;
 
 int double_exp = YES;
+
+/* reset the mine after the next reboot */
+int reset_mine = NO;
+
 /****************************************************************************/
 /****************************************************************************/
 

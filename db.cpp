@@ -282,6 +282,8 @@ void destroy_shops ( void );  //mord??
 void strip_cr ( char * );     //...
 void load_notes ( void );
 void free_identifier ( struct obj_data *obj );
+void reset_the_mine();
+int save_config ( int nowhere );
 
 #define READ_SIZE 256
 
@@ -882,6 +884,14 @@ void boot_world ( void )
             c++;
         }
         explorable[z] = c;
+    }
+
+    if ( CONFIG_RESET_MINE )
+    {
+        log ( "Resetting the mine." );
+        reset_the_mine();
+        CONFIG_RESET_MINE = 0;
+        save_config ( NOWHERE );
     }
 }
 
@@ -8088,6 +8098,7 @@ extern int load_into_inventory;
 extern int track_through_doors;
 extern int immort_level_ok;
 extern int double_exp;
+extern int reset_mine;
 extern int free_rent;
 extern int max_obj_save;
 extern int min_rent_cost;
@@ -8151,6 +8162,7 @@ void load_default_config ( void )
     CONFIG_TRACK_T_DOORS          = track_through_doors;
     CONFIG_IMMORT_LEVEL_OK = immort_level_ok;
     CONFIG_DOUBLE_EXP		= double_exp;
+    CONFIG_RESET_MINE       = reset_mine;
 
     /****************************************************************************/
     /** Rent / crashsave options.                                              **/
@@ -8285,6 +8297,10 @@ void load_config ( void )
                     else
                         config_info.play.double_exp = 1;
                 }
+                else if ( !strcmp ( tag, "reset_mine" ) )
+                {
+                    CONFIG_RESET_MINE = num;
+                }
                 else if ( !strcmp ( tag, "dflt_ip" ) )
                 {
                     if ( CONFIG_DFLT_IP )
@@ -8418,6 +8434,8 @@ void load_config ( void )
             case 'r':
                 if ( !strcmp ( tag, "rent_file_timeout" ) )
                     CONFIG_RENT_TIMEOUT = num;
+                else if ( !strcmp ( tag, "reset_mine" ) )
+                    CONFIG_RESET_MINE = ( num == 1 ? true : false );
                 break;
 
             case 's':

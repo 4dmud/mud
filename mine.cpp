@@ -19,13 +19,14 @@
 #include "constants.h"
 #include "dg_event.h"
 #include "action.h"
+#include "genwld.h"
 
 extern struct time_info_data time_info;
 EVENTFUNC(message_event);
 int mine_damage(Character *vict, int dam);
 void die(Character *ch, Character *killer);
 struct mine_list *mine_shafts = NULL;
-
+int save_config ( int nowhere );
 
 ASUB(sub_tunneling)
 {
@@ -489,3 +490,28 @@ void make_tunnel(Character *ch)
 
 }
 
+void reset_the_mine()
+{
+    // Remove all tunnels and cave-ins in the mine
+    for ( int r = 54000; r < 55000; ++r )
+    {
+        for ( int door = 0; door < NUM_OF_DIRS; ++door )
+        {
+            auto d = world_vnum[ r ]->dir_option[ door ];
+            if ( d && d->general_description &&
+                   ( strstr ( d->general_description, "A tunnel entrance made by " ) ||
+                     strstr ( d->general_description, "A cave-in made by " )))
+            {
+                free ( d->general_description );
+                free ( d );
+                world_vnum[ r ]->dir_option[ door ] = NULL;
+            }
+        }
+    }
+
+    // Save the mine to disk
+    save_rooms( world_vnum[ 54000 ]->zone );
+
+    // Remove all shafts
+    free_mine_shafts();
+}

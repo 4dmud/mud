@@ -116,7 +116,8 @@ void cedit_setup(Descriptor *d)
   OLC_CONFIG(d)->play.load_into_inventory = CONFIG_LOAD_INVENTORY;
   OLC_CONFIG(d)->play.track_through_doors = CONFIG_TRACK_T_DOORS;
   OLC_CONFIG(d)->play.immort_level_ok     = CONFIG_IMMORT_LEVEL_OK;
-  OLC_CONFIG(d)->play.double_exp	  = CONFIG_DOUBLE_EXP;
+  OLC_CONFIG(d)->play.double_exp          = CONFIG_DOUBLE_EXP;
+  OLC_CONFIG(d)->play.reset_mine          = CONFIG_RESET_MINE;
 
   /****************************************************************************/
   /** Crash Saves                                                            **/
@@ -229,6 +230,7 @@ void cedit_save_internally(Descriptor *d)
   CONFIG_TRACK_T_DOORS = OLC_CONFIG(d)->play.track_through_doors;
   CONFIG_IMMORT_LEVEL_OK     = OLC_CONFIG(d)->play.immort_level_ok;
   CONFIG_DOUBLE_EXP 	     = OLC_CONFIG(d)->play.double_exp;
+  CONFIG_RESET_MINE          = OLC_CONFIG(d)->play.reset_mine;
 
   /****************************************************************************/
   /** Crash Saves                                                            **/
@@ -405,6 +407,8 @@ int save_config( int nowhere )
               "immort_level_ok = %d\n\n", CONFIG_IMMORT_LEVEL_OK);
   fprintf(fl, "* Should players get double experience?\n"
               "double_exp = %d\n\n", CONFIG_DOUBLE_EXP);
+  fprintf(fl, "* Reset the mine after the next reboot?\n"
+              "reset_mine = %d\n\n", CONFIG_RESET_MINE);
 
   strcpy(buf, CONFIG_OK);
   strip_cr(buf);
@@ -644,6 +648,7 @@ void cedit_disp_game_play_options(Descriptor *d)
         "%sO%s) Track Through Doors         : %s%s\r\n"
         "%sP%s) Mortals Level To Immortal   : %s%s\r\n"
         "%sR%s) Double Experience Day	    : %s%s\r\n"
+        "%sS%s) Reset mine              : %s%s\r\n"
         "%s1%s) OK Message Text         : %s%s"
         "%s2%s) NOPERSON Message Text   : %s%s"
         "%s3%s) NOEFFECT Message Text   : %s%s"
@@ -667,7 +672,7 @@ void cedit_disp_game_play_options(Descriptor *d)
         grn, nrm, cyn, CHECK_VAR(OLC_CONFIG(d)->play.track_through_doors),
         grn, nrm, cyn, CHECK_VAR(OLC_CONFIG(d)->play.immort_level_ok),
         grn, nrm, cyn, CHECK_VAR(OLC_CONFIG(d)->play.double_exp),
-
+        grn, nrm, cyn, CHECK_VAR(OLC_CONFIG(d)->play.reset_mine),
         grn, nrm, cyn, OLC_CONFIG(d)->play.OK,
         grn, nrm, cyn, OLC_CONFIG(d)->play.NOPERSON,
         grn, nrm, cyn, OLC_CONFIG(d)->play.NOEFFECT,
@@ -983,9 +988,14 @@ void cedit_parse(Descriptor *d, char *arg)
           TOGGLE_VAR(OLC_CONFIG(d)->play.immort_level_ok);
           break;
 
-    case 'r':
+        case 'r':
         case 'R':
           TOGGLE_VAR(OLC_CONFIG(d)->play.double_exp);
+          break;
+
+        case 's':
+        case 'S':
+          TOGGLE_VAR(OLC_CONFIG(d)->play.reset_mine);
           break;
 
         case '1':
