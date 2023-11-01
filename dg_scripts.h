@@ -311,9 +311,12 @@ void reset_wtrigger(Room *ch);
 int load_mtrigger(Character *ch);
 int load_otrigger(obj_data *obj);
 
-int cast_mtrigger(Character *actor, Character *ch, int spellnum);
-int cast_otrigger(Character *actor, obj_data *obj, int spellnum);
-int cast_wtrigger(Character *actor, Character *vict, obj_data *obj, int spellnum);
+int cast_mtrigger(Character *actor, Character *ch, int spellnum,
+                  remembered_skill_spell *rem = nullptr);
+int cast_otrigger(Character *actor, obj_data *obj, int spellnum,
+                  remembered_skill_spell *rem = nullptr);
+int cast_wtrigger(Character *actor, Character *vict, obj_data *obj, int spellnum,
+                  remembered_skill_spell *rem = nullptr);
 
 int leave_mtrigger(Character *actor, int dir);
 int leave_wtrigger(Room *room, Character *actor, int dir);

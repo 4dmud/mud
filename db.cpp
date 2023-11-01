@@ -5720,6 +5720,58 @@ int store_to_char ( const char *name, Character *ch )
                     case 'e':
                         if ( !strcmp ( tag, "Race" ) )
                             set_race ( ch, num );
+                        else if ( !strcmp ( tag, "Reme" ) )
+                        {
+                            for  ( i = 0; i < SAVED(ch).remembered.size(); ++i )
+                            {
+                                get_line ( fl, line );
+                                sscanf ( line, "%d", &num );
+                                SAVED(ch).remembered[i].skill_spell_num = num;
+                                if ( num == 0 )
+                                    continue;
+                                get_line ( fl, line );
+                                sscanf ( line, "%d %d", &num2, &num3 );
+                                SAVED(ch).remembered[i].percentage_remembered = num2;
+                                SAVED(ch).remembered[i].percentage_learned = num3;
+                                if ( num > 0 )
+                                {
+                                    SAVED(ch).remembered[i].name = string ( skill_name ( num ) );
+                                    continue;
+                                }
+                                get_line ( fl, line );
+                                SAVED(ch).remembered[i].name = string ( line );
+                                get_line ( fl, line );
+                                sscanf ( line, "%d %d", &num4, &num5 );
+                                SAVED(ch).remembered[i].custom_attack_type = num4;
+                                SAVED(ch).remembered[i].custom_elemental_type = num5;
+                                msg_type msg;
+                                for ( int j = 0; j < 3; ++j )
+                                {
+                                    get_line ( fl, line );
+                                    msg.attacker_msg = string ( line );
+                                    get_line ( fl, line );
+                                    msg.victim_msg = string ( line );
+                                    get_line ( fl, line );
+                                    msg.room_msg = string ( line );
+                                    switch ( j )
+                                    {
+                                        case 0:
+                                            SAVED(ch).remembered[i].custom_messages.hit_msg = msg;
+                                            break;
+                                        case 1:
+                                            SAVED(ch).remembered[i].custom_messages.miss_msg = msg;
+                                            break;
+                                        case 2:
+                                            SAVED(ch).remembered[i].custom_messages.die_msg = msg;
+                                    }
+                                }
+                                // Default god messages
+                                msg.attacker_msg = "Are you sure this is a good idea??";
+                                msg.victim_msg = "$n tried to hurt you, haha.";
+                                msg.room_msg = "$n tried to hurt $N, better find a place to hide from the fallout!";
+                                SAVED(ch).remembered[i].custom_messages.god_msg = msg;
+                            }
+                        }
                         break;
                     case 'm':
                         if ( !strcmp ( tag, "Room" ) )
@@ -6128,6 +6180,27 @@ void char_to_store ( Character *ch )
                 fprintf ( fl, "%d %d %d\n", ( it->second )->subskill, ( it->second )->learn, ( it->second )->status );
         }
         fprintf ( fl, "0 0 0\n" );
+        fprintf ( fl, "Remembered:\n" );
+        for ( const auto &r : SAVED(ch).remembered )
+        {
+            fprintf ( fl, "%d\n", r.skill_spell_num );
+            if ( r.skill_spell_num == 0 )
+                continue;
+            fprintf ( fl, "%d %d\n", r.percentage_remembered, r.percentage_learned );
+            if ( r.skill_spell_num > -1 )
+                continue;
+            fprintf ( fl, "%s\n", r.name.c_str() );
+            fprintf ( fl, "%d %d\n", r.custom_attack_type, r.custom_elemental_type );
+            fprintf ( fl, "%s\n", r.custom_messages.hit_msg.attacker_msg.c_str() );
+            fprintf ( fl, "%s\n", r.custom_messages.hit_msg.victim_msg.c_str() );
+            fprintf ( fl, "%s\n", r.custom_messages.hit_msg.room_msg.c_str() );
+            fprintf ( fl, "%s\n", r.custom_messages.miss_msg.attacker_msg.c_str() );
+            fprintf ( fl, "%s\n", r.custom_messages.miss_msg.victim_msg.c_str() );
+            fprintf ( fl, "%s\n", r.custom_messages.miss_msg.room_msg.c_str() );
+            fprintf ( fl, "%s\n", r.custom_messages.die_msg.attacker_msg.c_str() );
+            fprintf ( fl, "%s\n", r.custom_messages.die_msg.victim_msg.c_str() );
+            fprintf ( fl, "%s\n", r.custom_messages.die_msg.room_msg.c_str() );
+        }
     }
     if ( CMD_FLAGS ( ch ) )
         fprintf ( fl, "Flag: %ld\n", CMD_FLAGS ( ch ) );

@@ -36,7 +36,8 @@ int perform_move ( Character *ch, int dir, int specials_check );
 void write_ignorelist ( Character *ch );
 int compute_armor_class ( Character *ch );
 void print_ignorelist ( Character *ch, Character *vict );
-int fe_after_damage ( Character* ch, Character* vict, int damage, int w_type );
+int fe_after_damage ( Character* ch, Character* vict, int damage, int w_type,
+                      remembered_skill_spell *rem = nullptr );
 //
 /* Daniel Houghton's revised external functions */
 int skill_roll ( Character *ch, int skill_num );
@@ -50,7 +51,7 @@ void fire_missile ( Character *ch, char arg1[MAX_INPUT_LENGTH],
 void check_killer ( Character *ch, Character *vict );
 int computer_armor_class ( Character *ch );
 int arena_ok ( Character *ch, Character *victim );
-void improve_skill ( Character *ch, int skill );
+void improve_skill ( Character *ch, int skill, remembered_skill_spell *rem = nullptr );
 
 
 

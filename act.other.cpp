@@ -197,7 +197,7 @@ ACMD ( do_gen_comm );
 void die ( Character *ch, Character *killer );
 void Crash_rentsave ( Character *ch, int cost );
 void write_poofs ( Character *ch );
-void improve_skill ( Character *ch, int skill );
+void improve_skill ( Character *ch, int skill, remembered_skill_spell *rem = nullptr );
 void stop_auction ( int type, Character *ch );
 void add_follower ( Character *ch, Character *leader );
 void raw_kill ( Character *ch, Character *killer );

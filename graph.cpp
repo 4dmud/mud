@@ -26,7 +26,7 @@
 /* Externals */
 ACMD(do_say);
 /* External functions */
-void improve_skill(Character *ch, int skill);
+void improve_skill(Character *ch, int skill, remembered_skill_spell *rem = nullptr);
 
 /* Local functions */
 ACMD(do_track);

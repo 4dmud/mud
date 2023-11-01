@@ -209,7 +209,7 @@ extern int spell_sorted_info[];
 
 /* external functions */
 int check_potion_weight ( struct obj_data *obj );
-void improve_skill ( Character *ch, int skill );
+void improve_skill ( Character *ch, int skill, remembered_skill_spell *rem = nullptr );
 
 /* local functions */
 void say_spell ( Character *ch, int spellnum, Character *tch,
@@ -228,7 +228,8 @@ ACMD ( do_cast );
 void unused_spell ( int spl );
 void mag_assign_spells ( void );
 void default_message ( void );
-int do_magic_direction ( int level, int dir, int dist, Character *ch, Character *vict, int spellnum );
+int do_magic_direction ( int level, int dir, int dist, Character *ch, Character *vict, int spellnum,
+                         remembered_skill_spell *rem );
 int sp_dist = -1;
 
 int tier_level ( Character *ch, int chclass );
@@ -295,7 +296,8 @@ int mag_manacost ( Character *ch, int spellnum )
                           SINFO.mana_min ) ) * ( 1.4 + ( -resist_elem ( ch, elemental_type ( spellnum ) ) *0.01 ) ) );
 }
 
-void say_spell ( Character *ch, int spellnum, Character *tch, struct obj_data *tobj )
+void say_spell ( Character *ch, int spellnum, Character *tch, struct obj_data *tobj,
+    remembered_skill_spell *rem = nullptr )
 {
     struct obj_data *focus = GET_EQ ( ch, WEAR_FOCUS );
     char lbuf[MAX_INPUT_LENGTH], lbuf2[MAX_INPUT_LENGTH];
@@ -305,7 +307,7 @@ void say_spell ( Character *ch, int spellnum, Character *tch, struct obj_data *t
     int j, ofs = 0, len = 0;
 
     *buf = '\0';
-    strlcpy ( lbuf, skill_name ( spellnum ), sizeof ( lbuf ) );
+    strlcpy ( lbuf, rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str(), sizeof lbuf );
 
     // replace any digits with words, for 'antidote 1' for example
     vector<string> number {"zero","one","two","three","four","five","six","seven","eight","nine"};
@@ -380,13 +382,15 @@ void say_spell ( Character *ch, int spellnum, Character *tch, struct obj_data *t
 
     if ( GET_SPELL_DIR ( ch ) != NOWHERE )
     {
-        snprintf ( buf1, sizeof ( buf1 ), format, skill_name ( spellnum ),
-                   dirs[GET_SPELL_DIR ( ch ) ] );
+        snprintf ( buf1, sizeof ( buf1 ), format,
+            rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str(),
+            dirs[GET_SPELL_DIR ( ch ) ] );
         snprintf ( buf2, sizeof ( buf2 ), format, buf, dirs[GET_SPELL_DIR ( ch ) ] );
     }
     else
     {
-        snprintf ( buf1, sizeof ( buf1 ), format, skill_name ( spellnum ) );
+        snprintf ( buf1, sizeof ( buf1 ), format,
+            rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str() );
         snprintf ( buf2, sizeof ( buf2 ), format, buf );
     }
 
@@ -405,15 +409,17 @@ void say_spell ( Character *ch, int spellnum, Character *tch, struct obj_data *t
         if ( focus )
         {
             snprintf ( buf1, sizeof ( buf1 ),
-                       "$n draws the runes of %s in the air with %s and sends them at you.",
-                       GET_CLASS ( ch ) == GET_CLASS ( tch ) ? skill_name ( spellnum ) : buf,
-                       focus->short_description );
+                "$n draws the runes of %s in the air with %s and sends them at you.",
+                GET_CLASS ( ch ) == GET_CLASS ( tch ) ?
+                ( rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str() ) : buf,
+                focus->short_description );
         }
         else
         {
             snprintf ( buf1, sizeof ( buf1 ),
-                       "$n draws the runes of %s in the air and sends them at you.",
-                       GET_CLASS ( ch ) == GET_CLASS ( tch ) ? skill_name ( spellnum ) : buf );
+                "$n draws the runes of %s in the air and sends them at you.",
+                GET_CLASS ( ch ) == GET_CLASS ( tch ) ?
+                ( rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str() ) : buf );
         }
         act ( buf1, FALSE, ch, NULL, tch, TO_VICT );
     }
@@ -486,31 +492,12 @@ bool is_abbrev3 ( const string &s1, const string &s2 )
 
 int spell_num ( const char *name )
 {
-    int bot, top, mid;
-
-    bot = 0;
-    top = MAX_SKILLS;
-
-    for ( ;; )
-    {
-        mid = ( bot + top ) / 2;
-
-        if ( str_cmp ( name, spell_info[spell_sorted_info[mid]].name ) == 0 )
-            return ( spell_sorted_info[mid] );
-        if ( bot >= top )
-            break;
-        if ( str_cmp ( name, spell_info[spell_sorted_info[mid]].name ) < 0 )
-            top = mid - 1;
-        else
-            bot = mid + 1;
-    }
-    bot = 0;
-    top = MAX_SKILLS;
+    int bot = 0, top = MAX_SKILLS;
 
     /* perform binary search on spells */
     for ( ;; )
     {
-        mid = ( bot + top ) / 2;
+        int mid = ( bot + top ) / 2;
 
         if ( is_abbrev2 ( name, spell_info[spell_sorted_info[mid]].name ) == 0 )
             return ( spell_sorted_info[mid] );
@@ -525,38 +512,7 @@ int spell_num ( const char *name )
 
 int find_skill_num ( char *name )
 {
-    /*int skindex, ok;
-    char *temp, *temp2;
-    char first[256], first2[256], tempbuf[256];*/
-
     return ( spell_num ( ( const char * ) name ) );
-    /*
-
-    for (skindex = 1; skindex <= MAX_SKILLS; skindex++)
-    if (*spell_info[spell_sorted_info[skindex]].name == *name)
-    break;
-
-    for (; skindex <= MAX_SKILLS; skindex++) {
-    if (is_abbrev(name, spell_info[spell_sorted_info[skindex]].name))
-     return (spell_sorted_info[skindex]);
-
-    ok = TRUE;
-    strlcpy(tempbuf, spell_info[spell_sorted_info[skindex]].name, sizeof(tempbuf));
-    temp = any_one_arg(tempbuf, first);
-    temp2 = any_one_arg(name, first2);
-    while (*first && *first2 && ok) {
-     if (!is_abbrev(first2, first))
-    ok = FALSE;
-     temp = any_one_arg(temp, first);
-     temp2 = any_one_arg(temp2, first2);
-    }
-
-    if (ok && !*first2)
-     return (spell_sorted_info[skindex]);
-     */
-
-
-    return ( -1 );
 }
 
 /*
@@ -568,18 +524,26 @@ int find_skill_num ( char *name )
  */
 int call_magic ( Character *caster, Character *cvict,
                  struct obj_data *ovict, char *tar_str, int spellnum,
-                 int level, int casttype )
+                 int level, int casttype, remembered_skill_spell *rem )
 {
     int savetype;
 
-    if ( spellnum < 1 || spellnum > MAX_SKILLS )
-        return ( 0 );
+    bool custom_spell = false;
+    if ( rem != nullptr )
+    {
+        spellnum = rem->skill_spell_num;
+        if ( spellnum == -1 )
+            custom_spell = true;
+    }
 
-    if ( !cast_wtrigger ( caster, cvict, ovict, spellnum ) )
+    if ( !custom_spell && ( spellnum < 1 || spellnum > MAX_SKILLS ) )
         return 0;
-    else if ( ovict && !cast_otrigger ( caster, ovict, spellnum ) )
+
+    if ( !cast_wtrigger ( caster, cvict, ovict, spellnum, rem ) )
         return 0;
-    else if ( cvict && !cast_mtrigger ( caster, cvict, spellnum ) )
+    else if ( ovict && !cast_otrigger ( caster, ovict, spellnum, rem ) )
+        return 0;
+    else if ( cvict && !cast_mtrigger ( caster, cvict, spellnum, rem ) )
         return 0;
 
     if ( cvict && AFF_FLAGGED ( cvict, AFF_MAGIC_BUBBLE ) )
@@ -608,15 +572,15 @@ int call_magic ( Character *caster, Character *cvict,
 
             caster->Send ( "Your magic fizzles out and dies.\r\n" );
             GET_WAIT_STATE ( caster ) += ( 2 RL_SEC );
-            return ( 0 );
+            return 0;
         }
-        if ( ROOM_FLAGGED ( IN_ROOM ( caster ), ROOM_PEACEFUL ) &&
-                ( SINFO.violent || IS_SET ( SINFO.routines, MAG_DAMAGE ) ) )
+        if ( ROOM_FLAGGED ( IN_ROOM ( caster ), ROOM_PEACEFUL ) && ( custom_spell ||
+                SINFO.violent || IS_SET ( SINFO.routines, MAG_DAMAGE ) ) )
         {
-            send_to_char ( "A flash of white light fills the room, dispelling your violent magic!\r\n", caster );
+            caster->Send ( "A flash of white light fills the room, dispelling your violent magic!\r\n" );
             act ( "White light from no particular source suddenly fills the room, then vanishes.", FALSE, caster, 0, 0, TO_ROOM );
             GET_WAIT_STATE ( caster ) += ( 2 RL_SEC );
-            return ( 0 );
+            return 0;
         }
     }
 
@@ -637,44 +601,46 @@ int call_magic ( Character *caster, Character *cvict,
             break;
     }
 
-    if ( GET_SPELL_DIR ( caster ) !=NOWHERE && sp_dist != NOWHERE )
-        return do_magic_direction ( level, GET_SPELL_DIR ( caster ), sp_dist, caster,cvict, spellnum );
+    if ( GET_SPELL_DIR ( caster ) != NOWHERE && sp_dist != NOWHERE )
+        return do_magic_direction ( level, GET_SPELL_DIR ( caster ), sp_dist, caster, cvict, spellnum, rem );
 
-    if ( IS_SET ( SINFO.routines, MAG_DAMAGE ) )
-        if ( mag_damage ( level, caster, cvict, spellnum, savetype ) == -1 )
-            return ( -1 );  /* Successful and target died, don't cast again. */
+    if ( ( custom_spell && rem->custom_attack_type == TAR_CHAR_ROOM ) ||
+            ( spellnum != -1 && IS_SET ( SINFO.routines, MAG_DAMAGE ) ) )
+        if ( mag_damage ( level, caster, cvict, spellnum, savetype, rem ) == -1 )
+            return -1;  /* Successful and target died, don't cast again. */
 
-    if ( IS_SET ( SINFO.routines, MAG_AFFECTS ) )
+    if ( spellnum != -1 && IS_SET ( SINFO.routines, MAG_AFFECTS ) )
         mag_affects ( level, caster, cvict, spellnum, savetype );
 
-    if ( IS_SET ( SINFO.routines, MAG_UNAFFECTS ) )
+    if ( spellnum != -1 && IS_SET ( SINFO.routines, MAG_UNAFFECTS ) )
         mag_unaffects ( level, caster, cvict, spellnum, savetype );
 
-    if ( IS_SET ( SINFO.routines, MAG_POINTS ) )
+    if ( spellnum != -1 && IS_SET ( SINFO.routines, MAG_POINTS ) )
         mag_points ( level, caster, cvict, spellnum, savetype );
 
-    if ( IS_SET ( SINFO.routines, MAG_ALTER_OBJS ) )
+    if ( spellnum != -1 && IS_SET ( SINFO.routines, MAG_ALTER_OBJS ) )
         mag_alter_objs ( level, caster, ovict, spellnum, savetype );
 
-    if ( IS_SET ( SINFO.routines, MAG_GROUPS ) )
+    if ( spellnum != -1 && IS_SET ( SINFO.routines, MAG_GROUPS ) )
         mag_groups ( level, caster, spellnum, savetype );
 
-    if ( IS_SET ( SINFO.routines, MAG_MASSES ) )
+    if ( spellnum != -1 && IS_SET ( SINFO.routines, MAG_MASSES ) )
         mag_masses ( level, caster, spellnum, savetype );
 
-    if ( IS_SET ( SINFO.routines, MAG_AREAS ) )
-        mag_areas ( level, caster, spellnum, savetype );
+    if ( ( custom_spell && rem->custom_attack_type == TAR_IGNORE ) ||
+            ( spellnum != -1 && IS_SET ( SINFO.routines, MAG_AREAS ) ) )
+        mag_areas ( level, caster, spellnum, savetype, rem );
 
-    if ( IS_SET ( SINFO.routines, MAG_SUMMONS ) )
+    if ( spellnum != -1 && IS_SET ( SINFO.routines, MAG_SUMMONS ) )
         mag_summons ( level, caster, ovict, spellnum, savetype );
 
-    if ( IS_SET ( SINFO.routines, MAG_CREATIONS ) )
+    if ( spellnum != -1 && IS_SET ( SINFO.routines, MAG_CREATIONS ) )
         mag_creations ( level, caster, spellnum, tar_str );
 
-    if (IS_SET (SINFO.routines, MAG_ROOM_AFFECTS))
-        mag_room_affects(level, caster, spellnum);
+    if ( spellnum != -1 && IS_SET (SINFO.routines, MAG_ROOM_AFFECTS ) )
+        mag_room_affects ( level, caster, spellnum );
 
-    if ( IS_SET ( SINFO.routines, MAG_MANUAL ) )
+    if ( spellnum != -1 && IS_SET ( SINFO.routines, MAG_MANUAL ) )
         switch ( spellnum )
         {
             case SPELL_CHARM:
@@ -748,7 +714,7 @@ int call_magic ( Character *caster, Character *cvict,
                 break;
         }
 
-    return ( 1 );
+    return 1;
 }
 
 /*
@@ -995,7 +961,6 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj, char *argument )
     }
 }
 
-
 /*
  * cast_spell is used generically to cast any spoken spell, assuming we
  * already have the target char/obj and spell number.  It checks all
@@ -1005,22 +970,16 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj, char *argument )
  * by NPCs via specprocs.
  */
 
-int cast_spell ( Character *ch, Character *tch,
-                 struct obj_data *tobj, char *tar_str, int spellnum )
+int cast_spell ( Character *ch, Character *tch, struct obj_data *tobj, char *tar_str,
+                 int spellnum, remembered_skill_spell *rem )
 {
-    int result;
-    struct obj_data *focus = GET_EQ ( ch, WEAR_FOCUS );
-
-
-
-    if ( spellnum < 0 || spellnum >= MAX_SKILLS)
+    if ( ( spellnum < 0 && rem == nullptr ) || spellnum >= MAX_SKILLS)
     {
-        log ( "SYSERR: cast_spell trying to call spellnum %d/%d.\n",
-              spellnum, MAX_SKILLS );
-        return ( 0 );
+        log ( "SYSERR: cast_spell trying to call spellnum %d/%d.\n", spellnum, MAX_SKILLS );
+        return 0;
     }
 
-    if ( GET_POS ( ch ) < SINFO.min_position )
+    if ( GET_POS ( ch ) < ( rem == nullptr ? SINFO.min_position : rem->min_position ) )
     {
         switch ( GET_POS ( ch ) )
         {
@@ -1040,34 +999,36 @@ int cast_spell ( Character *ch, Character *tch,
                 ch->Send ( "You can not do much of anything like this!\r\n" );
                 break;
         }
-        return ( 0 );
+        return 0;
     }
     if ( AFF_FLAGGED ( ch, AFF_CHARM ) && ( ch->master == tch ) )
     {
         ch->Send ( "You are afraid you might hurt your master!\r\n" );
-        return ( 0 );
+        return 0;
     }
-    if ( ( tch && tch != ch ) && IS_SET ( SINFO.targets, TAR_SELF_ONLY ) )
+    if ( tch != ch && rem == nullptr && IS_SET ( SINFO.targets, TAR_SELF_ONLY ) )
     {
         ch->Send ( "You can only cast this spell upon yourself!\r\n" );
-        return ( 0 );
+        return 0;
     }
-    if ( ( tch == ch ) && IS_SET ( SINFO.targets, TAR_NOT_SELF ) )
+    if ( tch == ch && rem == nullptr && IS_SET ( SINFO.targets, TAR_NOT_SELF ) )
     {
         ch->Send ( "You can not cast this spell upon yourself!\r\n" );
-        return ( 0 );
+        return 0;
     }
-    if ( IS_SET ( SINFO.routines, MAG_GROUPS ) && ( !ch->master && !ch->followers ) )
+    if ( rem == nullptr && IS_SET ( SINFO.routines, MAG_GROUPS ) && !ch->master && !ch->followers )
     {
         ch->Send ( "You can not cast this spell if you are not in a group!\r\n" );
-        return ( 0 );
+        return 0;
     }
-    if ( GET_SPELL_DIR ( ch ) != NOWHERE && SINFO.violent && tch!=NULL && CAN_HUNT ( tch ) && !tch->canHuntChar ( ch ) )
+    if ( GET_SPELL_DIR ( ch ) != NOWHERE && ( rem != nullptr || SINFO.violent ) && tch != NULL &&
+         CAN_HUNT ( tch ) && !tch->canHuntChar ( ch ) )
     {
         ch->Send ( "You can't get a clear shot.\r\n" );
         return ( 0 );
     }
 
+    struct obj_data *focus = GET_EQ ( ch, WEAR_FOCUS );
     if ( !focus )
     {
         if ( PRF_FLAGGED ( ch, PRF_NOREPEAT ) )
@@ -1077,18 +1038,18 @@ int cast_spell ( Character *ch, Character *tch,
         else if ( GET_SPELL_DIR ( ch ) != NOWHERE )
         {
             ch->Send ( "You concentrate your energy and send the runes of %s %s.\r\n",
-                       skill_name ( spellnum ),
-                       dirs[GET_SPELL_DIR ( ch ) ] );
+                rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str(),
+                dirs[GET_SPELL_DIR ( ch ) ] );
         }
-        else if ( IS_SET ( SINFO.routines, MAG_DAMAGE ) )
+        else if ( rem != nullptr || IS_SET ( SINFO.routines, MAG_DAMAGE ) )
         {
-            ch->Send ( "You power up %s %s attack.\r\n", LANA ( skill_name ( spellnum ) ), skill_name ( spellnum ) );
+            ch->Send ( "You power up %s %s attack.\r\n", LANA (( rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str() )),
+                rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str() );
         }
         else
         {
-            ch->Send (
-                "You concentrate and draw the runes for %s in the air.\r\n",
-                skill_name ( spellnum ) );
+            ch->Send ( "You concentrate and draw the runes for %s in the air.\r\n",
+                rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str() );
         }
     }
     else
@@ -1097,34 +1058,30 @@ int cast_spell ( Character *ch, Character *tch,
         {
             ch->Send ( "%s", CONFIG_OK );
         }
-        else if ( IS_SET ( SINFO.routines, MAG_DAMAGE ) )
+        else if ( rem != nullptr || IS_SET ( SINFO.routines, MAG_DAMAGE ) )
         {
-            ch->Send ( "You power up %s %s attack.\r\n", LANA ( skill_name ( spellnum ) ), skill_name ( spellnum ) );
+            ch->Send ( "You power up %s %s attack.\r\n", LANA (( rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str() )),
+                rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str() );
         }
         else if ( GET_SPELL_DIR ( ch ) != NOWHERE )
         {
-            ch->Send (
-                "You focus your energy and send the runes of %s %s.\r\n",
-                skill_name ( spellnum ),
+            ch->Send ( "You focus your energy and send the runes of %s %s.\r\n",
+                rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str(),
                 dirs[GET_SPELL_DIR ( ch ) ] );
         }
         else
         {
-            ch->Send (
-                "You focus and draw the runes for %s in the air.\r\n",
-                skill_name ( spellnum ) );
+            ch->Send ( "You focus and draw the runes for %s in the air.\r\n",
+                rem == nullptr ? skill_name ( spellnum ) : rem->name.c_str() );
         }
     }
 
+    say_spell ( ch, spellnum, tch, tobj, rem );
 
-    say_spell ( ch, spellnum, tch, tobj );
-
-    result =
-        call_magic ( ch, tch, tobj, tar_str, spellnum, GET_LEVEL ( ch ),
-                     CAST_SPELL );
+    int result = call_magic ( ch, tch, tobj, tar_str, spellnum, GET_LEVEL ( ch ), CAST_SPELL, rem );
     if ( result != 0 )
-        improve_skill ( ch, spellnum );
-    return ( result );
+        improve_skill ( ch, spellnum, rem );
+    return result;
 }
 
 
@@ -1137,8 +1094,7 @@ int cast_spell ( Character *ch, Character *tch,
 
 ACMD ( do_cast )
 {
-
-    Character *tch = NULL;//, *victim = NULL;
+    Character *tch = NULL;
     struct obj_data *tobj = NULL;
     char *s, *t, t_copy[MAX_INPUT_LENGTH], abuf[MAX_INPUT_LENGTH], *a;
     int mana, spellnum, i, target = 0, dir = NOWHERE;
@@ -1168,13 +1124,27 @@ ACMD ( do_cast )
     /* spellnum = search_block(s, spells, 0); */
     spellnum = find_skill_num ( s );
 
-    if ( !IS_SPELL_CAST(spellnum))
+    remembered_skill_spell *rem = nullptr;
+    if ( !IS_NPC ( ch ) )
+    {
+        for ( auto &r : SAVED(ch).remembered )
+        {
+            if ( r.skill_spell_num == spellnum && r.percentage_learned > 0 && is_abbrev3 ( s, r.name ) )
+            {
+                rem = &r;
+                break;
+            }
+        }
+    }
+
+    if ( rem == nullptr && !IS_SPELL_CAST ( spellnum ) )
     {
         ch->Send ( "Cast what?!?\r\n" );
         return;
     }
 
-    if ( !IS_NPC ( ch ) && total_chance ( ch, spellnum ) == 0 )
+    if ( !IS_NPC ( ch ) && ( ( rem == nullptr && total_chance ( ch, spellnum ) == 0 ) ||
+            ( rem != nullptr && rem->percentage_learned == 0 ) ) )
     {
         ch->Send ( "You are unfamiliar with that spell.\r\n" );
         return;
@@ -1187,8 +1157,7 @@ ACMD ( do_cast )
                 "Your ability to cast this spell has been worn out for \r\n"
                 "at least another %d second%s\r\n",
                 GET_SPELL_WAIT ( ch, spellnum ),
-                GET_SPELL_WAIT ( ch,
-                                 spellnum ) > 1 ? "s." : "." );
+                GET_SPELL_WAIT ( ch, spellnum ) > 1 ? "s." : "." );
             return;
         }
 
@@ -1221,12 +1190,23 @@ ACMD ( do_cast )
         target = TRUE;
     }
     else
-
+    {
         /* the start of finding the target
          * If they typed a target, see if we can find them*/
 
-        if ( IS_SET ( SINFO.targets, TAR_IGNORE ) && !( IS_SET ( SINFO.targets, TAR_AREA_DIR ) ||
-                                     IS_SET ( SINFO.targets, TAR_OBJ_INV ) ))
+        if ( rem != nullptr && spellnum == -1 )
+        { // custom spell
+            if ( IS_SET ( rem->custom_attack_type, TAR_IGNORE ) )
+                target = true;
+            else if ( t != NULL )
+            {
+                strcpy ( t_copy, t );
+                if ( ( tch = get_char_vis ( ch, t_copy, NULL, FIND_CHAR_ROOM ) ) != NULL )
+                    target = TRUE;
+            }
+        }
+        else if ( IS_SET ( SINFO.targets, TAR_IGNORE ) && !( IS_SET ( SINFO.targets, TAR_AREA_DIR ) ||
+                    IS_SET ( SINFO.targets, TAR_OBJ_INV ) ))
         {
             /* if no target wanted */
             target = TRUE;
@@ -1266,7 +1246,7 @@ ACMD ( do_cast )
             {
                 strcpy ( t_copy, t );
                 char *s = t_copy;
-                get_number ( &s ); // strip the number for is_name_full
+                get_number ( &s ); // strip the number for isname_full
                 for ( i = 0; !target && i < NUM_WEARS; i++ )
                     if ( HAS_BODY ( ch, i ) && GET_EQ ( ch, i )
                             && isname_full ( t_copy, GET_EQ ( ch, i )->name ) )
@@ -1312,7 +1292,6 @@ ACMD ( do_cast )
 
                 }
             }
-            //ch->Send( "target is %d\r\n", target);
             /*New case: TAR_AREA_ROOM targets the casters room but cycles through everyone in the room */
 
             if ( !target && IS_SET ( SINFO.targets, TAR_AREA_ROOM ) )
@@ -1349,15 +1328,14 @@ ACMD ( do_cast )
             if ( !target )
             {
                 ch->Send ( "Upon %s should the spell be cast?\r\n",
-                           IS_SET ( SINFO.targets,
-                                    TAR_OBJ_ROOM | TAR_OBJ_INV |
-                                    TAR_OBJ_WORLD | TAR_OBJ_EQUIP ) ? "what"
-                           : "who" );
+                           IS_SET ( SINFO.targets, TAR_OBJ_ROOM | TAR_OBJ_INV |
+                                TAR_OBJ_WORLD | TAR_OBJ_EQUIP ) ? "what" : "who" );
                 return;
             }
         }
+    }
 
-    if ( target && ( tch == ch ) && SINFO.violent )
+    if ( target && ( tch == ch ) && rem == nullptr && SINFO.violent )
     {
         ch->Send ( "You shouldn't cast that on yourself -- could be bad for your health!\r\n" );
         return;
@@ -1365,26 +1343,36 @@ ACMD ( do_cast )
 
     if ( !target )
     {
-        send_to_char ( "Cannot find the target of your spell!\r\n", ch );
+        ch->Send ( "Cannot find the target of your spell!\r\n" );
         return;
     }
 
+    string skillname;
+    if ( rem != nullptr )
+        skillname = rem->name;
+    else
+        skillname = string ( skill_name ( spellnum ) );
+
     if ( use_stamina ( ch, 3 ) < 0 )
     {
-        ch->Send ( "You haven't the energy to cast %s!\r\n", skill_name ( spellnum ) );
+        ch->Send ( "You haven't the energy to cast %s!\r\n", skillname.c_str() );
         GET_SPELL_DIR ( ch ) = NOWHERE;
         return;
     }
-    mana = mag_manacost ( ch, spellnum );
+
+    if ( rem != nullptr )
+        mana = rem->custom_mana_cost;
+    else
+        mana = mag_manacost ( ch, spellnum );
     if ( ( mana > 0 ) && ( GET_MANA ( ch ) < mana ) && ( GET_LEVEL ( ch ) < LVL_HERO ) )
     {
-        ch->Send ( "You haven't the energy to cast %s!\r\n", skill_name ( spellnum ) );
+        ch->Send ( "You haven't the energy to cast %s!\r\n", skillname.c_str() );
         GET_SPELL_DIR ( ch ) = NOWHERE;
         return;
     }
 
     /* You throw the dice and take your chances.. 101% is total failure */
-    if ( number ( 0, 101 ) > ( total_chance ( ch, spellnum ) ) )
+    if ( number ( 0, 101 ) > ( total_chance ( ch, spellnum, skillname ) ) )
     {
         if ( !tch || !skill_message ( 0, ch, tch, spellnum ) )
             GET_SPELL_DIR ( ch ) = NOWHERE;
@@ -1397,18 +1385,18 @@ ACMD ( do_cast )
         if ( mana > 0 )
             alter_mana ( ch, mana / 2 );
 
-        if ( SINFO.violent && tch && IS_NPC ( tch ) && !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) && can_fight ( ch, tch, TRUE ) )
+        if ( ( rem != nullptr || SINFO.violent ) && tch && IS_NPC ( tch ) &&
+             !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) && can_fight ( ch, tch, TRUE ) )
             start_fighting_delay ( tch, ch );
-
     }
     else              /* cast spell returns 1 on success; subtract mana & set waitstate */
     {
-        if ( cast_spell ( ch, tch, tobj, t, spellnum ) )
+        if ( cast_spell ( ch, tch, tobj, t, spellnum, rem ) )
         {
             GET_SPELL_DIR ( ch ) = NOWHERE;
             if ( !IS_NPC ( ch ) && GET_LEVEL ( ch ) < LVL_IMMORT )
             {
-                if ( !SINFO.wait )
+                if ( rem != nullptr || !SINFO.wait )
                     WAIT_STATE ( ch, 1 RL_SEC );
                 else
                     SET_SPELL_WAIT ( ch, spellnum, SINFO.wait );
@@ -1417,7 +1405,8 @@ ACMD ( do_cast )
                     alter_mana ( ch, mana );
             }
         }
-        else if ( SINFO.violent && tch && IS_NPC ( tch ) && HERE ( tch, ch ) && !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) && !FIGHTING(tch))
+        else if ( ( rem != nullptr || SINFO.violent ) && tch && IS_NPC ( tch ) && HERE ( tch, ch ) &&
+                !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) && !FIGHTING ( tch ) )
             start_fighting_delay ( tch, ch );
     }
 }
@@ -1432,7 +1421,7 @@ int grand_master ( Character *ch )
 }
 
 /* This works for skills too -- Mord */
-int knows_spell ( Character *ch, int spell )
+int knows_spell ( Character *ch, int spell, string custom_spell_name )
 {
     int i, gm, t;
     int ret_val = 0;
@@ -1446,6 +1435,16 @@ int knows_spell ( Character *ch, int spell )
 
     if ( GET_LEVEL ( ch ) >= LVL_IMMORT )
         return 1;
+
+    // Is it a remembered skill or spell?
+    if ( !IS_NPC ( ch ) )
+    {
+        for ( const auto &r : SAVED(ch).remembered )
+            if ( ( spell == -1 && r.name == custom_spell_name && r.percentage_remembered == 100 ) ||
+                 ( spell != -1 && r.skill_spell_num == spell && r.percentage_remembered == 100 ) )
+                return 1;
+    }
+
     if ( spell < 0 || spell >= MAX_SKILLS )
         return 0;
 
@@ -2440,8 +2439,11 @@ void mag_assign_spells ( void )
 
 }
 
-int elemental_type ( int spell )
+int elemental_type ( int spell, remembered_skill_spell *rem )
 {
+    if ( rem != nullptr )
+        return rem->custom_elemental_type;
+
     int retval = ELEM_NONE;
     switch ( spell )
     {

@@ -3545,7 +3545,7 @@ void skill_spell_help ( Character *ch, int spell )
         "     Points: {cy%-3s{cg       Alters Objects: {cy%-3s{cg\r\n"
         "     Groups: {cy%-3s{cg               Masses: {cy%-3s{cg\r\n"
         "      Areas: {cy%-3s{cg            Summoning: {cy%-3s{cg\r\n"
-        "   Creation: {cy%-3s{cg\r\n\r\n",
+        "   Creation: {cy%-3s{cg                   GM: {cy%-3s{cg\r\n\r\n",
         YESNO ( IS_SET ( spell_info[spell].targets, TAR_AREA_DIR ) ),
         YESNO ( spell_info[spell].violent ),
         YESNO ( IS_SET ( spell_info[spell].routines, MAG_AFFECTS ) ),
@@ -3556,7 +3556,8 @@ void skill_spell_help ( Character *ch, int spell )
         YESNO ( IS_SET ( spell_info[spell].routines, MAG_MASSES ) ),
         YESNO ( IS_SET ( spell_info[spell].routines, MAG_AREAS ) ),
         YESNO ( IS_SET ( spell_info[spell].routines, MAG_SUMMONS ) ),
-        YESNO ( IS_SET ( spell_info[spell].routines, MAG_CREATIONS ) )
+        YESNO ( IS_SET ( spell_info[spell].routines, MAG_CREATIONS ) ),
+        YESNO ( spell_info[spell].gm )
     );
     if ( IS_SET ( spell_info[spell].targets, TAR_SELF_ONLY ) )
         ch->Send ( "This spell can only be cast upon yourself.\r\n" );
@@ -3571,7 +3572,7 @@ void skill_spell_help ( Character *ch, int spell )
 
 
     if ( knows_spell ( ch, spell ) )
-        ch->Send ( "{cCYou know this spell{cg\r\n" );
+        ch->Send ( "{cCYou know this %s{cg\r\n", IS_SKILL ( spell ) ? "skill" : "spell" );
     if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
         ch->Send ( "----------------------------------------------------{c0\r\n" );
 }

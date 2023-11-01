@@ -31,7 +31,8 @@ int spell_num_dice ( Character *ch );
 #define S_NDICE (spell_num_dice(ch))
 extern int mini_mud;
 
-void skill_attack ( Character *ch, Character *vict, int skill, int pass );
+void skill_attack ( Character *ch, Character *vict, int skill, int pass,
+                    remembered_skill_spell *rem = nullptr );
 void start_fighting_delay ( Character *vict, Character *ch );
 sbyte saving_throws ( int class_num, int type, int level );  /* class.c */
 void clearMemory ( Character *ch );
@@ -40,7 +41,7 @@ int arena_ok ( Character *ch, Character *victim );
 void change_alignment ( Character *ch, Character *victim );
 void zap_char ( Character *victim );
 int find_first_step ( room_rnum src, room_rnum target );
-float has_staff_multi ( Character *ch, int wtype);
+float has_staff_multi ( Character *ch, int wtype, remembered_skill_spell *rem = nullptr );
 
 extern const char *opp_dirs[];
 
@@ -52,8 +53,10 @@ int mag_materials ( Character *ch, int item0, int item1, int item2,
 void perform_mag_groups ( int level, Character *ch,
                           Character *tch, int spellnum, int savetype );
 int mag_savingthrow ( Character *ch, int type, int modifier );
-int do_magic_direction ( int level, int dir, int dist, Character *ch, Character *vict, int spellnum );
-int perform_mag_direction ( int level, room_rnum room, Character *ch, Character *vict, int spellnum );
+int do_magic_direction ( int level, int dir, int dist, Character *ch, Character *vict, int spellnum,
+                         remembered_skill_spell *rem );
+int perform_mag_direction ( int level, room_rnum room, Character *ch, Character *vict, int spellnum,
+                            remembered_skill_spell *rem );
 void affect_update ( void );
 bool can_have_follower ( Character *ch, mob_vnum mob_num );
 bool can_have_follower ( Character *ch, Character *vict );
@@ -323,7 +326,7 @@ Character *find_in_dir ( room_rnum room, char *name, int dir, Character *ch )
  * -1 = dead, otherwise the amount of damage done.
  */
 int mag_damage ( int level, Character *ch, Character *victim,
-                 int spellnum, int savetype )
+                 int spellnum, int savetype, remembered_skill_spell *rem )
 {
 
     int spell_lvl = 0;
@@ -332,14 +335,11 @@ int mag_damage ( int level, Character *ch, Character *victim,
     int pass = TRUE;
     long pvict = -1;
 
-
     if ( ch )
     {
         good = IS_GOOD ( ch );
         evil = IS_EVIL ( ch );
     }
-
-
 
     if ( level <= 0 )
         spell_lvl = GET_LEVEL ( ch );
@@ -347,7 +347,7 @@ int mag_damage ( int level, Character *ch, Character *victim,
         spell_lvl = level;
 
     if ( victim == NULL || ch == NULL )
-        return ( 0 );
+        return 0;
 
     switch ( spellnum )
     {
@@ -360,7 +360,7 @@ int mag_damage ( int level, Character *ch, Character *victim,
             if ( good )
             {
                 act ( "You are much too good to cast this spell!", FALSE, ch, 0, victim, TO_CHAR );
-                return ( 0 );
+                return 0;
             }
             break;
 
@@ -373,7 +373,7 @@ int mag_damage ( int level, Character *ch, Character *victim,
             else if ( IS_GOOD ( victim ) )
             {
                 act ( "The gods protect $N.", FALSE, ch, 0, victim, TO_CHAR );
-                return ( 0 );
+                return 0;
             }
             break;
         case SPELL_DISPEL_GOOD:
@@ -385,7 +385,7 @@ int mag_damage ( int level, Character *ch, Character *victim,
             else if ( IS_EVIL ( victim ) )
             {
                 act ( "The gods protect $N.", FALSE, ch, 0, victim, TO_CHAR );
-                return ( 0 );
+                return 0;
             }
             break;
         case SPELL_HARM:
@@ -411,7 +411,6 @@ int mag_damage ( int level, Character *ch, Character *victim,
                 return 0;
             }
             break;
-
     }                 /* switch(spellnum) */
 
     if ( AFF_FLAGGED ( victim, AFF_SLEEP ) )
@@ -427,15 +426,16 @@ int mag_damage ( int level, Character *ch, Character *victim,
         pass = FALSE;
     if ( FIGHTING ( ch ) != NULL )
     {
-        /** if the player is fighting already, savethe person they are fighting with **/
+        /** if the player is fighting already, save the person they are fighting with **/
         if ( FIGHTING ( ch ) != victim )
             pvict = GET_ID ( FIGHTING ( ch ) );
         /** Temporarily make this other person the FIGHTEE **/
         FIGHTING ( ch ) = victim;
     }
     /** attack them **/
-    skill_attack ( ch, victim, spellnum, pass );
-    /** then switch back if nessercery **/
+    skill_attack ( ch, victim, spellnum, pass, rem );
+
+    /** then switch back if necessary **/
     if ( pvict != -1 )
         FIGHTING ( ch ) = find_char ( pvict );
 
@@ -443,7 +443,6 @@ int mag_damage ( int level, Character *ch, Character *victim,
         return -1;
     else
         return 1;
-
 }
 
 /*
@@ -1636,7 +1635,8 @@ void mag_affects ( int level, Character *ch, Character *victim,
     }
 }
 
-int do_magic_direction ( int level, int dir, int dist, Character *ch, Character *vict, int spellnum )
+int do_magic_direction ( int level, int dir, int dist, Character *ch, Character *vict, int spellnum,
+                         remembered_skill_spell *rem )
 {
     int i;
     room_rnum nextroom = IN_ROOM ( ch );
@@ -1645,7 +1645,7 @@ int do_magic_direction ( int level, int dir, int dist, Character *ch, Character 
     for ( i = 0; i < dist && ( nextroom != NULL ); i++ )
     {
 
-        ret += perform_mag_direction ( level, nextroom , ch , vict , spellnum );
+        ret += perform_mag_direction ( level, nextroom , ch , vict , spellnum, rem );
 
         if ( CAN_GO2 ( nextroom, dir ) )
             nextroom = EXIT2 ( nextroom, dir )->to_room;
@@ -1655,7 +1655,8 @@ int do_magic_direction ( int level, int dir, int dist, Character *ch, Character 
     return ret;
 }
 
-int perform_mag_direction ( int level, room_rnum room, Character *ch, Character *vict, int spellnum )
+int perform_mag_direction ( int level, room_rnum room, Character *ch, Character *vict, int spellnum,
+                            remembered_skill_spell *rem )
 {
     Character *tch, *tch_next;
     char format[MAX_INPUT_LENGTH];
@@ -1691,21 +1692,25 @@ int perform_mag_direction ( int level, room_rnum room, Character *ch, Character 
             break;
     }
 
+    string skillname;
+    if ( rem == nullptr )
+        skillname = string ( skill_name ( spellnum ) );
+    else
+        skillname = rem->name;
+
     if ( room == IN_ROOM ( ch ) )
     {
-        sprintf ( format, "%s %s emerges from $N and strikes you!", CANA ( skill_name ( spellnum ) ),skill_name ( spellnum ) );
+        sprintf ( format, "%s %s emerges from $N and strikes you!", CANA ( skillname.c_str() ), skillname.c_str() );
 
-        sprintf ( format2, "%s %s emerges from $N and strikes $n!" ,CANA ( skill_name ( spellnum ) ),skill_name ( spellnum ) );
+        sprintf ( format2, "%s %s emerges from $N and strikes $n!" ,CANA ( skillname.c_str() ), skillname.c_str() );
     }
     else
     {
 
-        sprintf ( format, "%s %s arrives from %s and strikes you!", CANA ( skill_name ( spellnum ) ),skill_name ( spellnum ),dirname );
+        sprintf ( format, "%s %s arrives from %s and strikes you!", CANA ( skillname.c_str() ), skillname.c_str(), dirname );
 
-        sprintf ( format2, "%s %s arrives from %s and strikes $n!" ,CANA ( skill_name ( spellnum ) ),skill_name ( spellnum ),dirname );
+        sprintf ( format2, "%s %s arrives from %s and strikes $n!" ,CANA ( skillname.c_str() ), skillname.c_str(), dirname );
     }
-
-
 
     for ( tch = room->people; tch; tch = tch_next )
     {
@@ -1733,13 +1738,13 @@ int perform_mag_direction ( int level, room_rnum room, Character *ch, Character 
             case SPELL_CONE_OF_COLD:
             case SPELL_FIREBALL:
 
-                if ( mag_damage ( level, ch, tch, spellnum, 1 ) )
+                if ( mag_damage ( level, ch, tch, spellnum, 1, rem ) )
                     ret += 1;
                 break;
             case SPELL_MANA_TRANSFER:
             case SPELL_LIFE_TRANSFER:
             case SPELL_VITALIZE:
-                mag_points ( level, ch, tch, spellnum, 1 );
+                mag_points ( level, ch, tch, spellnum, 1, rem );
                 ret += 1;
                 break;
         }
@@ -1845,12 +1850,15 @@ void mag_masses ( int level, Character *ch, int spellnum, int savetype )
  *  area spells have limited targets within the room.
 */
 
-void mag_areas ( int level, Character *ch, int spellnum, int savetype )
+void mag_areas ( int level, Character *ch, int spellnum, int savetype,
+                 remembered_skill_spell *rem )
 {
     Character *tch, *next_tch;
     const char *to_char = NULL, *to_room = NULL;
     int count = 0, rounds;
     bool ground_type = false;
+    if ( rem != nullptr )
+        spellnum = rem->skill_spell_num;
 
     if ( ch == NULL )
         return;
@@ -1938,10 +1946,22 @@ void mag_areas ( int level, Character *ch, int spellnum, int savetype )
             break;
     }
 
+    char buf[MAX_INPUT_LENGTH];
     if ( to_char != NULL )
         act ( to_char, FALSE, ch, 0, 0, TO_CHAR );
+    else if ( rem != nullptr )
+    {
+        sprintf ( buf, "You power up %s %s attack.", LANA (( rem->name.c_str() )), rem->name.c_str() );
+        act ( buf, FALSE, ch, 0, 0, TO_CHAR );
+    }
+
     if ( to_room != NULL )
         act ( to_room, FALSE, ch, 0, 0, TO_ROOM );
+    else if ( rem != nullptr )
+    {
+        sprintf ( buf, "$n powers up %s %s attack.", LANA (( rem->name.c_str() )), rem->name.c_str() );
+        act ( buf, FALSE, ch, 0, 0, TO_ROOM );
+    }
 
 
     for ( tch = ch->in_room->people; tch; tch = next_tch )
@@ -1994,7 +2014,7 @@ void mag_areas ( int level, Character *ch, int spellnum, int savetype )
         if ( number ( 0,170 ) < ( level + total_chance ( ch, spellnum ) ) )
         {
             GET_WAIT_STATE ( ch ) += 1 RL_SEC;
-            mag_damage ( level, ch, tch, spellnum, 1 );
+            mag_damage ( level, ch, tch, spellnum, 1, rem );
         }
         else
         {
@@ -2213,12 +2233,15 @@ void mag_summons ( int level, Character *ch, struct obj_data *obj,
 }
 
 
-void mag_points ( int level, Character *ch, Character *victim,
-                  int spellnum, int savetype )
+void mag_points ( int level, Character *ch, Character *victim, int spellnum, int savetype,
+                  remembered_skill_spell *rem )
 {
     int hit = 0, move = 0, mana = 0, stam = 0, spell_lvl = 0;
     //int good = 1, evil = 1;
     int multi = 1;
+
+    if ( rem != nullptr )
+        spellnum = rem->skill_spell_num;
 
     if ( ch && level == GET_LEVEL ( ch ) )
     {
@@ -2314,8 +2337,8 @@ void mag_unaffects ( int level, Character *ch,
             break;
         case SPELL_CURE_MUTATION:
             spell = SPELL_MUTATED;
-                        to_vict = "Your mutations are cured!";
-                        to_room = "$n's mutations are cured!";
+            to_vict = "Your mutations are cured!";
+            to_room = "$n's mutations are cured!";
             affect_from_char ( victim, AFF_MUTATED);
             break;
         case SPELL_ANTIDOTE_1:
@@ -2344,7 +2367,7 @@ void mag_unaffects ( int level, Character *ch,
             break;
         case SPELL_DISPELL_SANCTURY:
             spell = SPELL_SANCTUARY;
-            to_vict = "Your sanctury flickers and fades.";
+            to_vict = "Your sanctuary flickers and fades.";
             to_room = "$n's white aura flickers and fades.";
             break;
         case SPELL_DISPEL_BUBBLE:
@@ -2380,7 +2403,6 @@ void mag_unaffects ( int level, Character *ch,
 
     if ( poisoned )
         victim->check_regen_rates();     /* speed up regen rate immediately */
-
 }
 
 
@@ -2521,14 +2543,14 @@ void mag_creations ( int level, Character *ch, int spellnum, char *tar_str )
   switch ( spellnum )
   {
       case SPELL_CREATE_FOOD:
-      if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch)) {
-          ch->Send ("You can't carry any more items!\r\n");
-          return;
-      }
+          if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch)) {
+              ch->Send ("You can't carry any more items!\r\n");
+              return;
+          }
           z = 10;
           sprintf(to_room, "$n creates $p.");
           sprintf(to_char, "You create $p.");
-      break;
+          break;
       case SPELL_WALL_FORCE:
           z = OBJ_VNUM_WALL_FORCE;
           sprintf(to_room, "$n summons forth a {cbblue opaque {cxwall of {cBforce{cx, blocking the %s exit!\r\n", dirs[value]);

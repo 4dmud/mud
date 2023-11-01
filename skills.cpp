@@ -37,13 +37,14 @@ int can_fight ( Character *ch, Character *vict, int silent );
 void perform_give ( Character *ch, Character *vict,
                     OBJ_DATA *obj );
 int arena_ok ( Character *ch, Character *victim );
-void improve_skill ( Character *ch, int skill );
+void improve_skill ( Character *ch, int skill, remembered_skill_spell *rem = nullptr );
 int compute_armor_class ( Character *ch );
 void spello ( int spl, const char *name, int max_mana, int min_mana,
               int mana_change, int minpos, int targets, int violent,
               int routines, int wait, int first_prereq, int second_prereq, int tier, int level, int gm, const char *wear_off_msg );
 int find_first_step ( room_rnum src, room_rnum target,bool honour_notrack=false );
-void skill_attack ( Character *ch, Character *vict, int skill, int pass );
+void skill_attack ( Character *ch, Character *vict, int skill, int pass,
+                    remembered_skill_spell *rem = nullptr );
 ACMD ( do_gen_door );
 // Horus - I dont think check_killer is used here.
 // void check_killer ( Character *ch, Character *vict );
@@ -89,7 +90,7 @@ typedef struct
 dirParseStruct;
 
 /* Local Functions */
-int total_chance ( Character *ch, int skill );
+int total_chance ( Character *ch, int skill, string custom_spell_name );
 ASKILL ( skill_backstab );
 ASKILL ( skill_bash );
 ASKILL ( skill_hide );
@@ -378,7 +379,7 @@ ACMD ( do_skills )
      ** I know there is redundancy in the messages of these checks*/
     if ( IS_NPC ( orig ) && orig->desc )
         ch->Send ( "You have no idea how to do that.\r\n" );
-    else if ( !IS_NPC ( orig ) && ( ( !knows_spell ( orig, subcmd ) || !total_chance ( ch, subcmd ) ) && GET_LEVEL ( orig ) < LVL_GOD ) )
+    else if ( !IS_NPC ( orig ) && GET_LEVEL ( orig ) < LVL_GOD && !total_chance ( ch, subcmd ) )
         ch->Send ( "You have no idea how to do that.\r\n" );
     else if ( IS_SET ( SINFO.flags, SK_VIOLENT ) && ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) )
         ch->Send ( "This room just has such a peaceful, easy feeling...\r\n" );
@@ -2429,7 +2430,6 @@ ASKILL ( skill_push )
 
 ASKILL ( skill_scan )
 {
-
     Character *i;
     int  dir = 0, dis, maxdis, x, found = 0;
     room_rnum location = NULL, original_loc, is_in;
@@ -2472,7 +2472,16 @@ ASKILL ( skill_scan )
     }
     WAIT_STATE ( ch, 1 RL_SEC );
 
-    maxdis = ( 1 + ( ( GET_SKILL ( ch, SKILL_SCAN ) * 5 ) / 100 ) );
+    int skill = GET_SKILL ( ch, SKILL_SCAN );
+    if ( skill == 0 )
+    {
+        for ( const auto &r: SAVED(ch).remembered )
+        {
+            if ( r.skill_spell_num == SKILL_SCAN )
+                skill = r.percentage_learned;
+        }
+    }
+    maxdis = ( 1 + ( ( skill * 5 ) / 100 ) );
     if ( GET_LEVEL ( ch ) >= LVL_GOD )
         maxdis = 7;
 
@@ -2535,7 +2544,6 @@ ASKILL ( skill_scan )
         location = original_loc->dir_option[dir]->to_room;
         view_room_by_rnum ( ch, location );
         return SKILL_SCAN;
-
     }
 
     is_in = IN_ROOM ( ch );
@@ -2571,7 +2579,6 @@ ASKILL ( skill_scan )
         act ( "Nobody anywhere near you.", TRUE, ch, 0, 0, TO_CHAR );
     IN_ROOM ( ch ) = is_in;
     return ( SKILL_SCAN );
-
 }
 
 /* These Skills kept in act.movement.c*/
@@ -2968,19 +2975,29 @@ ASKILL ( skill_circle )
 
 }
 
-void improve_skill ( Character *ch, int skill )
+void improve_skill ( Character *ch, int skill, remembered_skill_spell *rem )
 {
+    int percent;
+    if ( rem == nullptr )
+    {
+        for ( auto &r : SAVED(ch).remembered )
+        {
+            if ( r.skill_spell_num == skill && r.percentage_remembered == 100 )
+            {
+                rem = &r;
+                percent = rem->percentage_learned;
+                break;
+            }
+        }
+    }
+    if ( rem == nullptr )
+        percent = GET_SKILL ( ch, skill );
 
-    int percent = GET_SKILL ( ch, skill );
-    int splevel = ( spell_info[skill].min_level );
-    gold_int share;
-
-    if ( skill == TYPE_UNDEFINED || percent < 0)
+    if ( percent <= 0)
         return;
 
     if ( number ( 1, 1000 ) > GET_WIS ( ch ) + GET_INT ( ch ) )
         return;
-
 
     if ( FIRST_PRE ( skill ) != TYPE_UNDEFINED )
     {
@@ -2990,8 +3007,23 @@ void improve_skill ( Character *ch, int skill )
                 improve_skill ( ch, FIRST_PRE ( skill ) );
         }
         else
-            return;
+        {
+            bool prereq_found = false;
+            for ( auto &r : SAVED(ch).remembered )
+            {
+                if ( r.skill_spell_num == FIRST_PRE ( skill ) && r.percentage_remembered == 100 )
+                {
+                    prereq_found = true;
+                    if ( !number ( 0, 10 ) )
+                        improve_skill ( ch, FIRST_PRE ( skill ), &r );
+                    break;
+                }
+            }
+            if ( !prereq_found )
+                return;
+        }
     }
+
     if ( SECOND_PRE ( skill ) != TYPE_UNDEFINED )
     {
         if ( GET_SKILL ( ch, SECOND_PRE ( skill ) ) )
@@ -3000,73 +3032,112 @@ void improve_skill ( Character *ch, int skill )
                 improve_skill ( ch, SECOND_PRE ( skill ) );
         }
         else
-            return;
+        {
+            bool prereq_found = false;
+            for ( auto &r : SAVED(ch).remembered )
+            {
+                if ( r.skill_spell_num == SECOND_PRE ( skill ) && r.percentage_remembered == 100 )
+                {
+                    prereq_found = true;
+                    if ( !number ( 0, 10 ) )
+                        improve_skill ( ch, SECOND_PRE ( skill ), &r );
+                    break;
+                }
+            }
+            if ( !prereq_found )
+                return;
+        }
     }
+
     if ( percent >= 98 || percent <= 0 )
         return;
 
     percent += number(1, GET_INT(ch)/5);
 
+    int splevel = 1;
+    if ( rem == nullptr )
+        splevel = spell_info[skill].min_level;
+    gold_int share;
     if ( percent >= 98 ) {
         share = ( gold_int ) ( exp_needed ( ch ) * 0.2 );
         percent = 98;
     } else
         share = number ( 50, 120 ) * ( percent ) * splevel;
 
-    SET_SKILL ( ch, skill, percent );
-    ch->Send ( "You feel your ability in %s %s.\r\n",  skill_name ( skill ), ( percent >= 97 ) ? "reach full strength" : "improve" );
+    if ( rem != nullptr )
+        rem->percentage_learned = percent;
+    else
+        SET_SKILL ( ch, skill, percent );
+
+    if ( rem != nullptr )
+        ch->Send ( "You feel your ability in %s %s.\r\n",  rem->name.c_str(), ( percent >= 97 ) ? "reach full strength" : "improve" );
+    else
+        ch->Send ( "You feel your ability in %s %s.\r\n",  skill_name ( skill ), ( percent >= 97 ) ? "reach full strength" : "improve" );
     gain_exp ( ch, abs ( share ) );
 
     return;
 }
 
-int total_chance ( Character *ch, int skill )
+int total_chance ( Character *ch, int skill, string custom_spell_name )
 {
-    int count = 0, total = 0, check = TRUE;
-    int skch = 0;
-    //    int cls = (IS_NPC(ch) ? 0 : GET_CLASS(ch));
-    if ( !knows_spell ( ch, skill ) )
+    if ( !knows_spell ( ch, skill, custom_spell_name ) )
         return 0;
 
-    if ( FIRST_PRE ( skill ) != TYPE_UNDEFINED )
+    int skch = GET_SKILL ( ch, skill );
+    if ( skch == 0 && !IS_NPC ( ch ) )
     {
-        if ( ( skch = GET_SKILL ( ch, FIRST_PRE ( skill ) ) ) > 1 )
+        for ( const auto &r : SAVED(ch).remembered )
         {
-            count++;
-            total += skch;
-        }
-        else
-        {
-            check = FALSE;
+            if ( ( skill == -1 && r.name == custom_spell_name && r.percentage_remembered == 100 ) ||
+                 ( skill != -1 && r.skill_spell_num == skill && r.percentage_remembered == 100 ) )
+            {
+                skch = r.percentage_learned;
+                break;
+            }
         }
     }
+    if ( skch == 0 )
+        return 0;
 
-    if ( ( SECOND_PRE ( skill ) != TYPE_UNDEFINED ) )
+    int count = 1, total = skch;
+    if ( skill != -1 && FIRST_PRE ( skill ) != TYPE_UNDEFINED )
     {
-        if ( ( skch = GET_SKILL ( ch, SECOND_PRE ( skill ) ) ) > 1 )
+        skch = GET_SKILL ( ch, FIRST_PRE ( skill ) );
+        if ( skch == 0 && !IS_NPC ( ch ) )
         {
-            count++;
-            total += skch;
+            for ( const auto &r : SAVED(ch).remembered )
+            {
+                if ( r.skill_spell_num == FIRST_PRE ( skill ) && r.percentage_remembered == 100 )
+                    skch = r.percentage_learned;
+                break;
+            }
         }
-        else
-        {
-            check = FALSE;
-        }
-    }
 
-    if ( check )
-    {
-        if ( ( skch = GET_SKILL ( ch, skill ) ) > 1 )
-        {
-            count++;
-            total +=  skch;
-            return ( total / count );
-        }
-        else
+        if ( skch == 0 )
             return 0;
+        count++;
+        total += skch;
     }
-    else
-        return 0;
+
+    if ( skill != -1 && SECOND_PRE ( skill ) != TYPE_UNDEFINED )
+    {
+        skch = GET_SKILL ( ch, SECOND_PRE ( skill ) );
+        if ( skch == 0 && !IS_NPC ( ch ) )
+        {
+            for ( const auto &r : SAVED(ch).remembered )
+            {
+                if ( r.skill_spell_num == SECOND_PRE ( skill ) && r.percentage_remembered == 100 )
+                    skch = r.percentage_learned;
+                break;
+            }
+        }
+
+        if ( skch == 0 )
+            return 0;
+        count++;
+        total += skch;
+    }
+    return total / count;
 }
 
 int perform_grapple ( Character *ch, int dir, int need_specials_check,
@@ -3133,11 +3204,10 @@ int perform_grapple ( Character *ch, int dir, int need_specials_check,
 
 int skill_cost ( int h, int m, int v, Character *ch )
 {
-    int mv;
     if ( GET_LEVEL ( ch ) > LVL_IMMORT )
         return 1;
 
-    mv = ( v/ ( 4 - ( GET_LEVEL ( ch ) /15 ) ) );
+    int mv = ( v/ ( 4 - ( GET_LEVEL ( ch ) /15 ) ) );
     if ( ( ( GET_HIT ( ch )-h ) <0 ) || ( ( GET_MANA ( ch )-m ) <0 ) || ( ( GET_MOVE ( ch )-mv ) <0 ) )
         return 0;
 

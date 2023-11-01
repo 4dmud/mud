@@ -27,7 +27,7 @@ extern int pk_allowed;
 
 /* external functions */
 int arena_ok(Character *ch, Character *victim);
-void improve_skill(Character *ch, int skill);
+void improve_skill(Character *ch, int skill, remembered_skill_spell *rem = nullptr);
 int compute_armor_class(Character *ch);
 void spello(int spl, const char *name, int max_mana, int min_mana,
             int mana_change, int minpos, int targets, int violent,

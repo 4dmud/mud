@@ -611,7 +611,8 @@ int load_mtrigger(Character * ch) {
     return ch ? 1 : -1;
 }
 
-int cast_mtrigger(Character * actor, Character * ch, int spellnum) {
+int cast_mtrigger(Character * actor, Character * ch, int spellnum, remembered_skill_spell *rem)
+{
     trig_data *t;
     char buf[MAX_INPUT_LENGTH];
 
@@ -627,7 +628,8 @@ int cast_mtrigger(Character * actor, Character * ch, int spellnum) {
             ADD_UID_VAR(buf, t, actor, "actor", 0);
             sprintf(buf, "%d", spellnum);
             add_var(&GET_TRIG_VARS(t), "spell", buf, 0);
-            add_var(&GET_TRIG_VARS(t), "spellname", (char *) skill_name(spellnum), 0);
+            add_var(&GET_TRIG_VARS(t), "spellname",
+                    rem == nullptr ? skill_name(spellnum) : rem->name.c_str(), 0);
 
             if ( !script_driver(&ch, t, MOB_TRIGGER, TRIG_NEW) )
                 ret_val = 0;
@@ -1020,7 +1022,8 @@ int load_otrigger(obj_data * obj) {
     return obj ? 1 : -1;
 }
 
-int cast_otrigger(Character * actor, obj_data * obj, int spellnum) {
+int cast_otrigger(Character * actor, obj_data * obj, int spellnum, remembered_skill_spell *rem)
+{
     trig_data *t;
     char buf[MAX_INPUT_LENGTH];
 
@@ -1037,7 +1040,8 @@ int cast_otrigger(Character * actor, obj_data * obj, int spellnum) {
             ADD_UID_VAR(buf, t, actor, "actor", 0);
             snprintf(buf, sizeof(buf), "%d", spellnum);
             add_var(&GET_TRIG_VARS(t), "spell", buf, 0);
-            add_var(&GET_TRIG_VARS(t), "spellname",(char *) skill_name(spellnum), 0);
+            add_var(&GET_TRIG_VARS(t), "spellname",
+                    rem == nullptr ? skill_name(spellnum) : rem->name.c_str(), 0);
 
             if ( !script_driver(&obj, t, OBJ_TRIGGER, TRIG_NEW) )
                 ret_val = 0;
@@ -1466,7 +1470,9 @@ int drop_wtrigger(obj_data * obj, Character * actor) {
 }
 
 
-int cast_wtrigger(Character * actor, Character * vict, obj_data * obj, int spellnum) {
+int cast_wtrigger(Character * actor, Character * vict, obj_data * obj, int spellnum,
+                  remembered_skill_spell *rem)
+{
     Room *room;
     trig_data *t;
     char buf[MAX_INPUT_LENGTH];
@@ -1485,7 +1491,8 @@ int cast_wtrigger(Character * actor, Character * vict, obj_data * obj, int spell
                 ADD_UID_VAR(buf, t, obj, "object", 0);
             sprintf(buf, "%d", spellnum);
             add_var(&GET_TRIG_VARS(t), "spell", buf, 0);
-            add_var(&GET_TRIG_VARS(t), "spellname", (char *) skill_name(spellnum), 0);
+            add_var(&GET_TRIG_VARS(t), "spellname",
+                    rem == nullptr ? skill_name(spellnum) : rem->name.c_str(), 0);
 
             if ( !script_driver(&room, t, WLD_TRIGGER, TRIG_NEW) )
                 ret_val = 0;

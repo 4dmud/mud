@@ -27,6 +27,8 @@
 #include "oasis.h"
 #include "fight.h"
 
+bool is_abbrev3 ( const string &s1, const string &s2 );
+
 /*
     ASSIGNMOB(500, guild);	// guild guard in Mud School
     ASSIGNMOB(564, guild);	// Gym master in school
@@ -217,8 +219,7 @@ bool can_teach_skill ( Character *mob, int i )
 void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, string arg3 )
 {
     int i, sortpos, h = 0, ending, sub, lvl_min = 0, lvl_max = LVL_IMPL, levels;
-    int count= 0;
-    char buf[MAX_INPUT_LENGTH];
+    char buf[MAX_INPUT_LENGTH * 20];
     DYN_DEFINE;
     *buf = 0;
 
@@ -269,7 +270,8 @@ void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, s
     }
     else
     {
-        snprintf ( buf, sizeof ( buf ), "%s can teach you the following %s %s:\r\n", GET_NAME ( mob ), skillspell == 1 ? "spells" : "skills", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "with a * in front" : "in green" );
+        snprintf ( buf, sizeof ( buf ), "%s can teach you the following %s %s:\r\n", GET_NAME ( mob ), skillspell == 1 ? "spells" : "skills",
+            PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "with a * in front" : skillspell == 1 ? "in yellow" : "in green" );
         DYN_RESIZE ( buf );
     }
 
@@ -300,7 +302,6 @@ void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, s
             }
             if ( sub == 0 )
                 continue;
-            count++;
             if ( GET_LEVEL ( ch ) > LVL_IMMORT )
             {
                 sprintf ( buf, "%-3d)", i );
@@ -309,15 +310,12 @@ void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, s
             sprintf ( buf, "%s\x1B[1;31m%-28s  \x1B[0m[%s] ", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "*" : " ", sub_name ( i ), ( ( sub > 0 ) ? how_good_perc ( ch, sub ) : unlearnedsub ) );
             DYN_RESIZE ( buf );
 
-
-
-
-            if ( !IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].parent!=TYPE_UNDEFINED )
+            if ( !IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].parent != TYPE_UNDEFINED )
             {
                 sprintf ( buf, " Parent Skill: %s", skill_name ( sub_info[i].parent ) );
                 DYN_RESIZE ( buf );
             }
-            if ( IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].parent!=TYPE_UNDEFINED )
+            if ( IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].parent != TYPE_UNDEFINED )
             {
                 sprintf ( buf, " Profession: %s", profession_names[sub_info[i].parent] );
                 DYN_RESIZE ( buf );
@@ -327,7 +325,6 @@ void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, s
         }
         else
         {
-
             if ( ( FIRST_PRE ( i ) != TYPE_UNDEFINED )
                     && ( SECOND_PRE ( i ) != TYPE_UNDEFINED ) )
                 h = 2;
@@ -342,13 +339,11 @@ void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, s
 
             if ( knows_spell ( ch, i ) )
             {
-
                 if ( GET_LEVEL ( ch ) == LVL_IMPL )
                 {
                     sprintf ( buf, "%-3d)", i );
                     DYN_RESIZE ( buf );
                 }
-
 
                 sprintf ( buf, "%s%s%-20s     \x1B[0m[%s] ", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "*" : " ",
                           ( ! ( IS_SPELL_CAST(i) ) ? "\x1B[32m" : "\x1B[33m" ),
@@ -357,8 +352,6 @@ void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, s
 
                 sprintf ( buf, "[L:%2d T:%d]",spell_info[i].min_level, spell_info[i].tier );
                 DYN_RESIZE ( buf );
-
-
 
                 if ( skillspell == 1 )
                 {
@@ -402,17 +395,14 @@ void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, s
 
                 sprintf ( buf, "\r\n" );
                 DYN_RESIZE ( buf );
-                count++;
 
-                /*if (!(GET_LEVEL(ch) >= LVL_IMMORT))
-                break;*/
             }
             else if ( mob )
             {
                 if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) && arg2 != "all" && arg3 != "all" )
                     continue;
 
-                sprintf ( buf, "{cr %-20s{c0                  ", skill_name ( i ) );
+                sprintf ( buf, "{cr %-20s{c0            ", skill_name ( i ) );
                 DYN_RESIZE ( buf );
                 sprintf ( buf, "[L:%2d T:%d]",spell_info[i].min_level, spell_info[i].tier );
                 DYN_RESIZE ( buf );
@@ -438,16 +428,113 @@ void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, s
 
                 sprintf ( buf, "\r\n" );
                 DYN_RESIZE ( buf );
-
             }
-
-
         }
     }
-    if ( count == 0 )
+
+    if ( !mob && skillspell == 0 )
     {
-        sprintf ( buf, "You don't know any!\r\n" );
+        // list remembered skills
+        sprintf ( buf, "------------------------------------------------------------------------------------\r\n" );
         DYN_RESIZE ( buf );
+        sprintf ( buf, "Remembered skills:\r\n" );
+        DYN_RESIZE ( buf );
+        for ( int i = 0; i < SAVED ( ch ).remembered.size(); ++i )
+        {
+            auto r = &SAVED ( ch ).remembered[ i ];
+            if ( r->skill_spell_num == 0 )
+            {
+                sprintf ( buf, "%d. empty\r\n", i + 1 );
+                DYN_RESIZE ( buf );
+                continue;
+            }
+
+            if ( r->skill_spell_num == TYPE_UNDEFINED || IS_SPELL_CAST ( r->skill_spell_num ) )
+            {
+                sprintf ( buf, "%d. \x1B[32m%s{c0 (spell)\r\n", i + 1, r->name.c_str() );
+                DYN_RESIZE ( buf );
+                continue;
+            }
+
+            sprintf ( buf, "%d. \x1B[32m%-17s{c0[%-3d%%][%-3d%%] [L: 1 T:1]", i + 1, r->name.c_str(), r->percentage_remembered,
+                r->skill_spell_num == TYPE_UNDEFINED ? r->percentage_learned : total_chance ( ch, r->skill_spell_num ) );
+            DYN_RESIZE ( buf );
+
+            if ( FIRST_PRE ( r->skill_spell_num ) != TYPE_UNDEFINED && SECOND_PRE ( r->skill_spell_num ) != TYPE_UNDEFINED )
+            {
+                sprintf ( buf, "\x1B[1;34m  Requires: %s and %s \x1B[0;0m",
+                    skill_name ( FIRST_PRE ( r->skill_spell_num ) ),
+                    skill_name ( SECOND_PRE ( r->skill_spell_num ) ) );
+                DYN_RESIZE ( buf );
+            }
+            else if ( FIRST_PRE ( r->skill_spell_num ) != TYPE_UNDEFINED )
+            {
+                sprintf ( buf, "\x1B[1;34m  Requires: %s \x1B[0;0m", skill_name ( FIRST_PRE ( r->skill_spell_num ) ) );
+                DYN_RESIZE ( buf );
+            }
+
+            sprintf ( buf, "\r\n" );
+            DYN_RESIZE ( buf );
+        }
+    }
+    else if ( !mob && skillspell == 1 )
+    {
+        // list remembered spells
+        sprintf ( buf, "------------------------------------------------------------------------------------\r\n" );
+        DYN_RESIZE ( buf );
+        sprintf ( buf, "Remembered spells:\r\n" );
+        DYN_RESIZE ( buf );
+        for ( int i = 0; i < SAVED ( ch ).remembered.size(); ++i )
+        {
+            auto r = &SAVED ( ch ).remembered[ i ];
+            if ( r->skill_spell_num == 0 )
+            {
+                sprintf ( buf, "%d. empty\r\n", i + 1 );
+                DYN_RESIZE ( buf );
+                continue;
+            }
+
+            if ( IS_SKILL ( r->skill_spell_num ) )
+            {
+                sprintf ( buf, "%d. \x1B[33m%s{c0 (skill)\r\n", i + 1, r->name.c_str() );
+                DYN_RESIZE ( buf );
+                continue;
+            }
+
+            if ( r->skill_spell_num == TYPE_UNDEFINED )
+            {
+                sprintf ( buf, "%d. \x1B[33m%-17.17s{c0[%-3d%%][%-3d%%] [L: 1 T:1][Mana:%-4d][{cp%-11s{c0]",
+                    i + 1, r->name.c_str(), r->percentage_remembered, r->percentage_learned,
+                    r->custom_mana_cost, elemental_types[ r->custom_elemental_type ] );
+                DYN_RESIZE ( buf );
+            }
+            else
+            {
+                sprintf ( buf, "%d. \x1B[33m%-17.17s{c0[%-3d%%][%-3d%%] [L: 1 T:1][Mana:%-4d][{cp%-11s{c0]",
+                    i + 1, r->name.c_str(), r->percentage_remembered, r->percentage_learned,
+                    mag_manacost ( ch, r->skill_spell_num ), elemental_types[ elemental_type ( r->skill_spell_num ) ] );
+                DYN_RESIZE ( buf );
+            }
+
+            if ( r->skill_spell_num != TYPE_UNDEFINED )
+            {
+                if ( FIRST_PRE ( r->skill_spell_num ) != TYPE_UNDEFINED && SECOND_PRE ( r->skill_spell_num ) != TYPE_UNDEFINED )
+                {
+                    sprintf ( buf, "\x1B[1;34m  Requires: %s and %s \x1B[0;0m",
+                        skill_name ( FIRST_PRE ( r->skill_spell_num ) ),
+                        skill_name ( SECOND_PRE ( r->skill_spell_num ) ) );
+                    DYN_RESIZE ( buf );
+                }
+                else if ( FIRST_PRE ( r->skill_spell_num ) != TYPE_UNDEFINED )
+                {
+                    sprintf ( buf, "\x1B[1;34m  Requires: %s \x1B[0;0m", skill_name ( FIRST_PRE ( r->skill_spell_num ) ) );
+                    DYN_RESIZE ( buf );
+                }
+            }
+
+            sprintf ( buf, "\r\n" );
+            DYN_RESIZE ( buf );
+        }
     }
 
     page_string ( ch->desc, dynbuf, DYN_BUFFER );
@@ -455,18 +542,6 @@ void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, s
 
 ACMD ( do_practice )
 {
-    int skill_num, percent, learned, pp;
-    gold_int cig  = 0;
-    vector<Character *> mob_trainers;
-    vector<Character *>::iterator mti;
-    Character *mob;
-    int train_list = -1;
-    int remorts = MIN(REMORTS(ch), 50);
-    bool is_mikey = FALSE;
-    istringstream iss ( argument );
-    string arg;
-    vector<string> args;
-
     if ( IS_NPC ( ch ) || !IN_ROOM ( ch ) )
         return;
 
@@ -483,122 +558,155 @@ ACMD ( do_practice )
         ch->Send ( "{ccpractice <skill/spell name>{c0\r\n" );
         ch->Send ( "{ccFor example: {cCpractice magic missile{c0\r\n" );
         ch->Send ( "{cG[NOTE: You can practice with your skills and spells at a guildmaster]{c0\r\n" );
-
         return;
     }
 
-    for ( Character *p = IN_ROOM ( ch )->people; p != NULL;p = p->next_in_room ) {
-                // Going to try to remark this out and see if Mikey gets wierd or not
-        // Prom
-        //if (GET_MOB_VNUM(p) == 3007) is_mikey = TRUE;
-        if ( IS_NPC ( p ) && !p->mob_specials.teaches_skills.empty() )
-            mob_trainers.push_back ( p );
-        }
+    istringstream iss ( argument );
+    string arg;
+    vector<string> args;
 
     while ( iss >> arg )
         args.push_back ( arg );
     while ( args.size() < 3 )
         args.push_back ( "" );
 
-    if ( is_abbrev ( args[0].c_str(), "skills" ) )
+    int train_list = -1;
+    if ( is_abbrev3 ( args[0], "skills" ) )
         train_list = 0;
-    else if ( is_abbrev ( args[0].c_str(), "spells" ) )
+    else if ( is_abbrev3 ( args[0], "spells" ) )
         train_list = 1;
-    else if ( is_abbrev ( args[0].c_str(), "subskills" ) )
+    else if ( is_abbrev3 ( args[0], "subskills" ) )
         train_list = 2;
+
+    vector<Character *> mob_trainers;
+    bool middleman_present = false;
+    for ( Character *p = IN_ROOM ( ch )->people; p != NULL; p = p->next_in_room )
+    {
+        if ( IS_NPC ( p ) )
+        {
+            if ( GET_MOB_VNUM ( p ) == 10300 )
+                middleman_present = true;
+            if ( !p->mob_specials.teaches_skills.empty() )
+                mob_trainers.push_back ( p );
+        }
+    }
 
     if ( train_list != -1 )
     {
         /** In the future, perhaps have it so that mobs can teach subskills too? - Mord **/
-        if ( train_list == 2 || mob_trainers.empty() )
-        {
+        if ( train_list == 2 )
             list_skills ( ch, train_list, NULL, "", "" );
-            return;
-        }
         else
         {
-            for ( mti = mob_trainers.begin();mti != mob_trainers.end();mti++ )
-                list_skills ( ch, train_list, *mti, args[1], args[2] );
+            if ( mob_trainers.empty() )
+                ch->Send ( "There are no trainers available here.\r\n" );
+            else
+                for ( const auto &mti : mob_trainers )
+                    list_skills ( ch, train_list, mti, args[1], args[2] );
         }
         return;
     }
 
-    learned = IRANGE ( 30, ( 20* ( TIERNUM ) ), 80 );
-    skill_num = find_skill_num ( argument );
-
-    if ( mob_trainers.empty() )
+    if ( GET_PRACTICES ( ch ) <= 0 )
     {
-        ch->Send ( "You can't train that here, there are no trainers available." );
+        ch->Send ( "You do not seem to be able to practice now.\r\n" );
+        return ;
+    }
+
+    int skill_num = find_skill_num ( argument );
+
+    // is the skill/spell remembered?
+    remembered_skill_spell *rem = nullptr;
+    for ( auto &r : SAVED(ch).remembered )
+    {
+        if ( r.skill_spell_num == skill_num && r.percentage_remembered == 100 &&
+             is_abbrev3 ( args[0], r.name ) )
+        {
+            rem = &r;
+            break;
+        }
+    }
+
+    if ( rem == nullptr && !knows_spell ( ch, skill_num ) )
+    {
+        ch->Send ( "You do not know of that %s.\r\n", IS_SKILL ( skill_num ) ? "skill" : "spell" );
         return;
     }
-    else if ( mob_trainers.size() == 1 )
+
+    int learned = IRANGE ( 30, ( 20* ( TIERNUM ) ), 80 );
+    if ( GET_SKILL ( ch, skill_num ) >= learned ||
+        ( rem != nullptr && rem->percentage_learned >= learned ) )
     {
-        mob = mob_trainers[0];
-        if ((is_mikey && GET_SKILL(ch, skill_num) < 2) || (!is_mikey &&  !can_teach_skill ( mob, skill_num ) ))
+        ch->Send ( "You can't train that skill any further for now, come back when you remort.\r\n" );
+        return;
+    }
+
+    if ( ( skill_num != -1 && mob_trainers.empty() ) ||
+         ( skill_num == -1 && rem != nullptr && !middleman_present ) )
+    {
+        ch->Send ( "You can't train that here, there are no trainers available.\r\n" );
+        return;
+    }
+    else if ( rem == nullptr && mob_trainers.size() == 1 )
+    {
+        if ( !can_teach_skill ( mob_trainers[0], skill_num ) )
         {
-            act ( "$N says 'I'm not skilled in that.  You must find someone else to teach you it.'", FALSE, ch, 0, mob, TO_CHAR );
+            act ( "$N says 'I'm not skilled in that.  You must find someone else to teach you it.'", FALSE, ch, 0, mob_trainers[0], TO_CHAR );
             return;
         }
     }
-    else
+    else if ( rem == nullptr )
     {
         bool can = false;
-        for ( mti = mob_trainers.begin();can == false && mti != mob_trainers.end();mti++ )
-            if ( can_teach_skill ( *mti, skill_num ) )
+        for ( const auto &mti : mob_trainers )
+            if ( can_teach_skill ( mti, skill_num ) )
                 can = true;
-        if ( (is_mikey && GET_SKILL(ch, skill_num) < 2) || (!is_mikey && can == false ))
+        if ( !can )
         {
             act ( "Nobody here is skilled in that.  You must find someone else to teach you it.", FALSE, ch, 0, NULL, TO_CHAR );
             return;
         }
     }
-    if ( skill_num < 1 ||
-            !knows_spell ( ch, skill_num ) )
-    {
-        ch->Send ( "You do not know of that %s.\r\n", SPLSKL ( ch ) );
-        return;
-    }
-    else if ( GET_SKILL ( ch, skill_num ) >= learned )
-    {
-        *ch << "You can't train that skill any further for now, come back when you remort.\r\n";
-        return;
-    }
-    else if ( GET_PRACTICES ( ch ) <= 0 )
-    {
-        *ch << "You do not seem to be able to practice now.\r\n";
-        return ;
-    }
 
     //pp = MIN(MAXGAIN(ch), MAX(MINGAIN(ch), int_app[GET_INT(ch)].learn));
-    pp = MAX ( 2, ( ( GET_INT ( ch ) + GET_WIS ( ch ) - 20 ) *40+5 ) /240 + 2 );
+    int pp = MAX ( 2, ( ( GET_INT ( ch ) + GET_WIS ( ch ) - 20 ) *40+5 ) /240 + 2 );
 
-    percent = GET_SKILL ( ch, skill_num );
-    /* Cost In Gold */
-    cig = ( ( percent*4000 ) + ( remorts * 1000 ) + ( GET_LEVEL ( ch ) * 1000 * current_class_is_tier_num ( ch ) ) + ( spell_info[skill_num].min_level * 1000 ) ) * pp;
+    int percent = GET_SKILL ( ch, skill_num );
+    if ( rem != nullptr )
+        percent = rem->percentage_learned;
+
+    int remorts = MIN ( REMORTS ( ch ), 50 );
+    gold_int cig; /* Cost In Gold */
+    if ( rem == nullptr )
+        cig = ( ( percent*4000 ) + ( remorts * 1000 ) + ( GET_LEVEL ( ch ) * 1000 * current_class_is_tier_num ( ch ) ) + ( spell_info[skill_num].min_level * 1000 ) ) * pp;
+    else
+        cig = ( ( percent*4000 ) + ( remorts * 1000 ) + ( GET_LEVEL ( ch ) * 1000 * current_class_is_tier_num ( ch ) ) + 1000 ) * pp;
+
     if ( remorts > 2 && ch->Gold ( 0, GOLD_HAND ) < cig )
     {
         ch->Send ( "You need at least %lld gold coins to pay for practicing that.\r\n", cig );
         return;
     }
+
     percent += pp;
+    if ( rem == nullptr )
+        SET_SKILL ( ch, skill_num, MIN ( learned, percent ) );
+    else
+        rem->percentage_learned = MIN ( learned, percent );
 
-
-    SET_SKILL ( ch, skill_num, MIN ( learned, percent ) );
-    int total_perc = total_chance ( ch, skill_num );
-
+    int total_perc = total_chance ( ch, skill_num, rem == nullptr ? "" : rem->name );
     if ( REMORTS ( ch ) > 2 )
     {
         ch->Gold ( -cig, GOLD_HAND );
         ch->Send ( "You pay %lld gold and a practice point to train your skill to %d%%.\r\n", cig, total_perc );
     }
     else
-    {
         ch->Send ( "You pay a practice point and train your skill up to %d%%.\r\n", total_perc );
-    }
     GET_PRACTICES ( ch )--;
 
-    if ( GET_SKILL ( ch, skill_num ) >= learned )
-        *ch << "You cannot train that any further for now. \r\nAlthough it may improve through use.\r\n";
+    if ( GET_SKILL ( ch, skill_num ) >= learned ||
+         ( rem != nullptr && rem->percentage_learned >= learned ) )
+        ch->Send ( "You cannot train that any further for now. \r\nAlthough it may improve through use.\r\n" );
 
     return;
 }

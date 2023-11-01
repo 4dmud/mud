@@ -257,7 +257,6 @@ EVENTFUNC(points_event)
  */
 void alter_hit(Character *ch, int amount)
 {
-
   GET_HIT(ch) = MIN(GET_HIT(ch) - amount, GET_MAX_HIT(ch));
 
   /* take off old event, create updated event */
@@ -297,30 +296,26 @@ void alter_hit(Character *ch, int amount)
  */
 void alter_mana(Character *ch, int amount)
 {
+    GET_MANA(ch) = MIN(GET_MANA(ch) - amount, GET_MAX_MANA(ch));
 
+    /* take off old event, create updated event */
+    if ( GET_POINTS_EVENT ( ch, REGEN_MANA ) != NULL )
+        event_cancel ( GET_POINTS_EVENT ( ch, REGEN_MANA ) );
+    GET_POINTS_EVENT ( ch, REGEN_MANA ) = NULL;
 
-  GET_MANA(ch) = MIN(GET_MANA(ch) - amount, GET_MAX_MANA(ch));
-  /* take off old event, create updated event */
-  if (GET_POINTS_EVENT(ch, REGEN_STAMINA) != NULL)
-    event_cancel(GET_POINTS_EVENT(ch, REGEN_STAMINA));
-  GET_POINTS_EVENT(ch, REGEN_STAMINA) = NULL;
-
-  if (!GET_POINTS_EVENT(ch, REGEN_MANA)
-      && (GET_MANA(ch) < GET_MAX_MANA(ch)))
-  {
-
-    /* make sure the character isn't dying */
-    if (GET_POS(ch) >= POS_STUNNED)
+    if ( !GET_POINTS_EVENT ( ch, REGEN_MANA ) && GET_MANA ( ch ) < GET_MAX_MANA ( ch ))
     {
-      struct regen_event_obj *regen = NULL;
-      long t;
-      int gain;
-      regen = new regen_event_obj(ch, REGEN_MANA);
-      gain = (mana_gain(ch));
-      t = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
-      GET_POINTS_EVENT(ch, REGEN_MANA) = event_create(points_event, regen, t, EVENT_TYPE_REGEN);
+        /* make sure the character isn't dying */
+        if ( GET_POS(ch) >= POS_STUNNED )
+        {
+            struct regen_event_obj *regen = new regen_event_obj ( ch, REGEN_MANA );
+            long t;
+            int gain;
+            gain = ( mana_gain(ch) );
+            t = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
+            GET_POINTS_EVENT ( ch, REGEN_MANA ) = event_create ( points_event, regen, t, EVENT_TYPE_REGEN );
+        }
     }
-  }
 }
 
 
@@ -329,8 +324,6 @@ void alter_mana(Character *ch, int amount)
  */
 void alter_move(Character *ch, int amount)
 {
-
-
   GET_MOVE(ch) = MIN(GET_MOVE(ch) - amount, GET_MAX_MOVE(ch));
 
   /* take off old event, create updated event */
@@ -359,12 +352,10 @@ void alter_move(Character *ch, int amount)
 }
 
 /*
- * subtracts amount of moves from ch's current and starts points event
+ * subtracts amount of stamina from ch's current and starts points event
  */
 void alter_stamina(Character *ch, int amount)
 {
-
-
   GET_STAMINA(ch) = MIN(GET_STAMINA(ch) - amount, GET_MAX_STAMINA(ch));
 
   /* take off old event, create updated event */

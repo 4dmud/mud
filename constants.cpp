@@ -160,7 +160,7 @@ const char * dimension_types[] =
     ""
 };
 
-const char *elemental_types[] =
+const vector<const char *> elemental_types =
 {
     "none",
     "fire",
