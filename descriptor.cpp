@@ -65,7 +65,6 @@
 #include "ident.h"
 #include "auction.h"
 #include "descriptor.h"
-#include "linkedlist.h"
 
 extern struct txt_block *bufpool;  /* pool of large output buffers */
 extern int buf_largecount;       /* # of large buffers which exist */
@@ -427,12 +426,12 @@ Descriptor::~Descriptor() {
         this->original->desc = NULL;
 
     /* Clear the command history. */
-    if (this->history) {
-        for (unsigned int cnt = 0; cnt < HISTORY_SIZE; cnt++)
-            if (this->history[cnt]) {
-                free(this->history[cnt]);
-                this->history[cnt] = NULL;
-            }
+    for (unsigned int cnt = 0; cnt < HISTORY_SIZE; cnt++)
+    {
+        if (this->history[cnt]) {
+            free(this->history[cnt]);
+            this->history[cnt] = NULL;
+        }
     }
 
     if (this->showstr_head) {

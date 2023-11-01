@@ -36,7 +36,7 @@ ASUB(sub_throttle);
 int strangle_affect(Character *ch, Character *vict, int num);
 /* extern procedures */
 int mag_manacost(Character *ch, int spellnum);
-void improve_skill(Character *ch, int skill);
+void improve_skill(Character *ch, int skill, remembered_skill_spell *rem = nullptr);
 void make_focus(Character *ch, int type, struct obj_data *o);
 int set_task(Character *ch, int task);
 //string tolower (const string & s);

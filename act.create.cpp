@@ -130,7 +130,7 @@ int save_forest ( void );
 /* extern procedures */
 void copyover ( Character* ch );
 int mag_manacost ( Character *ch, int spellnum );
-void improve_skill ( Character *ch, int skill );
+void improve_skill ( Character *ch, int skill, remembered_skill_spell *rem = nullptr );
 ACTION ( thing_lumberjack );
 ACTION ( thing_manifest );
 ACTION ( thing_singwood );
@@ -358,7 +358,17 @@ ASKILL ( skill_brew )
         ch->Send ( "You do not know how to make that potion!\r\n" );
         return 0;
     }
-    if ( GET_SKILL ( ch, potion ) == 0 )
+
+    int skill = GET_SKILL ( ch, potion );
+    if ( skill == 0 )
+    {
+        for ( const auto &r : SAVED(ch).remembered )
+        {
+            if ( r.skill_spell_num == potion )
+                skill = r.percentage_learned;
+        }
+    }
+    if ( skill == 0 )
     {
         ch->Send ( "You are unfamiliar brewing %s.\r\n", skill_name ( potion ) );
         return 0;

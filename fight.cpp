@@ -349,7 +349,8 @@ void update_affects ( struct obj_data *obj );
 
 /* local functions */
 void delay_die ( Character *ch, Character *killer );
-int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam = 0 );
+int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam = 0,
+                   remembered_skill_spell *rem = nullptr );
 void make_half ( Character *ch );
 void make_head ( Character *ch );
 int class_min_strike ( Character *ch );
@@ -371,7 +372,7 @@ char *replace_string ( const char *str, const char *weapon_singular,
                        const char *weapon_plural, const char *strike_sing,
                        const char *strike_plural, const char *hitcount_word );
 void perform_violence ( void );
-void improve_skill ( Character *ch, int skill );
+void improve_skill ( Character *ch, int skill, remembered_skill_spell *rem = nullptr );
 int compute_armor_class ( Character *ch );
 void send_not_to_spam ( const char *buf, Character *ch,
                         Character *victim, struct obj_data *weap,
@@ -380,13 +381,17 @@ void send_not_to_spam ( const char *buf, Character *ch,
 EVENTFUNC ( fight_event );
 int calc_fight_speed ( Character* ch );
 long fight_timeout_calc ( Character* ch, short type, short number );
-int fight_event_hit ( Character* ch, Character* vict, short type, short number );
+int fight_event_hit ( Character* ch, Character* vict, short type, short number,
+                      remembered_skill_spell *rem = nullptr );
 int fe_group_damage ( Character* ch, Character* vict, int damage, int w_type );
-int fe_after_damage ( Character* ch, Character* vict, int damage, int w_type );
-int fe_solo_damage ( Character* ch, Character* vict, int damage, int w_type );
+int fe_after_damage ( Character* ch, Character* vict, int damage, int w_type,
+                      remembered_skill_spell *rem = nullptr );
+int fe_solo_damage ( Character* ch, Character* vict, int damage, int w_type,
+                     remembered_skill_spell *rem);
 
 
-int evade_hit_check ( Character *ch, Character *vict, int w_type );
+int evade_hit_check ( Character *ch, Character *vict, int w_type,
+                      remembered_skill_spell *rem = nullptr );
 int one_hit_damage ( Character *ch, int type );
 int speed_update ( Character *ch );
 void kill_list ( Character *ch, Character *vict );
@@ -419,11 +424,11 @@ float area_damage_multi ( int area );
 int find_part_area ( int part );
 int chance_hit_part ( Character *ch, int part );
 void start_fighting_delay ( Character *vict, Character *ch );
-int steal_affects ( Character *ch,int dam, int w_type, Character *vict );
+int steal_affects ( Character *ch,int dam, int w_type, Character *vict,
+                    remembered_skill_spell *rem = nullptr );
 int valid_perc ( Character *ch );
 void gain_group_exp ( Character *ch, gold_int gain );
-int fe_special_hit ( Character* ch, Character* vict, int type );
-float skill_type_multi ( Character *ch, Character *vict, int type );
+int fe_special_hit ( Character* ch, Character* vict, int type, remembered_skill_spell *rem );
 float atk_chance_multi ( int acm );
 int num_casting ( Character *ch );
 void death_room ( Character *ch );
@@ -556,47 +561,45 @@ float has_staff ( Character *ch )
 }
 /*Affects from spells should change these dice*/
 
-float has_staff_multi ( Character *ch, int wtype)
+float has_staff_multi ( Character *ch, int wtype, remembered_skill_spell *rem = nullptr )
 {
     if (!ch)
         return 1.0;
        // Insert Logic here for elemental_type(wtype) vs staff's var for elements
-          if (GET_EQ(ch, WEAR_FOCUS)) {
-    if ((elemental_type(wtype) == ELEM_FIRE) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_FIRE_FOCUS))) {
+    if (GET_EQ(ch, WEAR_FOCUS))
+    {
+        if ((elemental_type(wtype, rem) == ELEM_FIRE) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_FIRE_FOCUS))) {
         return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
 
-        if ((elemental_type(wtype) == ELEM_ICE) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_ICE_FOCUS))) {
+        if ((elemental_type(wtype, rem) == ELEM_ICE) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_ICE_FOCUS))) {
         return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
 
-        if ((elemental_type(wtype) == ELEM_EARTH) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_EARTH_FOCUS))) {
+        if ((elemental_type(wtype, rem) == ELEM_EARTH) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_EARTH_FOCUS))) {
         return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
 
-       if ((elemental_type(wtype) == ELEM_WATER) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_WATER_FOCUS))) {
+        if ((elemental_type(wtype, rem) == ELEM_WATER) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_WATER_FOCUS))) {
         return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
 
-       if ((elemental_type(wtype) == ELEM_ELEC) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_ELEC_FOCUS))) {
+        if ((elemental_type(wtype, rem) == ELEM_ELEC) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_ELEC_FOCUS))) {
         return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
 
-       if ((elemental_type(wtype) == ELEM_AIR) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_AIR_FOCUS))) {
+        if ((elemental_type(wtype, rem) == ELEM_AIR) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_AIR_FOCUS))) {
         return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
 
-       if ((elemental_type(wtype) == ELEM_SPIRIT) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_SPIRIT_FOCUS))) {
+        if ((elemental_type(wtype, rem) == ELEM_SPIRIT) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_SPIRIT_FOCUS))) {
         return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
 
-      if ((elemental_type(wtype) == ELEM_MIND) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_MIND_FOCUS))) {
+        if ((elemental_type(wtype, rem) == ELEM_MIND) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_MIND_FOCUS))) {
         return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
 
-       if ((elemental_type(wtype) == ELEM_DEATH) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_DEATH_FOCUS))) {
+        if ((elemental_type(wtype, rem) == ELEM_DEATH) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_DEATH_FOCUS))) {
         return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
 
-       else
-    return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS));
-
-
-
-     }
-       else
-       return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS));
+        else
+            return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS));
+    }
+    else
+        return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS));
 }
 
 int spell_size_dice ( Character *ch )
@@ -1270,16 +1273,18 @@ int next_attack_type ( Character *ch )
 }
 
 
-void skill_attack ( Character *ch, Character *vict, int skill, int pass )
+void skill_attack ( Character *ch, Character *vict, int skill, int pass,
+                    remembered_skill_spell *rem = nullptr )
 {
     if ( pass )
     {
         if ( !FIGHTING ( ch ) )
-            fight_event_hit ( ch, vict, 0, skill );
+            fight_event_hit ( ch, vict, 0, skill, rem );
         else if ( GET_FIGHT_EVENT ( ch ) == NULL )
-            fight_event_hit ( ch, vict, 0, skill );
-        else if ( IS_SPELL_CAST ( skill ) && ( IS_SET ( spell_info[skill].routines, MAG_AREAS ) || GET_SPELL_DIR ( ch ) != NOWHERE ) )
-            fight_event_hit ( ch, vict, 0, skill );
+            fight_event_hit ( ch, vict, 0, skill, rem );
+        else if ( ( rem != nullptr && !IS_SKILL ( rem->skill_spell_num ) ) ||
+                  ( IS_SPELL_CAST ( skill ) && ( IS_SET ( spell_info[skill].routines, MAG_AREAS ) || GET_SPELL_DIR ( ch ) != NOWHERE ) ) )
+            fight_event_hit ( ch, vict, 0, skill, rem );
         else
         {
             if ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) )
@@ -1295,8 +1300,7 @@ void skill_attack ( Character *ch, Character *vict, int skill, int pass )
         }
     }
     else
-        fe_after_damage ( ch, vict, 0, skill );
-
+        fe_after_damage ( ch, vict, 0, skill, rem );
 }
 
 
@@ -1367,12 +1371,15 @@ float race_dam_mod ( int race, int magic )
 }
 
 
-int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
+int modify_dam ( int dam, Character *ch, Character *vict , int w_type,
+                 remembered_skill_spell *rem )
 {
     float damage = dam;
     Character *k = NULL;
     struct follow_type *f;
     int skill_cost ( int h, int m, int v, Character *ch );
+    if ( rem != nullptr )
+        w_type = rem->skill_spell_num;
     int wep = IS_WEAPON ( w_type );
     //  Character *mount = (RIDING(ch) && (HERE(ch, RIDING(ch)))) ? RIDING(ch) : NULL;
 
@@ -1412,7 +1419,8 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
     if ( !IS_NPC ( ch ) )
     {
         int remorts = MIN ( REMORTS ( ch ), 50 );
-        damage *= race_dam_mod ( GET_RACE ( ch ), IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) );
+        damage *= race_dam_mod ( GET_RACE ( ch ), ( rem != nullptr && !IS_SKILL ( rem->skill_spell_num ) ) ||
+                        IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) );
         damage += ( ( float ) damage * ( ( float ) ( remorts * 0.005 ) ) );
     }
 
@@ -1424,7 +1432,6 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
         }
         else
         {
-
             damage -= damage/3;
 
             vict->Send ( "You were braced against the damage!\r\n" );
@@ -1433,21 +1440,18 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
     if ( !IS_NPC ( vict ) && GET_COND ( vict, DRUNK ) > 10 && damage > 5 )
         damage -= damage/5;
 
-
-
     if ( ( GET_ALIGNMENT ( ch ) > 350 ) && affected_by_spell ( vict, SPELL_PROT_FROM_GOOD ) )
         damage -= damage/4;
     else if ( ( GET_ALIGNMENT ( ch ) < -350 ) && affected_by_spell ( vict, SPELL_PROT_FROM_EVIL ) )
         damage -= damage/4;
 
-
-    if ( ( elemental_type ( w_type ) == ELEM_FIRE || affected_by_spell ( ch, SPELL_MIND_FIRE ) ) &&
-        (AFF_FLAGGED(vict, AFF_RESIST_FIRE) || affected_by_spell ( vict, SPELL_PROT_FIRE )) )
+    if ( ( elemental_type ( w_type, rem ) == ELEM_FIRE || affected_by_spell ( ch, SPELL_MIND_FIRE ) ) &&
+        ( AFF_FLAGGED ( vict, AFF_RESIST_FIRE ) || affected_by_spell ( vict, SPELL_PROT_FIRE )) )
         damage -= damage/4;
-    else if ( ( elemental_type ( w_type ) == ELEM_ICE || affected_by_spell ( ch, SPELL_MIND_ICE ) ) && (AFF_FLAGGED(vict, AFF_RESIST_COLD) ||
-            affected_by_spell ( vict, SPELL_PROT_COLD )) )
+    else if ( ( elemental_type ( w_type, rem ) == ELEM_ICE || affected_by_spell ( ch, SPELL_MIND_ICE ) ) &&
+        ( AFF_FLAGGED ( vict, AFF_RESIST_COLD ) || affected_by_spell ( vict, SPELL_PROT_COLD )) )
         damage -= damage/4;
-        else if (elemental_type (w_type) == ELEM_ELEC && AFF_FLAGGED(vict, AFF_RESIST_ELEC))
+    else if ( elemental_type ( w_type, rem ) == ELEM_ELEC && AFF_FLAGGED ( vict, AFF_RESIST_ELEC ) )
         damage -= damage/4;
 
 
@@ -1456,15 +1460,13 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
         if ( !DEAD ( vict ) && HERE ( f->follower,ch ) && FIGHTING ( f->follower ) == vict )
             damage -= damage/10;
 
-
-
     /**TODO: this needs to be fixed up and finished (currently crashes us)**/
     /** FIXED - Nov 9th 08 Mord */
 
-    if ( immune_to ( vict, elemental_type ( w_type ) ) )
-        damage = 0;
+    damage += ( damage * ( resist_elem ( vict, elemental_type ( w_type, rem ) ) / 100 ) );
 
-    damage += ( damage * ( resist_elem ( vict, elemental_type ( w_type ) / 100 ) ) );
+    if ( immune_to ( vict, elemental_type ( w_type, rem ) ) )
+        damage = 0;
 
     if ( AFF_FLAGGED ( vict, AFF_SANCTUARY ) )
     {
@@ -1475,7 +1477,7 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
             act ( "You move in past $N's white aura!", FALSE, ch, 0, vict, TO_CHAR );
         }
         else
-            damage *= ( 0.60 );
+            damage *= 0.60;
     }
 
     if ( wep && AFF_FLAGGED ( vict, AFF_SHIELD ) )
@@ -1491,7 +1493,7 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
         damage -= ( damage/5 ); //20% reduction
 
 
-    if ( ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) &&
+    if ( ( ( rem != nullptr && !IS_SKILL ( rem->skill_spell_num ) ) || IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) &&
             ( AFF_FLAGGED ( vict, AFF_SHIELD_MANA ) || AFF_FLAGGED ( vict, AFF_BERSERK ) ) )
         damage /= 2;
 
@@ -1532,43 +1534,43 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
     damage -= ( ( 100 - valid_perc ( ch ) ) * damage ) /200;
 #endif
 
-        /* Ethos System, provides bonuses for being in alignment and penalites
-            for being out of alignment. in_align is a variable to easily handle the "alignment"
-                   logic. Not globalizing this because currently in_align is only really being considered
-                   in the fight code. */
+    /*  Ethos System, provides bonuses for being in alignment and penalites
+        for being out of alignment. in_align is a variable to easily handle the "alignment"
+        logic. Not globalizing this because currently in_align is only really being considered
+        in the fight code. */
 
-         sh_int  in_align = 0;
-        if (( ( GET_ALIGNMENT ( ch ) > 350) && (GET_ETHOS(ch) == 1))  && (GET_ALIGNMENT(vict) < -350))
-                 in_align = 1; //good
+    int in_align = 0;
+    if (( ( GET_ALIGNMENT ( ch ) > 350) && (GET_ETHOS(ch) == 1))  && (GET_ALIGNMENT(vict) < -350))
+        in_align = 1; //good
 
-    if (((GET_ALIGNMENT(ch) < 350) && (GET_ALIGNMENT(ch) > -350)) && ((GET_ALIGNMENT(vict) > 350) || (GET_ALIGNMENT(vict) < -350)))
-            in_align = 2; //neutral
+    if (((GET_ALIGNMENT(ch) < 350) && (GET_ALIGNMENT(ch) > -350)) &&
+        ((GET_ALIGNMENT(vict) > 350) || (GET_ALIGNMENT(vict) < -350)))
+        in_align = 2; //neutral
 
-        if (((GET_ALIGNMENT(ch) < -350) && (GET_ETHOS(ch) == 3))  && (GET_ALIGNMENT(vict) > 350))
-                    in_align = 3; //evil
-
-
-               /* Here we check if in_align is greater than zero so that we know their align actually matches
-                  but we aren't checking whether they're good or evil. If we wanted to though we could query
-                  if in_align == 2 and provide bonuses for evil and bonuses for good (say holy vs unholy attack
-                  types or the like. */
-
-        if (in_align)
-                damage += damage/10;
-
-        if (!in_align)
-                damage -= damage/10;
+    if (((GET_ALIGNMENT(ch) < -350) && (GET_ETHOS(ch) == 3))  && (GET_ALIGNMENT(vict) > 350))
+        in_align = 3; //evil
 
 
-         /* Champion System (BBV Replacement) by Once.  Here we're going to give the Champion 10% more damage
-                while he still holds the throne. */
-                if (GET_IDNUM(ch) == CHAMPION)
-                damage += damage/10;
+    /*  Here we check if in_align is greater than zero so that we know their align actually matches
+        but we aren't checking whether they're good or evil. If we wanted to though we could query
+        if in_align == 2 and provide bonuses for evil and bonuses for good (say holy vs unholy attack
+        types or the like. */
+
+    if (in_align)
+        damage += damage/10;
+    else
+        damage -= damage/10;
 
 
+    /*  Champion System (BBV Replacement) by Once.  Here we're going to give the Champion 10% more damage
+        while he still holds the throne. */
+
+    if (GET_IDNUM(ch) == CHAMPION)
+        damage += damage/10;
 
     return ( int ) damage;
 }
+
 int fighter_damroll ( Character *ch )
 {
     int dam = 0;
@@ -1924,7 +1926,8 @@ long fight_timeout_calc ( Character* ch, short type, short number )
     return ( long ) IRANGE ( 1, FTOI ( to_ret ), PULSES_PER_FIGHT );
 }
 
-int fight_event_hit ( Character* ch, Character* vict, short type, short num )
+int fight_event_hit ( Character* ch, Character* vict, short type, short num,
+                      remembered_skill_spell *rem )
 {
     Character *k;
     struct follow_type *f;
@@ -1942,7 +1945,7 @@ int fight_event_hit ( Character* ch, Character* vict, short type, short num )
     if ( AFF_FLAGGED ( ch, AFF_INVISIBLE ) )
     {
         ch->appear();
-        *ch << "You slowly fade into existence.\r\n";
+        ch->Send ( "You slowly fade into existence.\r\n" );
     }
 
     if ( RIDING ( ch ) && RIDING ( ch ) == vict )
@@ -2090,7 +2093,7 @@ int fight_event_hit ( Character* ch, Character* vict, short type, short num )
         }
     }
 
-    if ( IS_WEAPON ( num ) || IS_SPELL_ATK ( num ) || num == TYPE_UNDEFINED )
+    if ( IS_WEAPON ( num ) || IS_SPELL_ATK ( num ) || ( num == TYPE_UNDEFINED && rem == nullptr ) )
     {
 
         switch ( type )
@@ -2126,7 +2129,7 @@ int fight_event_hit ( Character* ch, Character* vict, short type, short num )
     }
     else
     {
-        return fe_special_hit ( ch, vict, num );
+        return fe_special_hit ( ch, vict, num, rem );
     }
 
     return 0;
@@ -2148,12 +2151,12 @@ int melee_type_dam ( Character *ch, Character *vict, int attack_chance, int weps
         dam = str_app[STRENGTH_APPLY_INDEX ( ch ) ].todam;
         if ( second ) //hitting with secondary weapon
         {
-            dam += dice ( size_dice_wep ( ch, WEAPON_SECO_AFF ), num_dice_wep ( ch, WEAPON_SECO_AFF ) );
+            dam += dice ( num_dice_wep ( ch, WEAPON_SECO_AFF ), size_dice_wep ( ch, WEAPON_SECO_AFF ) );
             if ( !number ( 0, 100 ) )
                 improve_skill ( ch, SKILL_DUAL );
         }
         else  //hitting with primary weapon
-            dam +=  dice ( size_dice_wep ( ch, WEAPON_PRIM_AFF ), num_dice_wep ( ch, WEAPON_PRIM_AFF ) );
+            dam +=  dice ( num_dice_wep ( ch, WEAPON_PRIM_AFF ), size_dice_wep ( ch, WEAPON_PRIM_AFF ) );
     }
     else
         dam += dice ( ch->mob_specials.damnodice,ch->mob_specials.damsizedice );
@@ -2257,7 +2260,7 @@ int fe_melee_hit ( Character* ch, Character* vict,
     else
         attack_chance = attack_roll ( ch, vict, w_type );
 
-    if ( evade_hit_check ( ch, vict, w_type ) ||attack_chance == 0 )
+    if ( evade_hit_check ( ch, vict, w_type ) || attack_chance == 0 )
         damage_ret = fe_after_damage ( ch, vict, 0, w_type );
     else /*yep, landing a hit*/
     {
@@ -2274,12 +2277,12 @@ int fe_melee_hit ( Character* ch, Character* vict,
 
 }
 
-int fe_special_hit ( Character* ch, Character* vict, int type )
+int fe_special_hit ( Character* ch, Character* vict, int type, remembered_skill_spell *rem )
 {
     int dam = 0, attack_chance = 3, damage_ret;
     GET_ATTACK_POS ( ch ) = TYPE_UNDEFINED;
 
-    if ( evade_hit_check ( ch, vict, type ) )
+    if ( evade_hit_check ( ch, vict, type, rem ) )
     {
         if ( type == SKILL_BASH )
         {
@@ -2290,13 +2293,13 @@ int fe_special_hit ( Character* ch, Character* vict, int type )
     }
     else
     {
-        if ( IS_SKILL ( type ) )
+        if ( ( rem != nullptr && IS_SKILL ( rem->skill_spell_num ) ) || IS_SKILL ( type ) )
         {
             dam = melee_type_dam ( ch, vict, attack_chance, has_weapon ( ch ), SINGLE_WEP );
         }
-        else if ( IS_SPELL_CAST ( type ) )
+        else if ( ( rem != nullptr && !IS_SKILL ( rem->skill_spell_num ) ) || IS_SPELL_CAST ( type ) )
         {
-            dam += dice ( spell_size_dice ( ch ), spell_num_dice ( ch ) );
+            dam += dice ( spell_num_dice ( ch ), spell_size_dice ( ch ) );
 
             if ( IS_NPC ( ch ) )
                 dam += dice ( ch->mob_specials.damnodice, ch->mob_specials.damsizedice );
@@ -2305,25 +2308,26 @@ int fe_special_hit ( Character* ch, Character* vict, int type )
                 dam += fused_dambonus ( ch );
             else dam += caster_damroll ( ch );
 
-            if ( has_staff_multi ( ch, type ) > 0 )
-                dam = FTOI ( dam * has_staff_multi ( ch, type ) );
+            int hsm = has_staff_multi ( ch, type );
+            if ( hsm > 0 )
+                dam = FTOI ( dam * hsm );
 
             dam = FTOI ( dam * pos_multi ( GET_POS ( vict ) ) );
 
             dam = FTOI ( dam * atk_chance_multi ( attack_chance ) );
         }
 
-        dam = FTOI ( dam * ( GET_SKILLMULTI ( ch ) = skill_type_multi ( ch, vict, type ) ) );
+        dam = FTOI ( dam * ( GET_SKILLMULTI ( ch ) = skill_type_multi ( ch, vict, type, rem ) ) );
 
         // Make sure skills/spells actually do damage so that the right messages will be shown
         if ( dam < 10 ) dam = 10;
 
-        damage_ret = fe_solo_damage ( ch, vict, dam, type ); //change this in future?
+        damage_ret = fe_solo_damage ( ch, vict, dam, type, rem ); //change this in future?
     }
     if ( damage_ret != -1 )
         hitprcnt_mtrigger ( vict );
     if ( !number ( 0, 20 ) )
-        improve_skill ( vict, type );
+        improve_skill ( vict, type, rem );
 
     return damage_ret;
 }
@@ -2346,7 +2350,7 @@ int fe_spell_hit ( Character* ch, Character* vict, int type )
         damage_ret = fe_after_damage ( ch, vict, 0, type );
     else
     {
-        dam += dice ( spell_size_dice ( ch ), spell_num_dice ( ch ) );
+        dam += dice ( spell_num_dice ( ch ), spell_size_dice ( ch ) );
 
         if ( IS_NPC ( ch ) )
             dam += dice ( ch->mob_specials.damnodice, ch->mob_specials.damsizedice );
@@ -2395,20 +2399,25 @@ float atk_chance_multi ( int acm )
    takes those affects into account before the calling.
 */
 
-int fe_solo_damage ( Character* ch, Character* vict,
-                     int damage, int w_type )
+int fe_solo_damage ( Character* ch, Character* vict, int damage, int w_type,
+                     remembered_skill_spell *rem )
 {
     if ( ch == NULL || vict == NULL )
-        return ( -1 );
+        return -1;
 
     if ( damage == 0 ) // no damage:: lets not mess with more equations
-        return fe_after_damage ( ch, vict, damage, w_type );
+        return fe_after_damage ( ch, vict, damage, w_type, rem );
 
-    if ( ( IS_WEAPON ( w_type ) || IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) && shield_check ( ch, vict, SHIELD_BLOCK, w_type, damage ) )
-        return fe_after_damage ( ch, vict, 0, w_type );
+    if ( rem == nullptr )
+    {
+        if ( ( IS_WEAPON ( w_type ) || IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) &&
+               shield_check ( ch, vict, SHIELD_BLOCK, w_type, damage ) )
+            return fe_after_damage ( ch, vict, 0, w_type );
+    }
+    else if ( !IS_SKILL ( rem->skill_spell_num ) && shield_check ( ch, vict, SHIELD_BLOCK, w_type, damage, rem ) )
+        return fe_after_damage ( ch, vict, 0, w_type, rem );
 
-
-    damage = modify_dam ( damage, ch, vict, w_type );
+    damage = modify_dam ( damage, ch, vict, w_type, rem );
 #if defined(EXP_GAIN_SYSTEM_1)
     if ( IS_NPC ( vict ) )
         damage = IRANGE ( 0, damage, MAX_MOB_DAM );
@@ -2420,7 +2429,7 @@ int fe_solo_damage ( Character* ch, Character* vict,
             damage = IRANGE ( 0, damage, MAX_PLAYER_DAM );
     }
 #endif
-    return fe_after_damage ( ch, vict, damage, w_type );
+    return fe_after_damage ( ch, vict, damage, w_type, rem );
 }
 #if defined(EXP_GAIN_SYSTEM_1)
 Character *find_next_target ( Character *ch )
@@ -2717,7 +2726,8 @@ of item.
 
 
 */
-int steal_affects ( Character *ch, int dam, int w_type, Character *vict )
+int steal_affects ( Character *ch, int dam, int w_type, Character *vict,
+                    remembered_skill_spell *rem )
 {
     int ret_val = 0;
     float hp = 0, ma = 0, mv = 0;
@@ -2728,7 +2738,7 @@ int steal_affects ( Character *ch, int dam, int w_type, Character *vict )
     if ( ! ( ( GET_ALIGNMENT ( ch ) > 350 && GET_ALIGNMENT ( vict ) < -350 ) || ( GET_ALIGNMENT ( ch ) < -350 && GET_ALIGNMENT ( vict ) > 350 ) ) )
         return ret_val;
 
-    if ( has_staff_multi ( ch, w_type ) )
+    if ( has_staff_multi ( ch, w_type, rem ) )
     {
         struct obj_data *staff = GET_EQ ( ch, WEAR_FOCUS );
         if ( staff )
@@ -2802,9 +2812,6 @@ int steal_affects ( Character *ch, int dam, int w_type, Character *vict )
     if ( !IS_NPC ( ch ) )
         hp += GET_SUB ( ch, SUB_DRAIN_BLOOD ) * 0.04;
 
-
-
-
     if ( GET_MANA ( ch ) < GET_MAX_MANA ( ch ) && ( ma= ( ( dam*ma ) /100.0 ) ) > 0.0 )
     {
         alter_mana ( ch, FTOI ( -ma ) );
@@ -2816,6 +2823,7 @@ int steal_affects ( Character *ch, int dam, int w_type, Character *vict )
         alter_move ( ch, FTOI ( -mv ) );
         alter_move ( vict, FTOI ( mv ) );
     }
+
     if ( GET_HIT ( ch ) < GET_MAX_HIT ( ch ) && ( hp= ( ( dam*hp ) /100.0 ) ) > 0.0 )
     {
         /* TODO: add random message's for this */
@@ -2825,12 +2833,11 @@ int steal_affects ( Character *ch, int dam, int w_type, Character *vict )
         ret_val = damage ( ch, vict, int ( hp ), TYPE_UNDEFINED );
     }
 
-
     return ret_val;
-
 }
 
-void reduce_quality ( Character *ch, Character *vict, int damage, int w_type, obj_data *shield, int location = -1 )
+void reduce_quality ( Character *ch, Character *vict, int damage, int w_type, obj_data *shield, int location = -1,
+                      remembered_skill_spell *rem = nullptr )
 {
     obj_data *weapon, *focus, *eq;
     vector< vector<int> > loc;
@@ -2844,7 +2851,8 @@ void reduce_quality ( Character *ch, Character *vict, int damage, int w_type, ob
             GET_OBJ_QUALITY ( weapon ) = 0;
         update_affects ( weapon );
     }
-    else if ( ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) && ( focus = GET_EQ ( ch, WEAR_FOCUS ) ) != NULL && GET_OBJ_QUALITY ( focus ) > 0 )
+    else if ( ( ( rem != nullptr && !IS_SKILL ( rem->skill_spell_num ) ) || ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) ) &&
+            ( focus = GET_EQ ( ch, WEAR_FOCUS ) ) != NULL && GET_OBJ_QUALITY ( focus ) > 0 )
     {
         GET_OBJ_QUALITY ( focus ) -= damage / 50000.0 * ( 1 + GET_OBJ_REPAIRS ( focus ) / 5.0 );
         if ( GET_OBJ_QUALITY ( focus ) < 0 )
@@ -2921,16 +2929,12 @@ bool wearing_antibackstab ( Character *ch )
    The function has been cleaned up alot, looking much better.
 */
 
-int fe_after_damage ( Character* ch, Character* vict,
-                      int dam, int w_type )
+int fe_after_damage ( Character* ch, Character* vict, int dam, int w_type,
+                      remembered_skill_spell *rem )
 {
     gold_int local_gold = 0, bonus_gold = 0;
     char local_buf[100] = "";
     int partial = 0;
-
-    if ( IS_NPC ( vict ) && ( vict->master || vict->followers ) )
-        if ( followers_assisting ( vict ) == 0 )
-            dam = 100 + ( dam*2 );
 
     if ( !can_fight ( ch, vict, FALSE ) )
         return -1;
@@ -2940,8 +2944,15 @@ int fe_after_damage ( Character* ch, Character* vict,
         log ( "SYSERR: Attempt to damage corpse '%s' in room #%d by '%s'.",
               GET_NAME ( vict ), GET_ROOM_VNUM ( IN_ROOM ( vict ) ), GET_NAME ( ch ) );
         die ( vict, ch );
-        return ( -1 );
+        return -1;
     }
+
+    if ( rem != nullptr )
+        w_type = rem->skill_spell_num;
+
+    if ( IS_NPC ( vict ) && ( vict->master || vict->followers ) )
+        if ( followers_assisting ( vict ) == 0 )
+            dam = 100 + ( dam*2 );
 
     if ( vict->master && ( vict->master == ch || vict->master == ch->master ) )
         stop_follower ( vict );
@@ -2991,17 +3002,17 @@ int fe_after_damage ( Character* ch, Character* vict,
         {
             if ( wearing_antibackstab ( vict ) )
             {
-                reduce_quality ( ch, vict, partial, w_type, NULL, WEAR_BODY );
+                reduce_quality ( ch, vict, partial, w_type, NULL, WEAR_BODY, rem );
                 partial = 0;
             }
             else if ( IS_NPC ( ch ) && !IS_NPC ( vict ) )
             {
                 partial = MIN ( partial, (int) ( 0.75 * GET_MAX_HIT ( vict ) ) );
-                reduce_quality ( ch, vict, partial, w_type, NULL );
+                reduce_quality ( ch, vict, partial, w_type, NULL, -1, rem );
             }
         }
         else
-            reduce_quality ( ch, vict, partial, w_type, NULL );
+            reduce_quality ( ch, vict, partial, w_type, NULL, -1, rem );
 
         // Divide pk damage by 10
         if ( !IS_NPC ( ch ) && !IS_NPC ( vict ) )
@@ -3044,10 +3055,10 @@ int fe_after_damage ( Character* ch, Character* vict,
 
         if ( !SELF ( ch, vict ) )
         {
-                if ( !IS_NPC ( vict ) )
-                                GET_LAST_DAM_T ( vict ) = partial;
-                        if ( !IS_NPC ( ch ) )
-                                GET_LAST_DAM_D ( ch )   = partial;
+            if ( !IS_NPC ( vict ) )
+                GET_LAST_DAM_T ( vict ) = partial;
+            if ( !IS_NPC ( ch ) )
+                GET_LAST_DAM_D ( ch )   = partial;
 
             if ( partial > 5 && steal_affects ( ch, partial, w_type, vict ) == -1 )
                 return -1;
@@ -3065,10 +3076,10 @@ int fe_after_damage ( Character* ch, Character* vict,
       * dam_message. Otherwise, always send a dam_message.
       */
 
-    if ( w_type != TYPE_UNDEFINED )
+    if ( rem != nullptr || w_type != TYPE_UNDEFINED )
     {
-        if ( IS_SPELL_CAST ( w_type ) || IS_SKILL ( w_type ) || IS_OTHERDAM ( w_type ) )
-            skill_message ( partial, ch, vict, w_type );
+        if ( rem != nullptr || IS_SPELL_CAST ( w_type ) || IS_SKILL ( w_type ) || IS_OTHERDAM ( w_type ) )
+            skill_message ( partial, ch, vict, w_type, rem );
         else
             dam_message ( partial, ch, vict, w_type );
     }
@@ -3086,8 +3097,6 @@ int fe_after_damage ( Character* ch, Character* vict,
         }
         if ( partial )
         {
-
-
             /* learn */
             if ( !IS_NPC ( ch ) )
             {
@@ -3117,10 +3126,7 @@ int fe_after_damage ( Character* ch, Character* vict,
                             if ( number ( 0, 10 ) < 2 )
                                 improve_skill ( ch, SKILL_SHORT_BLADE );
                         }
-
-                        break;
                 }
-
 
                 if ( number ( 1,100 ) > GET_PERM_ACCURACY ( ch ) && number ( 1, 1000 ) < 5 )
                 {
@@ -3138,16 +3144,14 @@ int fe_after_damage ( Character* ch, Character* vict,
                 }
             }
 
-
             global_dam = partial;
-            if ( shield_check ( ch, vict, SHIELD_REFLECT, w_type ) == -1 )
+            if ( shield_check ( ch, vict, SHIELD_REFLECT, w_type, partial, rem ) == -1 )
             {
                 //stop_fighting(vict);
                 return -1;
             }
             poison_wep_check ( ch, vict, w_type, partial );
         }
-
     }
 
     update_pos ( vict );
@@ -3270,10 +3274,7 @@ void poison_wep_check ( Character *ch, Character *vict, int w_type, int dam )
             if ( number ( 0, 200 ) > 5 )
                 return; //Failed to poison.
         }
-
         else
-
-
         {
             if ( number ( 0, 300 ) > 5 )
                 return; //Failed to poison.
@@ -3281,11 +3282,8 @@ void poison_wep_check ( Character *ch, Character *vict, int w_type, int dam )
     }
     else
     {
-
-        {
-            if ( number ( 0, 10 ) > 5 )
-                return; //Failed to poison.
-        }
+        if ( number ( 0, 10 ) > 5 )
+            return; //Failed to poison.
     }
 
     /* do the poison shuffle */
@@ -3358,7 +3356,8 @@ void poison_wep_check ( Character *ch, Character *vict, int w_type, int dam )
 
 
 
-int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam )
+int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam,
+                   remembered_skill_spell *rem )
 {
     int success = FALSE;
     struct affected_type af;
@@ -3371,7 +3370,7 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam
         return 0;
 
     /**
-    If the person Ch is hitting has Ice Shield, while the Ch has a shoet weapon, and hasn;t got prot from cold.
+    If the person Ch is hitting has Ice Shield, while the Ch has a short weapon, and hasn't got prot from cold.
     There is a 1 in 6 chance that Ch will be affected by the freeze affect of the shield.
     - Mord**/
     if ( HERE ( ch, vict ) && is_short_wep ( GET_EQ ( ch, WEAR_WIELD ) ) && AFF_FLAGGED ( vict, AFF_SHIELD_ICE ) && !affected_by_spell ( ch, SPELL_PROT_COLD ) )
@@ -3402,7 +3401,7 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam
             success = ( armor_rating ? ( number ( 0, 100 ) < armor_rating ) : 0 );
             if ( success )
             {
-                if ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) )
+                if ( ( rem != nullptr && !IS_SKILL ( rem->skill_spell_num ) ) || IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) )
                 {
                     act ( "$N deflects your magic with $S shield!", FALSE, ch, 0, vict, TO_CHAR );
                     act ( "You deflect $n's magic with your shield!", FALSE, ch, 0, vict, TO_VICT );
@@ -3415,7 +3414,7 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam
                 if ( knows_spell ( ch, SPELL_SHIELD_STATIC ) )
                     improve_skill ( ch, SPELL_SHIELD_STATIC );
                 improve_skill ( vict, SPELL_SHIELD_STATIC );
-                reduce_quality ( NULL, NULL, dam, 0, GET_EQ ( vict, WEAR_SHIELD ) );
+                reduce_quality ( NULL, NULL, dam, 0, GET_EQ ( vict, WEAR_SHIELD ), -1, rem );
             }
             break;
         case SHIELD_REFLECT:
@@ -3437,7 +3436,9 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam
                 improve_skill ( vict, SPELL_SHIELD_THORN );
                 return damage ( vict, ch, global_dam, TYPE_UNDEFINED );
             }
-            else if ( AFF_FLAGGED ( vict, AFF_SHIELD_MIRROR ) && ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) && ( number ( 1, 81 ) < lev || ded ) )
+            else if ( AFF_FLAGGED ( vict, AFF_SHIELD_MIRROR ) &&
+                    ( ( rem != nullptr && !IS_SKILL ( rem->skill_spell_num ) ) || IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) &&
+                    ( number ( 1, 81 ) < lev || ded ) )
             {
                 act ( "$N's mirror shield reflects your magic back at you!", FALSE, ch, 0, vict, TO_CHAR );
                 act ( "You bounce $n's magic right back at $m!", FALSE, ch, 0, vict, TO_VICT );
@@ -3473,31 +3474,27 @@ seperate into its own function
 add other evacive skills and spell checks here.
 dodge, evade, phase, etc etc
 */
-int evade_hit_check ( Character *ch, Character *vict, int w_type )
+int evade_hit_check ( Character *ch, Character *vict, int w_type, remembered_skill_spell *rem )
 {
     int skill_cost ( int h, int m, int v, Character *ch );
     int parrychance = 0;
-    int v_type = w_type;
     if ( ( !ch || !vict ) || GET_POS ( vict ) < POS_FIGHTING )
         return 0;
 
+    if ( rem != nullptr )
+        w_type = rem->skill_spell_num;
 
     if ( IS_WEAPON ( w_type ) && has_weapon ( ch ) && ( ( parrychance = has_weapon ( vict ) ) != 0 ) &&
             ( number ( 1, 30 ) < GET_DEX ( vict ) ) &&
             ( number ( 1, 300 ) < ( total_chance ( vict, SKILL_PARRY ) * parrychance ) ) )
     {
-        if ( !IS_WEAPON ( v_type ) )
-        {
-            log ( "COMBAT: player %s, attacked with a weapon type of %d (%s)", GET_NAME ( vict ), v_type, skill_name ( v_type ) );
-            return 0;
-        }
-        if ( ( v_type ) >= TYPE_HIT )
-            v_type -= TYPE_HIT;
+        if ( w_type >= TYPE_HIT )
+            w_type -= TYPE_HIT;
 
         ch->Send ( "%s parries your attack with a swift %s.\r\n",
-                   PERS ( vict,ch ), attack_hit_text[v_type].singular );
+                   PERS ( vict,ch ), attack_hit_text[w_type].singular );
         vict->Send ( "You parry %s's attack with a swift %s.\r\n",
-                     PERS ( ch, vict ), attack_hit_text[v_type].singular );
+                     PERS ( ch, vict ), attack_hit_text[w_type].singular );
         improve_skill ( ch, SKILL_PARRY );
         improve_skill ( vict, SKILL_PARRY );
         return 1;
@@ -3514,17 +3511,17 @@ int evade_hit_check ( Character *ch, Character *vict, int w_type )
         }
         else
             send_to_char ( "You try and dodge but just can't find the energy!!\r\n", ch );
-
     }
 
-    if ( ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) && affected_by_spell ( vict, SPELL_DETECT_MAGIC ) && number ( 0, 100 ) < ( GET_INT ( vict ) /5 ) )
+    if ( ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) &&
+         affected_by_spell ( vict, SPELL_DETECT_MAGIC ) && number ( 0, 100 ) < ( GET_INT ( vict ) /5 ) )
     {
         act ( "$N senses your oncoming magical attack and narrowly avoids it.", TRUE, ch, 0, vict, TO_CHAR );
         act ( "You sense $n's oncoming magical attack and narrowly avoid it.", TRUE, ch, 0, vict, TO_VICT );
         return 1;
     }
 
-    if ( AFF_FLAGGED ( vict, AFF_PHASE ) && number ( 1, 30 ) < GET_DEX ( vict ) && IS_WEAPON ( v_type ) && number ( 1, 300 ) < total_chance ( vict, SKILL_PHASE ) )
+    if ( AFF_FLAGGED ( vict, AFF_PHASE ) && number ( 1, 30 ) < GET_DEX ( vict ) && IS_WEAPON ( w_type ) && number ( 1, 300 ) < total_chance ( vict, SKILL_PHASE ) )
     {
         if ( skill_cost ( 0, 2, 20, vict ) )
         {
@@ -3541,7 +3538,7 @@ int evade_hit_check ( Character *ch, Character *vict, int w_type )
 
     }
 
-    if ( number ( 1, 30 ) < GET_DEX ( vict ) && IS_WEAPON ( v_type ) && AFF_FLAGGED ( vict, AFF_DRUNKEN_MASTER ) && number ( 1, 200 ) < ( 70-GET_LEVEL ( vict ) ) )
+    if ( number ( 1, 30 ) < GET_DEX ( vict ) && IS_WEAPON ( w_type ) && AFF_FLAGGED ( vict, AFF_DRUNKEN_MASTER ) && number ( 1, 200 ) < ( 70-GET_LEVEL ( vict ) ) )
     {
         ch->Send ( "%s weaves drunkenly out of your reach!\r\n", PERS ( vict,ch ) );
         vict->Send ( "You weave drunkenly out of %s's reach!\r\n",  PERS ( ch, vict ) );
@@ -6042,7 +6039,8 @@ ACMD ( do_fightmsg )
  * message for doing damage with a spell or skill
  *  C3.0: Also used for weapon damage on miss and death blows
  */
-int skill_message ( int dam, Character *ch, Character *vict, int attacktype )
+int skill_message ( int dam, Character *ch, Character *vict, int attacktype,
+                    remembered_skill_spell *rem )
 {
     int i, j, nr;
     struct message_type *msg = NULL;
@@ -6060,13 +6058,19 @@ int skill_message ( int dam, Character *ch, Character *vict, int attacktype )
 
     for ( i = 0; i < MAX_MESSAGES; i++ )
     {
-        if ( fight_messages[i].a_type == attacktype )
+        if ( rem != nullptr || fight_messages[i].a_type == attacktype )
         {
             if ( dam && ch != victim && !IS_NPC ( ch ) )
                 ch->Send ( "{cg%2.2fx) {cy", GET_SKILLMULTI ( ch ) );
-            nr = number ( 1, fight_messages[i].number_of_attacks );
-            for ( j = 1, msg = fight_messages[i].msg; ( j < nr ) && msg; j++ )
-                msg = msg->next;
+
+            if ( rem == nullptr )
+            {
+                nr = number ( 1, fight_messages[i].number_of_attacks );
+                for ( j = 1, msg = fight_messages[i].msg; ( j < nr ) && msg; j++ )
+                    msg = msg->next;
+            }
+            else
+                msg = &rem->custom_messages;
 
             if ( !IS_NPC ( vict ) && ( GET_LEVEL ( vict ) > LVL_HERO ) )
             {
@@ -6399,8 +6403,20 @@ void fire_missile ( Character *ch, char arg1[MAX_INPUT_LENGTH],
 
             if ( attacktype != TYPE_UNDEFINED )
             {
-                shot = ch->skill_roll ( attacktype );
-                improve_skill ( ch, attacktype );
+                remembered_skill_spell *rem = nullptr;
+                for ( auto &r : SAVED(ch).remembered )
+                {
+                    if ( r.skill_spell_num == attacktype )
+                    {
+                        rem = &r;
+                        break;
+                    }
+                }
+                if ( rem == nullptr )
+                    shot = ch->skill_roll ( attacktype );
+                else
+                    shot = rem->percentage_learned > number ( 1, 101 );
+                improve_skill ( ch, attacktype, rem );
             }
             else
                 shot = FALSE;
@@ -6410,7 +6426,7 @@ void fire_missile ( Character *ch, char arg1[MAX_INPUT_LENGTH],
                 strike_missile ( ch, vict, missile, dir, attacktype );
                 if ( attacktype != SKILL_FIREARM )
                     extract_obj ( unequip_char ( ch, pos ) );
-                else // remove a bullet from the gun
+                else if ( GET_EQ ( ch, WEAR_WIELD ) ) // remove a bullet from the gun
                     GET_EQ ( ch, WEAR_WIELD )->obj_flags.value[2]--;
             }
             else
@@ -6979,7 +6995,7 @@ void combat_skill ( Character *ch )
     }
 }
 #define HPLEFT(vict) ((GET_HIT(vict)*100)/GET_MAX_HIT(vict))
-float skill_type_multi ( Character *ch, Character *vict, int type )
+float skill_type_multi ( Character *ch, Character *vict, int type, remembered_skill_spell *rem )
 {
     //int m_user = FALSE, chclass = TYPE_UNDEFINED;
     //int chcha = 1,
@@ -7006,7 +7022,14 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
     stormy = sky == SKY_LIGHTNING;
 
     ch->Send("{cg(");
-    switch ( type )
+
+    if ( rem != nullptr && rem->skill_spell_num == -1 )
+    { // custom spell
+        dam = 1 + 3.0 * GET_MANA ( ch ) / GET_MAX_MANA  ( ch ) * ( MIN ( 100, REMORTS ( ch ) ) / 100.0 );
+        return dam;
+    }
+
+    switch ( rem == nullptr ? type : rem->skill_spell_num )
     {
         default:
             return 1.0;
@@ -7750,6 +7773,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 
             if ( affected_by_spell ( vict, SPELL_PROT_FIRE) )
             {	dam *= 0.25; ch->Send("-VictProtection "); }
+
             break;
         case  SPELL_HAIL_STORM:
             if ( inside )
@@ -7794,14 +7818,14 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 
     }
 
-      /* Moved mastery bonus (multiplicative) before mind bonuses (additive).  Increased mind bonus.
-         This effectively buffs newbies, while players with mage and esper masteries are more or less
-         unaffected.  Slightly nerfed actually.  -- Graham */
+    /* Moved mastery bonus (multiplicative) before mind bonuses (additive).  Increased mind bonus.
+       This effectively buffs newbies, while players with mage and esper masteries are more or less
+       unaffected.  Slightly nerfed actually.  -- Graham */
 
-        if ( GET_MASTERY ( ch, CLASS_ESPER ) )
-                dam *= 1.25;
-        if ( GET_MASTERY ( ch, CLASS_MAGE ) )
-                dam *= 1.20;
+    if ( GET_MASTERY ( ch, CLASS_ESPER ) )
+        dam *= 1.25;
+    if ( GET_MASTERY ( ch, CLASS_MAGE ) )
+        dam *= 1.20;
 
     if ( affected_by_spell ( ch, SPELL_DIVINE_MIND ) )
         dam += 0.20;
@@ -7810,7 +7834,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
     if ( affected_by_spell ( ch, SPELL_NUMB_MIND ) )
         dam -= 0.75;
 
-    switch ( elemental_type ( type ) )
+    switch ( rem == nullptr ? elemental_type ( type ) : rem->custom_elemental_type )
     {
         default:
             break;
@@ -7818,21 +7842,12 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
             if ( affected_by_spell ( ch, SPELL_MIND_FIRE ) )
             {
                 if (affected_by_spell ( ch, SPELL_MUTATED))
-                {
-                dam += 0.75;
-                ch->Send("+Mutated +MindFire ");
-                }
+                { dam += 0.75; ch->Send("+Mutated +MindFire "); }
                 else
-                {
-                dam += 0.25;
-                ch->Send("+MindFire ");
-                }
+                { dam += 0.25; ch->Send("+MindFire "); }
             }
             else if (affected_by_spell ( ch, SPELL_MUTATED))
-            {
-            dam += 0.25;
-            ch->Send("+Mutated ");
-            }
+            { dam += 0.25; ch->Send("+Mutated "); }
             break;
         case ELEM_ICE:
             if ( affected_by_spell ( ch, SPELL_MIND_ICE ) )
@@ -7841,24 +7856,14 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
         case ELEM_ELEC:
             if ( affected_by_spell ( ch, SPELL_MIND_ELEC ) )
             {
-                                if (affected_by_spell ( ch, SPELL_MUTATED))
-                                {
-                                dam += 0.50;
-                                ch->Send("+Mutated +MindElec ");
-                                }
-                                else
-                                {
-                                dam += 0.25;
-                                ch->Send("+MindElec ");
-                                }
+                if (affected_by_spell ( ch, SPELL_MUTATED))
+                { dam += 0.50; ch->Send("+Mutated +MindElec "); }
+                else
+                { dam += 0.25; ch->Send("+MindElec "); }
             }
-                        else if (affected_by_spell ( ch, SPELL_MUTATED))
-                        {
-                        dam += 0.25;
-                        ch->Send("+Mutated ");
-                        }
-                        break;
-
+            else if (affected_by_spell ( ch, SPELL_MUTATED))
+            { dam += 0.25; ch->Send("+Mutated "); }
+            break;
         case ELEM_WATER:
             if ( affected_by_spell ( ch, SPELL_MIND_WATER ) )
             {	dam += 0.25;  ch->Send("+MindWater "); }
@@ -7877,7 +7882,6 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
     // It was meant to be for the ch, not vict, oops! :-P - Mord
     GET_WAIT_STATE ( ch ) += 1 RL_SEC;
     return dam;
-
 }
 
 void kill_list ( Character *ch, Character *vict )

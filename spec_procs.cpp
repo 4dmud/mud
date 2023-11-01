@@ -812,9 +812,9 @@ SPECIAL ( dump )
 
 SPECIAL ( mayor )
 {
-    const char open_path[] =
+    static const char open_path[] =
         "W3a3003b33000c111d0d111Oe333333Oe22c222112212111a1S.";
-    const char close_path[] =
+    static const char close_path[] =
         "W3a3003b33000c111d0d111CE333333CE22c222112212111a1S.";
 
     static const char *path = NULL;
@@ -1043,17 +1043,17 @@ SPECIAL ( magic_user )
         return ( TRUE );
 
     if ( ( GET_LEVEL ( ch ) > 13 ) && ( number ( 0, 10 ) == 0 ) )
-        cast_spell ( ch, vict, NULL, 0, SPELL_SLEEP );
+        cast_spell ( ch, vict, NULL, NULL, SPELL_SLEEP );
 
     if ( ( GET_LEVEL ( ch ) > 7 ) && ( number ( 0, 8 ) == 0 ) )
-        cast_spell ( ch, vict, NULL, 0, SPELL_BLINDNESS );
+        cast_spell ( ch, vict, NULL, NULL, SPELL_BLINDNESS );
 
     if ( ( GET_LEVEL ( ch ) > 12 ) && ( number ( 0, 12 ) == 0 ) )
     {
         if ( IS_EVIL ( ch ) )
-            cast_spell ( ch, vict, NULL, 0, SPELL_ENERGY_DRAIN );
+            cast_spell ( ch, vict, NULL, NULL, SPELL_ENERGY_DRAIN );
         else if ( IS_GOOD ( ch ) )
-            cast_spell ( ch, vict, NULL, 0, SPELL_DISPEL_EVIL );
+            cast_spell ( ch, vict, NULL, NULL, SPELL_DISPEL_EVIL );
     }
     if ( number ( 0, 4 ) )
         return ( TRUE );
@@ -1062,32 +1062,32 @@ SPECIAL ( magic_user )
     {
         case 4:
         case 5:
-            cast_spell ( ch, vict, NULL, 0, SPELL_MAGIC_MISSILE );
+            cast_spell ( ch, vict, NULL, NULL, SPELL_MAGIC_MISSILE );
             break;
         case 6:
         case 7:
-            cast_spell ( ch, vict, NULL, 0, SPELL_CHILL_TOUCH );
+            cast_spell ( ch, vict, NULL, NULL, SPELL_CHILL_TOUCH );
             break;
         case 8:
         case 9:
-            cast_spell ( ch, vict, NULL, 0, SPELL_BURNING_HANDS );
+            cast_spell ( ch, vict, NULL, NULL, SPELL_BURNING_HANDS );
             break;
         case 10:
         case 11:
-            cast_spell ( ch, vict, NULL, 0, SPELL_SHOCKING_GRASP );
+            cast_spell ( ch, vict, NULL, NULL, SPELL_SHOCKING_GRASP );
             break;
         case 12:
         case 13:
-            cast_spell ( ch, vict, NULL, 0, SPELL_LIGHTNING_BOLT );
+            cast_spell ( ch, vict, NULL, NULL, SPELL_LIGHTNING_BOLT );
             break;
         case 14:
         case 15:
         case 16:
         case 17:
-            cast_spell ( ch, vict, NULL, 0, SPELL_COLOUR_SPRAY );
+            cast_spell ( ch, vict, NULL, NULL, SPELL_COLOUR_SPRAY );
             break;
         default:
-            cast_spell ( ch, vict, NULL, 0, SPELL_FIREBALL );
+            cast_spell ( ch, vict, NULL, NULL, SPELL_FIREBALL );
             break;
     }
     return ( TRUE );
@@ -3116,6 +3116,30 @@ void read_hof ( vector<string> &hof )
     }
 }
 
+vector<string> read_msgs_in_form ( istringstream &ss, string &error )
+{
+    vector<string> msgs;
+    string line;
+    for ( int i = 0; i < 9; ++i )
+    {
+        getline ( ss, line );
+        if ( ss.fail() )
+        {
+            error = "You need to supply nine messages.";
+            return msgs;
+        }
+        if ( line.back() == '\r' )
+            line.erase ( line.length()-1 );
+        if ( line.length() > 100 )
+        {
+            error = "One of your messages is longer than 100 characters.";
+            return msgs;
+        }
+        msgs.push_back ( line );
+    }
+    return msgs;
+}
+
 SPECIAL ( middleman )
 {
     string filename = string (LIB_ETC) + "middleman.hof";
@@ -3123,7 +3147,192 @@ SPECIAL ( middleman )
     const int middleman_vnum = 10300;
     istringstream ss;
 
-    if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_random_room" ) )
+    if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_remember_start" ) )
+    {
+        // middleman_remember_start <player> <note_remember>
+        string player_id, obj_id;
+        ss.str ( arg );
+        ss >> player_id >> obj_id;
+        Character *player = get_char ( player_id.c_str() );
+        obj_data *note_remember = get_obj ( obj_id.c_str() );
+
+        // parse the note
+        if ( player && note_remember && note_remember->action_description )
+        {
+            string line, name, attack, element;
+            int slot_num, skill_spell_num;
+            istringstream ss2;
+            ss.clear();
+            ss.str ( note_remember->action_description );
+            try
+            {
+                getline ( ss, line );
+                if ( line.back() == '\r' )
+                    line.erase ( line.length()-1 );
+                if ( !is_number ( line.c_str() ) )
+                    throw runtime_error ( "The note should start with the slot number." );
+                slot_num = stoi ( line ) - 1;
+                if ( slot_num < 0 || slot_num >= SAVED( player ).remembered.size() )
+                    throw runtime_error ( "The slot number doesn't exist." );
+
+                getline ( ss, name );
+                if ( name.back() == '\r' )
+                    name.erase ( name.length()-1 );
+                if ( name.length() < 3 )
+                    throw runtime_error ( "The name is too short." );
+                if ( name.length() > 20 )
+                    throw runtime_error ( "The name length is limited to 20 characters." );
+
+                for ( const auto &c : name )
+                    if ( !isalnum ( c ) && c != ' ' )
+                        throw runtime_error ( "The name is only allowed to have letters, digits and spaces." );
+
+                name = tolower ( name );
+                auto rem = &SAVED ( player ).remembered[ slot_num ];
+                skill_spell_num = spell_num ( name.c_str() );
+                if ( skill_spell_num == TYPE_UNDEFINED ) // custom spell
+                {
+                    getline ( ss, attack );
+                    if ( attack.back() == '\r' )
+                        attack.erase ( attack.length()-1 );
+                    if ( attack != "victim" && attack != "area" )
+                        throw runtime_error ( "The attack type should be victim or area." );
+
+                    getline ( ss, element );
+                    if ( element.back() == '\r' )
+                        element.erase ( element.length()-1 );
+                    int el_type = 1;
+                    for ( ; el_type < elemental_types.size(); ++el_type )
+                    {
+                        if ( element == string ( elemental_types[ el_type ] ) )
+                            break;
+                    }
+                    if ( el_type == elemental_types.size() )
+                        throw runtime_error ( "I don't recognize the element name." );
+
+                    string error;
+                    auto msgs = read_msgs_in_form ( ss, error );
+                    if ( error.length() > 0 )
+                        throw runtime_error ( error );
+
+                    rem->custom_messages.hit_msg.attacker_msg = msgs[0];
+                    rem->custom_messages.hit_msg.victim_msg = msgs[1];
+                    rem->custom_messages.hit_msg.room_msg = msgs[2];
+                    rem->custom_messages.miss_msg.attacker_msg = msgs[3];
+                    rem->custom_messages.miss_msg.victim_msg = msgs[4];
+                    rem->custom_messages.miss_msg.room_msg = msgs[5];
+                    rem->custom_messages.die_msg.attacker_msg = msgs[6];
+                    rem->custom_messages.die_msg.victim_msg = msgs[7];
+                    rem->custom_messages.die_msg.room_msg = msgs[8];
+                    // Default god messages
+                    rem->custom_messages.god_msg.attacker_msg = "Are you sure this is a good idea??";
+                    rem->custom_messages.god_msg.victim_msg = "$n tried to hurt you, haha.";
+                    rem->custom_messages.god_msg.room_msg = "$n tried to hurt $N, better find a place to hide from the fallout!";
+
+                    rem->name = name;
+                    rem->custom_elemental_type = el_type;
+                    if ( attack == "victim" )
+                        rem->custom_attack_type = TAR_CHAR_ROOM;
+                    else
+                        rem->custom_attack_type = TAR_IGNORE;
+                }
+                else // existing skill/spell
+                {
+                    if ( knows_spell ( player, skill_spell_num ) )
+                    {
+                        if ( IS_SKILL ( skill_spell_num ) )
+                            throw runtime_error ( "You already know this skill!" );
+                        else
+                            throw runtime_error ( "You already know this spell!" );
+                    }
+
+                    if ( skill_spell_num == SPELL_HEAL || skill_spell_num == SPELL_GROUP_HEAL )
+                        throw runtime_error ( "The spell is too advanced to remember." );
+
+                    bool mastered_class = false;
+                    for ( int c = 0; c < NUM_CLASSES; ++c )
+                    {
+                        if ( IS_SET ( spell_info[ skill_spell_num ].classes, 1 << c ) &&
+                                GET_MASTERY ( player, c ) )
+                            mastered_class = true;
+                    }
+                    if ( !mastered_class )
+                        throw runtime_error ( "You haven't mastered the class yet." );
+                }
+                rem->skill_spell_num = skill_spell_num;
+                rem->name = name;
+                rem->percentage_learned = 0;
+                rem->percentage_remembered = 0;
+            }
+            catch ( const exception &e )
+            {
+                add_var ( &SCRIPT ( ch )->global_vars, "remember_form_format", e.what(), 0 );
+                return 1;
+            }
+
+            add_var ( &SCRIPT ( ch )->global_vars, "remember_form_format", "good", 0 );
+            char_to_store ( player );
+            return 1;
+        }
+
+        add_var ( &SCRIPT ( ch )->global_vars, "remember_form_format", "I can't read your form for some reason.", 0 );
+        return 1;
+    }
+    else if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_remember_quest" ) )
+    {
+        // middleman_remember_quest <player> <slot nr>
+        string s;
+        int slot;
+        ss.str ( arg );
+        ss >> s >> slot;
+        slot--;
+        Character *player = get_char ( s.c_str() );
+        if ( !player )
+        {
+            add_var ( &SCRIPT ( ch )->global_vars, "remember_quest", "Go away, you don't exist!", 0 );
+            return 1;
+        }
+
+        if ( slot < 0 || slot >= SAVED( player ).remembered.size() )
+            add_var ( &SCRIPT ( ch )->global_vars, "remember_quest", "That slot doesn't exist.", 0 );
+        else if ( SAVED ( player ).remembered[ slot ].skill_spell_num == 0 )
+            add_var ( &SCRIPT ( ch )->global_vars, "remember_quest", "That slot is empty.", 0 );
+        else
+            add_var ( &SCRIPT ( ch )->global_vars, "remember_quest", "go", 0 );
+        return 1;
+    }
+    else if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_remember_done" ) )
+    {
+        // middleman_remember_done <player> <slot nr>
+        string s;
+        int slot;
+        ss.str ( arg );
+        ss >> s >> slot;
+        slot--;
+        Character *player = get_char ( s.c_str() );
+        if ( !player )
+        {
+            add_var ( &SCRIPT ( ch )->global_vars, "remember_complete", "Go away, you don't exist!", 0 );
+            return 1;
+        }
+
+        auto rem = &SAVED( player ).remembered[ slot ];
+        rem->percentage_remembered += 10;
+        if ( rem->percentage_remembered == 100 )
+        {
+            rem->percentage_learned = 10;
+            add_var ( &SCRIPT ( ch )->global_vars, "remember_complete", "yes", 0 );
+            player->Send ( "You completely remember '%s'.\r\n", rem->name.c_str() );
+        }
+        else
+        {
+            add_var ( &SCRIPT ( ch )->global_vars, "remember_complete", "no", 0 );
+            player->Send ( "You gain 10%% in remembering '%s'.\r\n", rem->name.c_str() );
+        }
+        char_to_store ( player );
+        return 1;
+    }
+    else if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_random_room" ) )
     {
         // syntax: middleman_random_room <zone> <zone_size>
         // add the global variable random_room

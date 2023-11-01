@@ -733,8 +733,8 @@ ASPELL(spell_knock);
 int find_skill_num(char *name);
 
 int
-mag_damage(int level, Character *ch, Character *victim,
-           int spellnum, int savetype);
+mag_damage(int level, Character *ch, Character *victim, int spellnum,
+           int savetype, remembered_skill_spell *rem = nullptr);
 
 void
 mag_affects(int level, Character *ch, Character *victim,
@@ -746,16 +746,16 @@ void mag_groups(int level, Character *ch, int spellnum,
 void mag_masses(int level, Character *ch, int spellnum,
                 int savetype);
 
-void mag_areas(int level, Character *ch, int spellnum,
-               int savetype);
+void mag_areas(int level, Character *ch, int spellnum, int savetype,
+               remembered_skill_spell *rem = nullptr );
 
 void
 mag_summons(int level, Character *ch, struct obj_data *obj,
             int spellnum, int savetype);
 
 void
-mag_points(int level, Character *ch, Character *victim,
-           int spellnum, int savetype);
+mag_points(int level, Character *ch, Character *victim, int spellnum,
+           int savetype, remembered_skill_spell *rem = nullptr);
 
 void
 mag_unaffects(int level, Character *ch, Character *victim,
@@ -768,18 +768,14 @@ mag_alter_objs(int level, Character *ch, struct obj_data *obj,
 void mag_creations(int level, Character *ch, int spellnum, char *tar_str);
 void mag_room_affects(int level, Character *ch, int spellnum);
 
-int
-call_magic(Character *caster, Character *cvict,
-           struct obj_data *ovict, char *svict, int spellnum, int level,
-           int casttype);
+int call_magic(Character *caster, Character *cvict, struct obj_data *ovict,
+               char *svict, int spellnum, int level, int casttype,
+               remembered_skill_spell *rem = nullptr);
 
-void
-mag_objectmagic(Character *ch, struct obj_data *obj,
-                char *argument);
+void mag_objectmagic(Character *ch, struct obj_data *obj, char *argument);
 
-int
-cast_spell(Character *ch, Character *tch,
-           struct obj_data *tobj, char *tar_str, int spellnum);
+int cast_spell(Character *ch, Character *tch, struct obj_data *tobj, char *tar_str,
+               int spellnum, remembered_skill_spell *rem = nullptr);
 
 
 /* other prototypes */
@@ -789,8 +785,8 @@ void init_spell_levels(void);
 const char *skill_name(int num);
 float has_staff(Character *ch);
 const char *sub_name(int num);
-int knows_spell(Character *ch, int spell);
-int elemental_type(int spell);
+int knows_spell(Character *ch, int spell, string custom_spell_name = "");
+int elemental_type(int spell, remembered_skill_spell *rem = nullptr);
 int immune_to(Character *ch, int elem);
 float resist_elem(Character *ch, int elem);
 int grand_master(Character *ch);

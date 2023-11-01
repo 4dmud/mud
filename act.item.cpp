@@ -286,7 +286,7 @@ void House_crashsave ( room_vnum vnum );
 void Crash_rentsave ( Character *ch, int cost );
 int house_item_count ( room_vnum vnum );
 int Crash_is_unrentable ( struct obj_data *obj );
-void improve_skill ( Character *ch, int skill );
+void improve_skill ( Character *ch, int skill, remembered_skill_spell *rem = nullptr );
 int has_weapon ( Character *ch );
 int get_weapon_speed ( OBJ_DATA *wep );
 int wep_hands ( OBJ_DATA *wep );
@@ -4658,21 +4658,17 @@ ACMD ( do_compare )
 /*speed functions*/
 int speed_update ( Character *ch )
 {
-
     float speed = 0.0;
     float var = 0.0;
     int weps = has_weapon ( ch );
-
-
 
     if ( IS_NPC ( ch ) ) //npc speed
         speed += ( ( GET_LEVEL ( ch )- ( 30 - ( 2 * MOB_TIER ( ch ) ) ) ) * ( 5 + ( 2 *  MOB_TIER ( ch ) ) ) );
     else   // start of player speed
     {
-            speed = 50;  /* Beginning of Base Speed, as move modifier (which was a penalty more than it was a bonus and makes
+        speed = 50;  /* Beginning of Base Speed, as move modifier (which was a penalty more than it was a bonus and makes
                     no sense from a combat design standpoint) was removed in lieu of not encouraging players to sit around
                     without ever typing any commands. */
-
 
         if ( 0 < total_chance ( ch, SKILL_SECOND_ATTACK ) )
         {
@@ -4687,11 +4683,11 @@ int speed_update ( Character *ch )
         speed += class_speed ( ch );
         speed += race_speed ( ch );
 
-
         speed += ( ( ( GET_DEX ( ch ) * 200 ) / 22 )-130 );
         speed += AFF_SPEED ( ch );
         if ( ( GET_SUB ( ch, SUB_LOYALSPEED ) ) > 0 )
             speed += 50;
+
         if ( CAN_CARRY_W ( ch ) > 0 && IS_CARRYING_W ( ch ) >= 0 )
         {
             if ( IS_CARRYING_W ( ch ) == 0 )
@@ -4700,17 +4696,29 @@ int speed_update ( Character *ch )
                 var = 300  - ( ( ( IS_CARRYING_W ( ch ) * 400 ) / CAN_CARRY_W ( ch ) ) );
             else
                 var = -200;
-
         }
         if (REMORTS(ch) == 0)
             speed += 200;
         else
             speed += var;
 
-        if ( RIDING ( ch ) && HERE ( RIDING ( ch ), ch ) && total_chance ( ch, SKILL_MOUNTED_COMBAT ) )
-            speed += 25 + ( total_chance ( ch, SKILL_MOUNTED_COMBAT ) /3 );
-        else if ( GET_RACE ( ch ) == RACE_CENTAUR && GET_SKILL ( ch, SKILL_MOUNTED_COMBAT ) )
-            speed += 25 + ( total_chance ( ch, SKILL_MOUNTED_COMBAT ) /3 );
+        int tc_mounted_combat = total_chance ( ch, SKILL_MOUNTED_COMBAT );
+        if ( RIDING ( ch ) && HERE ( RIDING ( ch ), ch ) && tc_mounted_combat > 0 )
+            speed += 25 + tc_mounted_combat / 3;
+        else if ( GET_RACE ( ch ) == RACE_CENTAUR )
+        {
+            int skill = GET_SKILL ( ch, SKILL_MOUNTED_COMBAT );
+            if ( skill == 0 )
+            {
+                for ( const auto &r: SAVED(ch).remembered )
+                {
+                    if ( r.skill_spell_num == SKILL_MOUNTED_COMBAT )
+                        skill = r.percentage_learned;
+                }
+            }
+            if ( skill > 0 )
+                speed += 25 + tc_mounted_combat / 3;
+        }
         // end of player speed
     }
     if ( weps )
@@ -4718,7 +4726,6 @@ int speed_update ( Character *ch )
         speed += get_weapon_speed ( GET_EQ ( ch, WEAR_WIELD ) );
         speed += get_weapon_speed ( GET_EQ ( ch, WEAR_WIELD_2 ) );
     }
-
 
     if ( RIDDEN_BY ( ch ) && HERE ( RIDDEN_BY ( ch ), ch ) )
         speed *= 0.75;
@@ -4741,7 +4748,6 @@ int speed_update ( Character *ch )
         GET_SPEED ( ch ) = ( int ) speed;
 
     return ( int ) speed;
-
 }
 
 

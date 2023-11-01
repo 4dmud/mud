@@ -2,7 +2,8 @@
 #define FIGHT_H
 
 int apply_ac(Character *ch, int eq_pos);
-int modify_dam(int dam, Character *ch, Character *vict , int w_type);
+int modify_dam(int dam, Character *ch, Character *vict , int w_type,
+               remembered_skill_spell *rem = nullptr);
 int arena_ok(Character *ch, Character *victim);
 int find_fe_type(Character *ch);
 int has_weapon(Character *ch);
@@ -19,8 +20,8 @@ void set_fighting(Character *ch, Character *victim);
 void stop_fighting(Character *ch);
 void forget(Character *ch, Character *victim);
 void remember(Character *ch, Character *victim);
-int skill_message(int dam, Character *ch, Character *vict,
-                  int attacktype);
+int skill_message(int dam, Character *ch, Character *vict, int attacktype,
+                  remembered_skill_spell *rem = nullptr);
 
 void start_fighting_delay(Character *vict, Character *ch);
 
@@ -168,7 +169,8 @@ extern struct weapon_type_data weapon_type_info[MAX_WEAPON_TYPES];
 int attack_type(char chclass);
 void start_fighting(Character* ch, Character* vict);
 
-int fe_solo_damage(Character* ch, Character* vict, int damage, int w_type);
+int fe_solo_damage(Character* ch, Character* vict, int damage, int w_type,
+                   remembered_skill_spell *rem = nullptr);
 int fe_melee_hit(Character* ch, Character* vict, int type, int melee);
 int fe_spell_hit(Character* ch, Character* vict, int type);
 int fe_deal_damage(Character* ch, Character* vict, int dam, int w_type);
@@ -182,7 +184,8 @@ void die(Character *ch, Character *killer);
 float backstab_mult(int level, int tier);
 float cleave_mult(int level, int tier);
 float slit_mult(int level, int tier);
-float skill_type_multi ( Character *ch, Character *vict, int type );
+float skill_type_multi ( Character *ch, Character *vict, int type,
+                         remembered_skill_spell *rem = nullptr);
 
 /* Weapon attack texts */
 /* Attacktypes with grammar */

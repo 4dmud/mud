@@ -4438,12 +4438,8 @@ char * parse_prompt(Character *ch, char *str, size_t lenn) {
 
                     inpos += ((int)!def)*2;
 
-                    /* switch */
-                    if (outpos < (sizeof(out_buf)))
-                        out_buf[outpos] = '\0';
-
-                    /* don't overfill buffer */
-                    if (insert_text != NULL && (outpos < (sizeof(out_buf)))) {
+                    /* switch and don't overfill buffer */
+                    if (outpos < (sizeof(out_buf))) {
                         out_buf[outpos] = '\0';     /* so strcat is not confused by whatever out_buf WAS */
                         strlcat(out_buf, insert_text, sizeof(out_buf));
                         outpos = strlen(out_buf);

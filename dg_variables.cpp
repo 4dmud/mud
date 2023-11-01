@@ -2927,7 +2927,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             else
                             {
                                 for ( int i = 0; i < colour_names.size(); ++i )
-                                    if ( !strcasecmp ( colour_names[i], subfield ) )
+                                    if ( !strncasecmp ( colour_names[i] + 3, subfield, strlen ( colour_names[i] ) - 6 ))
                                     {
                                         GET_OBJ_COLOUR ( o ) = i;
                                         return;
@@ -3397,19 +3397,25 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         {
                             if ( pos < 4 )
                             {
-                                if ( tolower ( desc.substr ( 0, 2 ) ) == "a " && !strcmp ( AN ( new_colour.c_str() ), "an" ) )
+                                if ( tolower ( desc.substr ( 0, 2 ) ) == "a " && !strcmp ( AN (( new_colour.c_str() + 3 )), "an" ) )
                                     desc.insert ( 1, "n" );
-                                else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " && !strcmp ( AN ( new_colour.c_str() ), "a" ) )
+                                else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " && !strcmp ( AN (( new_colour.c_str() + 3 )), "a" ) )
                                     desc.erase ( 1, 1 );
                             }
                         }
                         else
                         {
-                            if ( tolower ( desc.substr ( 0, 2 ) ) == "a " && !strcmp ( AN ( new_colour.c_str() ), "an" ) )
+                            pos = 0;
+                            if ( tolower ( desc.substr ( 0, 2 ) ) == "a " && !strcmp ( AN (( new_colour.c_str() + 3 )), "an" ) )
+                            {
                                 desc.insert ( 1, "n" );
-                            else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " && !strcmp ( AN ( new_colour.c_str() ), "a" ) )
+                                pos = 3;
+                            }
+                            else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " && !strcmp ( AN (( new_colour.c_str() + 3 )), "a" ) )
+                            {
                                 desc.erase ( 1, 1 );
-                            pos = desc.find ( ' ' ) + 1;
+                                pos = 2;
+                            }
                             desc.insert ( pos, new_colour + " " );
                         }
 

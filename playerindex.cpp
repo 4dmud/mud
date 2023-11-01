@@ -292,8 +292,6 @@ int PlayerIndex::get_account_num(int num, long acc) {
 static int valid_file(const struct dirent *a1) {
     if (!a1)
         return 0;
-    else if (!a1->d_name)
-        return 0;
     else if (!*a1->d_name) //no blank filenames
         return 0;
 

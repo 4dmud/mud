@@ -33,7 +33,7 @@ void add_follower ( Character *ch, Character *leader );
 void death_cry ( Character *ch );
 void dismount_char ( Character *ch );
 void mount_char ( Character *ch, Character *mount );
-void improve_skill ( Character *ch, int skill );
+void improve_skill ( Character *ch, int skill, remembered_skill_spell *rem = nullptr );
 int special ( Character *ch, int cmd, char *arg , char *cmd_arg);
 int find_eq_pos ( Character *ch, struct obj_data *obj, char *arg );
 int ok_damage_shopkeeper ( Character *ch, Character *victim );
@@ -2944,7 +2944,22 @@ ASKILL ( skill_snare )
         // Changed this from 3 to 5. If this is too affecting
         // it can be changed back. Prom
         af.expire = HOURS_TO_EXPIRE ( 5 );
-        af.modifier = GET_LEVEL(ch) + IS_NPC(ch) ? GET_LEVEL(ch) / 2: GET_SKILL(ch, SKILL_SNARE);
+        int skill;
+        if ( IS_NPC ( ch ) )
+            skill = GET_LEVEL ( ch ) / 2;
+        else
+        {
+            skill = GET_SKILL ( ch, SKILL_SNARE );
+            if ( skill == 0 )
+            {
+                for ( const auto &r: SAVED(ch).remembered )
+                {
+                    if ( r.skill_spell_num == SKILL_SNARE )
+                        skill = r.percentage_learned;
+                }
+            }
+        }
+        af.modifier = GET_LEVEL ( ch ) + skill;
         af.location = APPLY_NONE;
         af.bitvector = AFF_SNARE;
 

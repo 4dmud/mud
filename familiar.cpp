@@ -29,7 +29,7 @@ int show_familiar_type(Character *familiar);
 float split_percent(Character *ch);
 int call_magic(Character *caster, Character *cvict,
                struct obj_data *ovict, char *tar_str, int spellnum,
-               int level, int casttype);
+               int level, int casttype, remembered_skill_spell *rem);
 
 void find_usable_weapon(Character *ch);
 void dismount_char(Character *ch);
@@ -54,7 +54,7 @@ void parse_undead_commands(Character *ch);
 Character * parse_aggressive(Character *ch);
 void parse_tasks(Character *ch);
 
-#define CAST_THE_SPELL(ch, vict, i) call_magic((ch), (vict), NULL, NULL, (i), GET_LEVEL((ch)), CAST_BREATH)
+#define CAST_THE_SPELL(ch, vict, i) call_magic((ch), (vict), NULL, NULL, (i), GET_LEVEL((ch)), CAST_BREATH, nullptr)
 
 void parse_mob_commands(Character *ch) {
     int health = ((GET_HIT(ch)*100)/GET_MAX_HIT(ch));

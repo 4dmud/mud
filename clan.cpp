@@ -1292,7 +1292,7 @@ void clan_to_store ( int i )
     for ( thing = 0; thing < NUM_CLAN_EQ; thing++ )
         fprintf ( fl, "%d %d\n", thing, clan[i].clan_eq[thing] );
     fprintf ( fl, "-1 -1\n" );
-    if ( clan[i].description && *clan[i].description )
+    if ( *clan[i].description )
     {
         strcpy ( buf, clan[i].description );
         strip_cr ( buf );

@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <string>
 #include <bitset>
+
 /*
  * Intended use of this macro is to allow external packages to work with
  * a variety of CircleMUD versions without modifications.  For instance,
@@ -1745,11 +1746,53 @@ struct skillspell_data {
     int wait; // recast delay left
 
     skillspell_data() : skill(-1), learn(0), wait(0) {}
-}
-;
+};
 typedef map<subskill_list,struct sub_list*> subs_map;
 typedef map<int,struct skillspell_data*> skills_map;
 
+struct msg_type {
+    string attacker_msg;       /* message to attacker */
+    string victim_msg;         /* message to victim   */
+    string room_msg;           /* message to room     */
+};
+
+
+struct message_type {
+    struct msg_type die_msg;  /* messages when death                  */
+    struct msg_type miss_msg; /* messages when miss                   */
+    struct msg_type hit_msg;  /* messages when hit                    */
+    struct msg_type god_msg;  /* messages when hit on god             */
+    struct message_type *next;/* to next messages of this kind.       */
+};
+
+
+struct message_list {
+    int a_type;               /* Attack type                          */
+    int number_of_attacks;    /* How many attack messages to chose from. */
+    struct message_type *msg; /* List of messages.                    */
+};
+
+struct remembered_skill_spell {
+    int skill_spell_num; // -1: custom (= TYPE_UNDEFINED)
+                         //  0: slot not used
+                         // >0: existing skill/spell
+    uint percentage_remembered;
+    uint percentage_learned;
+    string name;
+    uint custom_attack_type; // either TAR_IGNORE for area spells or TAR_CHAR_ROOM
+    uint custom_elemental_type;
+    uint custom_mana_cost;
+    uint min_position; // for custom spells
+    struct message_type custom_messages;
+
+    remembered_skill_spell() {
+        skill_spell_num = 0;
+        percentage_remembered = 0;
+        percentage_learned = 0;
+        custom_mana_cost = 100;
+        min_position = POS_FIGHTING;
+    }
+};
 class player_special_data_saved {
 public:
     int wimp_level;      /* Below this # of hit points, flee!    */
@@ -1781,6 +1824,7 @@ public:
     int aff_speed;
     long cmd;
     short orig_lev;
+    vector<struct remembered_skill_spell> remembered;
     /*mord - Pk addition*/
     int pk_kills;
     int pk_deaths;
@@ -2001,6 +2045,7 @@ public:
         aff_speed = 0;
         cmd = 0;
         orig_lev = 0;
+        remembered.resize( 5, remembered_skill_spell() );
         /*mord - Pk addition*/
         pk_kills = 0;
         pk_deaths = 0;
@@ -2076,7 +2121,6 @@ struct kill_data {
         first = time(0);
     }
 };
-
 
 /*
  * Specials needed only by PCs, not NPCs.  Space for this structure is
@@ -2414,29 +2458,6 @@ struct familiar_info {
 };
 
 
-struct msg_type {
-    string attacker_msg;       /* message to attacker */
-    string victim_msg;         /* message to victim   */
-    string room_msg;      /* message to room     */
-};
-
-
-struct message_type {
-    struct msg_type die_msg;  /* messages when death                  */
-    struct msg_type miss_msg; /* messages when miss                   */
-    struct msg_type hit_msg;  /* messages when hit                    */
-    struct msg_type god_msg;  /* messages when hit on god             */
-    struct message_type *next;     /* to next messages of this kind.       */
-};
-
-
-struct message_list {
-    int a_type;               /* Attack type                          */
-    int number_of_attacks;    /* How many attack messages to chose from. */
-    struct message_type *msg; /* List of messages.                    */
-};
-
-
 struct dex_skill_type {
     sh_int p_pocket;
     sh_int p_locks;
@@ -2708,7 +2729,7 @@ struct game_data {
     int immort_level_ok;    /* Automatically level mortals to imm?  */
     int double_exp;	    /* Is it double experience time?		*/
     long pk_champion;         /* The current Champion */
-
+    int reset_mine;         /* Reset the mine after the next reboot? */
     char *LAST_PK_WIN;       /* Last Player to win in PK */
     char *OK;               /* When player receives 'Okay.' text.       */
     char *NOPERSON;         /* 'No-one by that name here.'    */

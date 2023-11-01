@@ -54,7 +54,7 @@ void run_task(Character *ch) {
   //GET_TASK_NUM(ch) = SUB_UNDEFINED;
     if (GET_TASK(ch) == NULL)
         return;
-    if (!(GET_TASK(ch)->arg != NULL && *GET_TASK(ch)->arg)) {
+    if (!(*GET_TASK(ch)->arg)) {
         stop_task(ch);
         return;
     }

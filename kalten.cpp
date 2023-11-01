@@ -39,7 +39,7 @@ void script_stat_dump ( Character * ch, struct script_data *sc );
 void affect_modify_ar ( Character *ch, sbyte loc, sbyte mod,
                         int bitv[], bool add
                       );
-void improve_skill ( Character *ch, int skill );
+void improve_skill ( Character *ch, int skill, remembered_skill_spell *rem = nullptr );
 void dismount_char ( Character *ch );
 int can_breathe_underwater ( Character *ch );
 int has_space_suit ( Character *ch );
@@ -407,7 +407,7 @@ void script_stat_dump ( Character * ch, struct script_data *sc )
                       tv->context ? namebuf : tv->name.c_str(), name );
         }
         else
-            sprintf ( buf, "    %20s:  %20s\n",
+            snprintf ( buf, sizeof buf, "    %20s:  %20s\n",
                       tv->context ? namebuf : tv->name.c_str(), tv->value.c_str() );
         fprintf ( fp, "%s", buf );
     }
