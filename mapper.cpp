@@ -149,8 +149,6 @@ struct room_direction_data *get_exit(room_rnum  pRoom,int door )
     return NULL;
   if (door > DOWN)
     return NULL;
-  if (!pRoom->dir_option)
-    return NULL;
   if (!pRoom->dir_option[door])
     return NULL;
   else

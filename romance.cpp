@@ -717,7 +717,7 @@ ACMD(do_marry)
     ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
-  if (groom_name == bride_name)
+  if (!strcmp ( groom_name, bride_name ))
   {
     /* Groom is the Bride? */
     send_to_char("You can't marry someone to themself!\r\n", ch);

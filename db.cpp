@@ -303,8 +303,6 @@ static int taone ( const struct dirent *a1 )
 {
     if ( !a1 )
         return 0;
-    else if ( !a1->d_name )
-        return 0;
     else if ( !*a1->d_name ) //no blank filenames
         return 0;
     else if ( !isdigit ( *a1->d_name ) ) //all files start with a number
@@ -3195,10 +3193,10 @@ void parse_mobile ( FILE * mob_f, int nr, zone_vnum zon )
         log ( "SYSERR: Mob #%d both Aggressive and Aggressive_to_Alignment.", nr );
 
         // If mob is aggr to sex is ifnored if mob is Aggressive
-        if ( MOB_FLAGGED ( mob, MOB_AGGRESSIVE ) &&
-                ( MOB_FLAGGED ( mob, MOB_AGGR_FEMALE ) ||
-                  MOB_FLAGGED ( mob, MOB_AGGR_MALE ) ||
-                  MOB_FLAGGED ( mob, MOB_AGGR_SEX_NEUTRAL)))
+    if ( MOB_FLAGGED ( mob, MOB_AGGRESSIVE ) &&
+            ( MOB_FLAGGED ( mob, MOB_AGGR_FEMALE ) ||
+              MOB_FLAGGED ( mob, MOB_AGGR_MALE ) ||
+              MOB_FLAGGED ( mob, MOB_AGGR_SEX_NEUTRAL)))
         log ( "SYSERR: Mob #%d both Aggressive and Aggressive_to_sex.", nr );
 
     switch ( UPPER ( letter ) )

@@ -31,10 +31,9 @@ string d = s;
   }  // end of tolower*/
 // case-independent (ci) string compare
 // returns true if strings are EQUAL
-struct ciEqualTo : binary_function <string, string, bool>
+struct ciEqualTo
   {
   struct compare_equal
-    : public binary_function <unsigned char, unsigned char,bool>
     {
     bool operator() (const unsigned char& c1, const unsigned char& c2) const
       { return tolower (c1) == tolower (c2); }

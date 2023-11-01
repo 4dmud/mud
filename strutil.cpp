@@ -37,7 +37,7 @@ string tolower (const string & s) {
 
 // transformation function for tocapitals that has a "state"
 // so it can capitalise a sequence
-class fCapitals : public unary_function<unsigned char,unsigned char> {
+class fCapitals {
     bool bUpper;
 
 public:
