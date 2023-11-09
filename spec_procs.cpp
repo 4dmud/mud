@@ -3263,6 +3263,8 @@ SPECIAL ( middleman )
                 rem->name = name;
                 rem->percentage_learned = 0;
                 rem->percentage_remembered = 0;
+                if ( skill_spell_num > -1 )
+                    SET_SKILL ( player, skill_spell_num, 0 );
             }
             catch ( const exception &e )
             {
@@ -3271,7 +3273,9 @@ SPECIAL ( middleman )
             }
 
             add_var ( &SCRIPT ( ch )->global_vars, "remember_form_format", "good", 0 );
+            OBJ_INNATE_MESSAGE = false;
             char_to_store ( player );
+            OBJ_INNATE_MESSAGE = true;
             return 1;
         }
 
@@ -3297,6 +3301,8 @@ SPECIAL ( middleman )
             add_var ( &SCRIPT ( ch )->global_vars, "remember_quest", "That slot doesn't exist.", 0 );
         else if ( SAVED ( player ).remembered[ slot ].skill_spell_num == 0 )
             add_var ( &SCRIPT ( ch )->global_vars, "remember_quest", "That slot is empty.", 0 );
+        else if ( SAVED ( player ).remembered[ slot ].percentage_remembered == 100 )
+            add_var ( &SCRIPT ( ch )->global_vars, "remember_quest", "You've already remembered it.", 0 );
         else
             add_var ( &SCRIPT ( ch )->global_vars, "remember_quest", "go", 0 );
         return 1;
@@ -3329,7 +3335,9 @@ SPECIAL ( middleman )
             add_var ( &SCRIPT ( ch )->global_vars, "remember_complete", "no", 0 );
             player->Send ( "You gain 10%% in remembering '%s'.\r\n", rem->name.c_str() );
         }
+        OBJ_INNATE_MESSAGE = false;
         char_to_store ( player );
+        OBJ_INNATE_MESSAGE = true;
         return 1;
     }
     else if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_random_room" ) )
@@ -3377,6 +3385,7 @@ SPECIAL ( middleman )
         if ( !rnd_mob )
             return 1;
 
+        GET_NAME  ( mob ) = str_dup ( GET_NAME  ( rnd_mob ) );
         GET_ALIAS ( mob ) = str_dup ( GET_ALIAS ( rnd_mob ) );
         GET_LDESC ( mob ) = str_dup ( GET_LDESC ( rnd_mob ) );
         GET_DDESC ( mob ) = str_dup ( GET_DDESC ( rnd_mob ) );

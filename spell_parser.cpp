@@ -1360,7 +1360,7 @@ ACMD ( do_cast )
         return;
     }
 
-    if ( rem != nullptr )
+    if ( spellnum == -1 && rem != nullptr )
         mana = rem->custom_mana_cost;
     else
         mana = mag_manacost ( ch, spellnum );

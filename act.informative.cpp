@@ -5356,7 +5356,6 @@ void stop_fusion ( Character *ch )
         return;
 
     for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
-        FUSE_LOC ( ch, i ) = NULL;
         if ( FUSE_LOC ( ch, i ) )
         {
             was_fused = TRUE;
