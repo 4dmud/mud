@@ -641,8 +641,8 @@ ACMD ( do_practice )
         return;
     }
 
-    if ( ( skill_num != -1 && mob_trainers.empty() ) ||
-         ( skill_num == -1 && rem != nullptr && !middleman_present ) )
+    if ( ( rem == nullptr && mob_trainers.empty() ) ||
+         ( rem != nullptr && mob_trainers.empty() && !middleman_present ) )
     {
         ch->Send ( "You can't train that here, there are no trainers available.\r\n" );
         return;
