@@ -2985,13 +2985,14 @@ void improve_skill ( Character *ch, int skill, remembered_skill_spell *rem )
             if ( r.skill_spell_num == skill && r.percentage_remembered == 100 )
             {
                 rem = &r;
-                percent = rem->percentage_learned;
                 break;
             }
         }
     }
     if ( rem == nullptr )
         percent = GET_SKILL ( ch, skill );
+    else
+        percent = rem->percentage_learned;
 
     if ( percent <= 0)
         return;
