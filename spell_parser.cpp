@@ -492,15 +492,15 @@ bool is_abbrev3 ( const string &s1, const string &s2 )
 
 int spell_num ( const char *name )
 {
-    int bot = 0, top = MAX_SKILLS;
+    int bot = 0, top = MAX_SKILLS, mid;
 
     /* perform binary search on spells */
     for ( ;; )
     {
-        int mid = ( bot + top ) / 2;
+        mid = ( bot + top ) / 2;
 
         if ( is_abbrev2 ( name, spell_info[spell_sorted_info[mid]].name ) == 0 )
-            return ( spell_sorted_info[mid] );
+            break;
         if ( bot >= top )
             return ( TYPE_UNDEFINED );
         if ( is_abbrev2 ( name, spell_info[spell_sorted_info[mid]].name ) < 0 )
@@ -508,6 +508,29 @@ int spell_num ( const char *name )
         else
             bot = mid + 1;
     }
+
+    // Return the match with the shortest spell name
+    int num = spell_sorted_info[mid];
+    int min_length = strlen ( spell_info[num].name );
+    for ( int i = mid + 1; is_abbrev2 ( name, spell_info[spell_sorted_info[i]].name ) == 0; ++i )
+    {
+        int len = strlen ( spell_info[spell_sorted_info[i]].name );
+        if ( len < min_length )
+        {
+            min_length = len;
+            num = spell_sorted_info[i];
+        }
+    }
+    for ( int i = mid - 1; i >= 0 && is_abbrev2 ( name, spell_info[spell_sorted_info[i]].name ) == 0; --i )
+    {
+        int len = strlen ( spell_info[spell_sorted_info[i]].name );
+        if ( len < min_length )
+        {
+            min_length = len;
+            num = spell_sorted_info[i];
+        }
+    }
+    return num;
 }
 
 int find_skill_num ( char *name )
