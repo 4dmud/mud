@@ -521,8 +521,8 @@ void set_skill ( Character *ch, int skill, int amount );
 #define IS_NPC(ch)  (IS_SET_AR(MOB_FLAGS(ch), MOB_ISNPC))
 #define IS_MOB(ch)  (IS_NPC(ch) && !(ch)->proto)
 
-#define IS_IMP(ch)	(GET_LEVEL(ch) == LVL_IMPL)
-#define IS_IMM(ch)	(GET_LEVEL(ch) >= LVL_IMMORT)
+#define IS_IMP(ch)	(!IS_NPC(ch) && GET_LEVEL(ch) == LVL_IMPL)
+#define IS_IMM(ch)	(!IS_NPC(ch) && GET_LEVEL(ch) >= LVL_IMMORT)
 
 #define MOB_FLAGGED(ch, flag) (IS_NPC(ch) && IS_SET_AR(MOB_FLAGS(ch), (flag)))
 #define PLR_FLAGGED(ch, flag) (!IS_NPC(ch) && IS_SET_AR(PLR_FLAGS(ch), (flag)))
