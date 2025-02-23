@@ -418,6 +418,7 @@ Descriptor::~Descriptor() {
             new_mudlog(CMP, LVL_IMMORT, TRUE, "Losing player: %s.", GET_NAME(this->character) ? GET_NAME(this->character) : "<null>");
             delete character;
         }
+    }
 
     /* JE 2/22/95 -- part of my unending quest to make switch stable */
     if (this->original && this->original->desc)
