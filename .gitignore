@@ -6,6 +6,8 @@ TAGS
 *.a
 *.data
 config.log
+web_mapper/node_modules/
+web_mapper/build/
 lib/
 log/
 bin/
