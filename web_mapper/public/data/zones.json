@@ -1,0 +1,14 @@
+{
+    "zones": [
+        {
+            "id": 333,
+            "name": "The Hidden Snowflake",
+            "status": "available"
+        },
+        {
+            "id": 334,
+            "name": "Under Construction Zone",
+            "status": "development"
+        }
+    ]
+}
