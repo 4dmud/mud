@@ -1356,6 +1356,62 @@ void save_explored ( const Character *ch )
         f << e.to_ulong() << " ";
 }
 
+void load_keyring ( const Character *ch )
+{
+    DIR *dp = opendir ( LIB_KEYRING );
+
+    if ( !dp )
+    {
+        mkdir ( LIB_KEYRING, 0777 );
+        dp = opendir ( LIB_KEYRING );
+        if ( !dp )
+        {
+            log ( "SYSERR: couldn't open the keyring dir" );
+            return;
+        }
+
+        char cwd[1024];
+        getcwd ( cwd, sizeof cwd );
+        chdir ( LIB_KEYRING );
+        for ( char dir[] = "a"; *dir <= 'z'; (*dir)++ )
+            mkdir ( dir, 0777 );
+
+        closedir ( dp );
+        chdir ( cwd );
+        return;
+    }
+
+    closedir ( dp );
+    char filename[128], name[128];
+    snprintf ( name, sizeof name, "%s", GET_NAME ( ch ) );
+    *name = LOWER ( *name );
+    snprintf ( filename, sizeof filename, "%s%c/%s", LIB_KEYRING, *name, name );
+    ifstream f ( filename );
+    if ( !f.good() )
+        return;
+
+    int key;
+    while ( f >> key )
+        SPECIALS ( ch )->keyring.push_back ( key );
+}
+
+void save_keyring ( const Character *ch )
+{
+    char filename[128], name[128];
+    snprintf ( name, sizeof name, "%s", GET_NAME ( ch ) );
+    *name = LOWER ( *name );
+    snprintf ( filename, sizeof filename, "%s%c/%s", LIB_KEYRING, *name, name );
+    ofstream f ( filename );
+    if ( !f.good() )
+    {
+        new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: save_keyring couldn't write to file %s", filename );
+        return;
+    }
+
+    for ( const auto &key : SPECIALS ( ch )->keyring )
+        f << key << " ";
+}
+
 void read_last_compiled()
 {
     string filename = string ( LIB_ETC ) + "last_compiled";

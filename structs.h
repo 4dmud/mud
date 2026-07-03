@@ -2173,6 +2173,7 @@ public:
     struct help_index_element *help;
     int age; //age override
     vector<bitset<32>> explored; /* The rooms this char has been to */
+    vector<int> keyring; /* vnums of the keys that are on the keyring */
 
     player_special_data() {
         saved = player_special_data_saved();

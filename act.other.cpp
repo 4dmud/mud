@@ -187,6 +187,7 @@ extern Character *ch_selling;
 extern const int xap_objs;
 
 /* extern procedures */
+void save_keyring ( const Character *ch );
 void save_explored ( const Character *ch );
 void save_crashproof_room ( Room *room );
 void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, string arg3 );
@@ -355,6 +356,7 @@ ACMD ( do_quit )
             save_explored ( ch );
             REMOVE_BIT_AR ( PLR_FLAGS ( ch ), PLR_SAVE_EXPLORED );
         }
+        save_keyring ( ch );
         write_aliases ( ch );
         Crash_rentsave ( ch, 0 );
 

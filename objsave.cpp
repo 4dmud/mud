@@ -49,6 +49,7 @@ SPECIAL(cryogenicist);
 void write_aliases(Character *ch);
 void check_timer(obj_data *obj);
 void save_explored ( const Character* ch );
+void save_keyring ( const Character* ch );
 
 /* local functions */
 struct obj_data *Obj_from_store(struct obj_file_elem object,
@@ -1096,6 +1097,7 @@ void Crash_save_all(void)
         Crash_crashsave(d->character);
         d->character->save();
         write_aliases(d->character);
+        save_keyring ( d->character );
         REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRASH);
       }
       if ( PLR_FLAGGED ( d->character, PLR_SAVE_EXPLORED ) )

@@ -490,7 +490,7 @@ SPECIAL(antidt)
             ch->Send("You already have full protection!\r\n");
             return 1;
           }
-          if ( !deduct_tokens ( ch, TRUE ) )
+          if ( !deduct_tokens ( ch, true ) )
           {
             ch->Send("You do not have enough tokens!\r\n");
             return 1;
@@ -517,7 +517,7 @@ SPECIAL(antidt)
              act("You are not the original owner of $p!", FALSE, ch, obj, 0, TO_CHAR);
              return 1;
           }
-          if ( !deduct_tokens ( ch, FALSE ) )
+          if ( !deduct_tokens ( ch, false ) )
           {
               ch->Send("You do not have enough tokens!\r\n");
               return 1;
@@ -3045,6 +3045,86 @@ SPECIAL ( playershop )
         else
             log ( "SYSERR: playershop item at room %d has unknown currency %s", r, player_shop[r]->item[ num-1 ]->currency.c_str() );
 
+        return TRUE;
+    }
+    return FALSE;
+}
+
+SPECIAL ( keyring )
+{
+    if ( !strcmp ( cmd_arg, "duplicate" ) )
+    {
+        if ( !SAVED(ch).GetSubLearn ( SUB_LOCKSMITH ) )
+        {
+            ch->Send ( "You don't know how to copy a key.\r\n" );
+            return TRUE;
+        }
+
+        string arg = Trim ( string ( argument ) );
+        obj_data *key;
+        Character *tmp_ch;
+        generic_find ( (char*) arg.c_str(), FIND_OBJ_INV, ch, &tmp_ch, &key);
+        if ( !key || GET_OBJ_TYPE ( key ) != ITEM_KEY )
+        {
+            ch->Send ( "You can't copy that!\r\n" );
+            return TRUE;
+        }
+        if ( GET_OBJ_TIMER ( key ) != -1 )
+        {
+            ch->Send ( "There's not enough time to copy that key.\r\n" );
+            return TRUE;
+        }
+        if ( find ( SPECIALS(ch)->keyring.begin(), SPECIALS(ch)->keyring.end(), GET_OBJ_VNUM ( key )) != SPECIALS(ch)->keyring.end() )
+        {
+            ch->Send ( "You already have a copy of that key!\r\n" );
+            return TRUE;
+        }
+
+        // need to have a brass token in inv
+        obj_data *brass_token = ch->carrying;
+        for ( ; brass_token; brass_token = brass_token->next_content )
+        {
+            if ( GET_OBJ_VNUM ( brass_token ) == 3300 )
+                break;
+        }
+        if ( !brass_token )
+        {
+            ch->Send ( "You need to have a brass token in your inventory to do that.\r\n" );
+            return TRUE;
+        }
+
+        extract_obj ( brass_token );
+        if ( number ( 0, 100 ) < SAVED(ch).GetSubLearn ( SUB_LOCKSMITH ) )
+        {
+            ch->Send ( "All that's left is to try the copy on the lock! You attach it to your keyring.\r\n" );
+            SPECIALS(ch)->keyring.push_back ( GET_OBJ_VNUM ( key ) );
+            SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
+        }
+        else
+        {
+            int num = number ( 0, 2 );
+            switch ( num )
+            {
+                case 0:
+                    ch->Send ( "As you try to get the copy from the mold, it breaks in two. You throw the pieces away.\r\n" );
+                    break;
+                case 1:
+                    ch->Send ( "You pour too much brass into the mold, ruining the copy.\r\n" );
+                    break;
+                case 2:
+                    ch->Send ( "The clay mixture wasn't right as the molten brass destroys the mold.\r\n" );
+            }
+        }
+
+        if ( number ( 0, 100 ) < SAVED(ch).GetSubLearn ( SUB_LOCKSMITH ) && SAVED(ch).GetSubLearn ( SUB_LOCKSMITH ) < 98 )
+        {
+            improve_sub ( ch, SUB_LOCKSMITH, 2 );
+            if ( SAVED(ch).GetSubLearn ( SUB_LOCKSMITH ) < 98 )
+                ch->Send ( "You feel your ability in locksmith improve.\r\n" );
+            else
+                ch->Send ( "You feel your ability in locksmith reach full strength.\r\n" );
+            SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
+        }
         return TRUE;
     }
     return FALSE;

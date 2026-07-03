@@ -374,6 +374,7 @@ bool crafted ( obj_data *obj );
 const char* max_quality_name ( obj_data *obj );
 const char* quality_name ( obj_data *obj );
 void save_explored ( const Character *ch );
+void save_keyring ( const Character *ch );
 script_data* create_script();
 bool is_abbrev3 ( const string &s1, const string &s2 );
 trig_data *find_trigger ( script_data *sc, trig_vnum vnum );
@@ -3274,12 +3275,13 @@ void copyover ( Character *ch )
             if ( !IS_IMM ( och ) )
                 GET_LOADROOM ( och ) = GET_ROOM_VNUM ( GET_WAS_IN ( och ) == NULL? IN_ROOM ( och ) : GET_WAS_IN ( och ) );
 
-            if ( PLR_FLAGGED ( d->character, PLR_SAVE_EXPLORED ) )
+            if ( PLR_FLAGGED ( och, PLR_SAVE_EXPLORED ) )
             {
-                save_explored ( d->character );
-                REMOVE_BIT_AR ( PLR_FLAGS ( d->character ), PLR_SAVE_EXPLORED );
+                save_explored ( och );
+                REMOVE_BIT_AR ( PLR_FLAGS ( och ), PLR_SAVE_EXPLORED );
             }
 
+            save_keyring ( och );
             log ( "printing descriptor name and host of connected players" );
             och->save();
             Crash_rentsave ( och, 0 );
