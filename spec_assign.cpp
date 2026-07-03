@@ -46,6 +46,7 @@ SPECIAL(guild);
 SPECIAL(guild_guard);
 SPECIAL(high_dice);
 SPECIAL(janitor);
+SPECIAL(keyring);
 SPECIAL(magic_user);
 SPECIAL(mayor);
 SPECIAL(middleman);
@@ -372,6 +373,7 @@ void assign_objects(void)
     ASSIGNOBJ(260, slots);
 
     ASSIGNOBJ(219, token_machine);
+    ASSIGNOBJ(11095, keyring);
 }
 
 

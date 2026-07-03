@@ -28,6 +28,7 @@
 #include "descriptor.h"
 
 /* external functs */
+bool check_owner ( Character *ch, struct obj_data *obj );
 void eq_to_room ( Character *ch );
 void add_follower ( Character *ch, Character *leader );
 void death_cry ( Character *ch );
@@ -1475,13 +1476,19 @@ int has_key ( Character *ch, obj_vnum key )
 
     for ( o = ch->carrying; o; o = o->next_content )
         if ( GET_OBJ_VNUM ( o ) == key )
-            return ( 1 );
+            return 1;
 
     if ( GET_EQ ( ch, WEAR_HOLD ) )
         if ( GET_OBJ_VNUM ( GET_EQ ( ch, WEAR_HOLD ) ) == key )
-            return ( 1 );
+            return 1;
 
-    return ( 0 );
+    // is it on ch's keyring?
+    for ( o = ch->carrying; o; o = o->next_content )
+        if ( GET_OBJ_VNUM ( o ) == keyring_vnum && check_owner ( ch, o ) &&
+            find ( SPECIALS(ch)->keyring.begin(), SPECIALS(ch)->keyring.end(), key ) != SPECIALS(ch)->keyring.end() )
+                return 1;
+
+    return 0;
 }
 
 // When a door is opened or closed, update the MSDP map and exits for the players in the room
@@ -1686,8 +1693,7 @@ ACMD ( do_gen_door )
     {
         keynum = DOOR_KEY ( ch, obj, door );
         if ( ! ( DOOR_IS_OPENABLE ( ch, obj, door ) ) )
-            act ( "You can't $F that!", FALSE, ch, 0, cmd_door[subcmd],
-                  TO_CHAR );
+            act ( "You can't $F that!", FALSE, ch, 0, cmd_door[subcmd], TO_CHAR );
         else if ( !DOOR_IS_OPEN ( ch, obj, door )
                   && IS_SET ( flags_door[subcmd], NEED_OPEN ) )
             send_to_char ( "But it's already closed!\r\n", ch );

@@ -741,6 +741,10 @@ void assign_subskills(void) {
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_WOODWORK);
 
+    subo(SUB_LOCKSMITH, "Locksmith", 0, 0,
+        0, POS_SLEEPING, 0, PEAC,
+        SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_METALLURGIST);
+
 }
 #undef SINFO
 #define SINFO sub_info[(int)subcmd]

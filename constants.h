@@ -96,4 +96,5 @@ extern const char *origins[];
 extern const vector< vector<const char*> > origin_names;
 
 extern const vector<string> qc_difficulties;
+extern const int keyring_vnum;
 #endif

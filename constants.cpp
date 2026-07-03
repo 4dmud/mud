@@ -132,7 +132,7 @@
 #include "utils.h"
 #include "versionlist.h"
 
-
+const obj_vnum keyring_vnum = 11095;
 
 const char * fuse_locations[] =
 {

@@ -136,6 +136,7 @@ enum subskill_list {
     SUB_CARPENTER,
     SUB_CABINETMAKER, //130
     SUB_SHIPBUILDER,
+    SUB_LOCKSMITH,
     TOP_SUB_DEFINE
 };
 
