@@ -139,6 +139,7 @@ extern map < long, Room* > obj_in_plrshop;
 extern struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
 
 /* extern functions */
+void convert_tokens ( Character *ch );
 void copy_ex_descriptions ( struct extra_descr_data **to, struct extra_descr_data *from );
 void identify_object ( Character *ch, OBJ_DATA *obj );
 void save_player_shop ( string owner );
@@ -1401,6 +1402,7 @@ SPECIAL ( pet_shops )
 SPECIAL ( bank )
 {
     gold_int amount = 0;
+    skip_spaces ( &argument );
     int all = !strcmp ( argument, "all" );
 
     if ( CMD_IS ( "balance" ) )
@@ -1409,28 +1411,50 @@ SPECIAL ( bank )
             ch->Send ( "Your current balance is %lld coins.\r\n",GET_BANK_GOLD ( ch ) );
         else
             ch->Send ( "You currently have no money deposited.\r\n" );
-        return ( 1 );
+        return 1;
     }
     else if ( CMD_IS ( "deposit" ) )
     {
         if ( !all )
         {
-            if ( atoll ( argument ) <= 0 )
+            if ( !is_number ( argument ) )
             {
-                *ch << "How much do you want to deposit?\r\n";
-                return ( 1 );
+                obj_data *obj = get_obj_in_list_vis ( ch, argument, nullptr, ch->carrying );
+                if ( obj && GET_OBJ_VNUM ( obj ) >= 3300 && GET_OBJ_VNUM ( obj ) <= 3312 )
+                {
+                    int n = GET_OBJ_VNUM ( obj ) % 3300;
+                    if ( n == 0 )
+                        GET_BRASS_TOKEN_COUNT ( ch )++;
+                    else if ( n % 3 == 1 )
+                        GET_BRONZE_TOKEN_COUNT ( ch )++;
+                    else if ( n % 3 == 2 )
+                        GET_SILVER_TOKEN_COUNT ( ch )++;
+                    else
+                        GET_GOLD_TOKEN_COUNT ( ch )++;
+                    convert_tokens ( ch );
+
+                    ch->Send ( "You deposit %s.\r\n", obj->short_description );
+                    extract_obj ( obj );
+                }
+                else
+                    ch->Send ( "You can't deposit that, only gold and tokens.\r\n" );
+                return 1;
+            }
+            amount = atoll ( argument );
+            if ( amount <= 0 )
+            {
+                ch->Send ( "How much do you want to deposit?\r\n" );
+                return 1;
 
             }
-            else
-                amount = atoll ( argument );
         }
         else
             amount = ch->Gold ( 0, GOLD_HAND );
 
         if ( ch->Gold ( 0, GOLD_HAND ) < amount )
         {
-            *ch << "You don't have that many coins!\r\n";
-            return ( 1 );
+            ch->Send ( "You don't have that many coins!\r\n" );
+            return 1;
         }
         if ( ch->Gold ( 0, GOLD_BANK ) + amount > 100000000 )
             ch->Send ( "With bank accounts with more than 100mil a 10 percent fee is charged on withdrawal. Thank you.\r\n" );
@@ -1438,7 +1462,7 @@ SPECIAL ( bank )
         ch->Gold ( amount, GOLD_BANK );
         ch->Send ( "You deposit %lld coins.\r\n", amount );
         act ( "$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM );
-        return ( 1 );
+        return 1;
     }
     else if ( CMD_IS ( "withdraw" ) )
     {
@@ -1446,16 +1470,16 @@ SPECIAL ( bank )
         {
             if ( ( amount = atoll ( argument ) ) <= 0 )
             {
-                *ch << "How much do you want to withdraw?\r\n";
-                return ( 1 );
+                ch->Send ( "How much do you want to withdraw?\r\n" );
+                return 1;
             }
         }
         else
             amount = ch->Gold ( 0, GOLD_BANK );
         if ( ch->Gold ( 0, GOLD_BANK ) < amount )
         {
-            *ch << "You don't have that many coins deposited!\r\n";
-            return ( 1 );
+            ch->Send ( "You don't have that many coins deposited!\r\n" );
+            return 1;
         }
         if ( ch->Gold ( 0, GOLD_BANK ) > 100000000 )
         {
@@ -1464,7 +1488,7 @@ SPECIAL ( bank )
             if ( ( ch->Gold ( 0, GOLD_BANK )- ( amount + 1 ) ) < ( amount/10 ) )
             {
                 ch->Send ( "Which you can't afford. Please withdraw a smaller amount.\r\n" );
-                return ( 1 );
+                return 1;
             }
             ch->Gold ( - ( ( amount/10 ) +1 ), GOLD_BANK );
         }
@@ -1472,10 +1496,10 @@ SPECIAL ( bank )
         ch->Gold ( -amount, GOLD_BANK );
         ch->Send ( "You withdraw %lld coins.\r\n", amount );
         act ( "$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM );
-        return ( 1 );
+        return 1;
     }
     else
-        return ( 0 );
+        return 0;
 }
 
 /* This special procedure makes a mob into a 'rent-a-cleric', who sells spells

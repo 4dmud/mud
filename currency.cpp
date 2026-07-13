@@ -72,6 +72,7 @@ O======================================================================O
 /* external variables */
 
 void convert_tokens ( Character *ch );
+
 ACMD ( do_convert )
 {
     char arg2[MAX_INPUT_LENGTH];
@@ -114,52 +115,57 @@ ACMD ( do_convert )
     }
     else if ( isname ( "bronze", arg2 ) )
     {
-        if ( GET_BRONZE_TOKEN_COUNT ( ch ) >= amount )
+        int total_bronze = GET_BRONZE_TOKEN_COUNT ( ch ) +
+                      10 * GET_SILVER_TOKEN_COUNT ( ch ) +
+                     100 * GET_GOLD_TOKEN_COUNT ( ch );
+
+        if ( total_bronze >= amount )
         {
-            ch->Send ( "%d tokens were deducted from your account and split to brass.\r\n",
-                       amount );
-            GET_BRONZE_TOKEN_COUNT ( ch ) -= amount;
+            GET_BRONZE_TOKEN_COUNT ( ch ) = total_bronze - amount;
+            GET_SILVER_TOKEN_COUNT ( ch ) = 0;
+            GET_GOLD_TOKEN_COUNT ( ch ) = 0;
+            convert_tokens ( ch );
+
             for ( counter = 0; counter < 5; counter++ )
             {
                 obj = read_object ( 3300, VIRTUAL );
                 if ( obj )
                     obj_to_char ( obj, ch );
             }
-            return;
+            ch->Send ( "One bronze token was deducted from your account and split to brass.\r\n" );
         }
         else
-        {
             ch->Send ( "You don't have that many tokens on account.\r\n" );
-            return;
-        }
+        return;
     }
     else if ( isname ( "silver", arg2 ) )
     {
-        if ( GET_SILVER_TOKEN_COUNT ( ch ) >= amount )
+        int total_silver = GET_SILVER_TOKEN_COUNT ( ch ) +
+                      10 * GET_GOLD_TOKEN_COUNT ( ch );
+
+        if ( total_silver >= amount )
         {
-            ch->Send ( "%d tokens were deducted from your account and split to bronze.\r\n",
-                       amount );
-            GET_SILVER_TOKEN_COUNT ( ch ) -= amount;
+            GET_SILVER_TOKEN_COUNT ( ch ) = total_silver - amount;
+            GET_GOLD_TOKEN_COUNT ( ch ) = 0;
+            convert_tokens ( ch );
+
             for ( counter = 0; counter < 10; counter++ )
             {
                 obj = read_object ( 3301, VIRTUAL );
                 if ( obj )
                     obj_to_char ( obj, ch );
             }
-
-            return;
+            ch->Send ( "One silver token was deducted from your account and split to bronze.\r\n" );
         }
         else
-        {
             ch->Send ( "You don't have that many tokens on account.\r\n" );
-            return;
-        }
+        return;
     }
     else if ( isname ( "gold", arg2 ) )
     {
         if ( GET_GOLD_TOKEN_COUNT ( ch ) >= amount )
         {
-            ch->Send ( "%d tokens were deducted from your account and split.\r\n", amount );
+            ch->Send ( "One gold token was deducted from your account and split to silver.\r\n" );
             GET_GOLD_TOKEN_COUNT ( ch ) -= amount;
             for ( counter = 0; counter < 10; counter++ )
             {
@@ -167,20 +173,13 @@ ACMD ( do_convert )
                 if ( obj )
                     obj_to_char ( obj, ch );
             }
-
-            return;
         }
         else
-        {
             ch->Send ( "You don't have enough tokens on account.\r\n" );
-            return;
-        }
-    }
-    else
-    {
-        ch->Send ( "You can only deduct tokens from your account.\r\n" );
         return;
     }
+    else
+        ch->Send ( "You can only deduct tokens from your account.\r\n" );
     return;
 }
 
@@ -436,13 +435,6 @@ void convert_tokens ( Character *ch )
 {
     div_t brass, bronze, silver;
 
-    /*
-      log("%s before conversion.", GET_NAME(ch));
-      log("brass: %5d, bronze: %5d, silver: %5d, gold: %5d.",
-          GET_BRASS_TOKEN_COUNT(ch), GET_BRONZE_TOKEN_COUNT(ch),
-          GET_SILVER_TOKEN_COUNT(ch), GET_GOLD_TOKEN_COUNT(ch));
-    */
-
     /* convert brass to bronze */
     brass = div ( GET_BRASS_TOKEN_COUNT ( ch ), 5 );
     GET_BRASS_TOKEN_COUNT ( ch ) = brass.rem;
@@ -458,13 +450,6 @@ void convert_tokens ( Character *ch )
     GET_SILVER_TOKEN_COUNT ( ch ) = silver.rem;
     GET_GOLD_TOKEN_COUNT ( ch ) += silver.quot;
 
-    /*
-      log("%s after conversion.", GET_NAME(ch));
-      log("brass: %5d, bronze: %5d, silver: %5d, gold: %5d.",
-          GET_BRASS_TOKEN_COUNT(ch), GET_BRONZE_TOKEN_COUNT(ch),
-          GET_SILVER_TOKEN_COUNT(ch), GET_GOLD_TOKEN_COUNT(ch));
-    */
-
     return;
 }
 
@@ -474,10 +459,9 @@ SPECIAL ( token_machine )
     char arg2[MAX_INPUT_LENGTH];
     struct obj_data *obj, *cont;
     Character *tmp_char;
-//  int obj_dotmode, cont_dotmode, found = 0;
 
     if ( !CMD_IS ( "put" ) )
-        return ( 0 );
+        return 0;
     if ( IS_NPC ( ch ) )
         return 0;
 
@@ -486,78 +470,73 @@ SPECIAL ( token_machine )
     if ( !*arg1 )
     {
         ch->Send ( "What do you want to put where?\r\n" );
-        return ( 1 );
+        return 1;
     }
 
     if ( !*arg2 )
     {
         ch->Send ( "What do you want to put it in?\r\n" );
-        return ( 1 );
+        return 1;
     }
 
     generic_find ( arg2, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &tmp_char, &cont );
 
     if ( !cont )
-        return ( 0 );
+        return 0;
 
     if ( GET_OBJ_VNUM ( cont ) != 219 )
-        return ( 0 );
+        return 0;
 
     if ( ! ( obj = get_obj_in_list_vis ( ch, arg1, NULL, ch->carrying ) ) )
     {
         ch->Send ( "You aren't carrying %s %s.\r\n", AN ( arg1 ), arg1 );
-        return ( 1 );
+        return 1;
     }
     else if ( ( GET_OBJ_VNUM ( obj ) == 3301 ) || ( GET_OBJ_VNUM ( obj ) == 3304 )
               || ( GET_OBJ_VNUM ( obj ) == 3307 )
               || ( GET_OBJ_VNUM ( obj ) == 3310 ) )
     {
-        ch->Send ( "You put %s %s into the machine.\r\n", AN ( arg1 ),
-                   arg1 );
+        ch->Send ( "You put %s %s into the machine.\r\n", AN ( arg1 ), arg1 );
         obj_from_char ( obj );
         extract_obj ( obj );
         GET_BRONZE_TOKEN_COUNT ( ch ) += 1;
         convert_tokens ( ch );
-        return ( 1 );
+        return 1;
     }
     else if ( GET_OBJ_VNUM ( obj ) == 3300 )
     {
-        ch->Send ( "You put %s %s into the machine.\r\n", AN ( arg1 ),
-                   arg1 );
+        ch->Send ( "You put %s %s into the machine.\r\n", AN ( arg1 ), arg1 );
         obj_from_char ( obj );
         extract_obj ( obj );
         GET_BRASS_TOKEN_COUNT ( ch ) += 1;
         convert_tokens ( ch );
-        return ( 1 );
+        return 1;
     }
     else if ( ( GET_OBJ_VNUM ( obj ) == 3302 ) || ( GET_OBJ_VNUM ( obj ) == 3305 )
               || ( GET_OBJ_VNUM ( obj ) == 3308 )
               || ( GET_OBJ_VNUM ( obj ) == 3311 ) )
     {
-        ch->Send ( "You put %s %s into the machine.\r\n", AN ( arg1 ),
-                   arg1 );
+        ch->Send ( "You put %s %s into the machine.\r\n", AN ( arg1 ), arg1 );
         obj_from_char ( obj );
         extract_obj ( obj );
         GET_SILVER_TOKEN_COUNT ( ch ) += 1;
         convert_tokens ( ch );
-        return ( 1 );
+        return 1;
     }
     else if ( ( GET_OBJ_VNUM ( obj ) == 3303 ) || ( GET_OBJ_VNUM ( obj ) == 3306 )
               || ( GET_OBJ_VNUM ( obj ) == 3309 )
               || ( GET_OBJ_VNUM ( obj ) == 3312 ) )
     {
-        ch->Send ( "You put %s %s into the machine.\r\n", AN ( arg1 ),
-                   arg1 );
+        ch->Send ( "You put %s %s into the machine.\r\n", AN ( arg1 ), arg1 );
         obj_from_char ( obj );
         extract_obj ( obj );
         GET_GOLD_TOKEN_COUNT ( ch ) += 1;
-        convert_tokens ( ch );
-        return ( 1 );
+        return 1;
     }
     else
     {
         ch->Send ( "The machine doesn't accept that.\r\n" );
-        return ( 1 );
+        return 1;
     }
 }
 
@@ -592,76 +571,100 @@ ACMD ( do_deduct )
 
     if ( isname ( "brass", arg2 ) )
     {
-        if ( GET_BRASS_TOKEN_COUNT ( ch ) >= amount )
+        int total_brass = GET_BRASS_TOKEN_COUNT ( ch ) +
+                      5 * GET_BRONZE_TOKEN_COUNT ( ch ) +
+                     50 * GET_SILVER_TOKEN_COUNT ( ch ) +
+                    500 * GET_GOLD_TOKEN_COUNT ( ch );
+
+        if ( total_brass >= amount )
         {
-            ch->Send ( "%d tokens were deducted from your account.\r\n", amount );
-            GET_BRASS_TOKEN_COUNT ( ch ) -= amount;
+            GET_BRASS_TOKEN_COUNT ( ch ) = total_brass - amount;
+            GET_BRONZE_TOKEN_COUNT ( ch ) = 0;
+            GET_SILVER_TOKEN_COUNT ( ch ) = 0;
+            GET_GOLD_TOKEN_COUNT ( ch ) = 0;
+            convert_tokens ( ch );
+
+            if ( amount == 1 )
+                ch->Send ( "One token was deducted from your account.\r\n");
+            else
+                ch->Send ( "%d tokens were deducted from your account.\r\n", amount );
+
             for ( counter = 0; counter < amount; counter++ )
             {
                 obj = read_object ( 3300, VIRTUAL );
                 if ( obj )
                     obj_to_char ( obj, ch );
             }
-
-            return;
         }
         else
-        {
             ch->Send ( "You don't have that many tokens on account.\r\n" );
-            return;
-        }
+        return;
     }
     else if ( isname ( "bronze", arg2 ) )
     {
-        if ( GET_BRONZE_TOKEN_COUNT ( ch ) >= amount )
+        int total_bronze = GET_BRONZE_TOKEN_COUNT ( ch ) +
+                      10 * GET_SILVER_TOKEN_COUNT ( ch ) +
+                     100 * GET_GOLD_TOKEN_COUNT ( ch );
+
+        if ( total_bronze >= amount )
         {
-            ch->Send ( "%d tokens were deducted from your account.\r\n", amount );
-            GET_BRONZE_TOKEN_COUNT ( ch ) -= amount;
+            GET_BRONZE_TOKEN_COUNT ( ch ) = total_bronze - amount;
+            GET_SILVER_TOKEN_COUNT ( ch ) = 0;
+            GET_GOLD_TOKEN_COUNT ( ch ) = 0;
+            convert_tokens ( ch );
+
+            if ( amount == 1 )
+                ch->Send ( "One token was deducted from your account.\r\n");
+            else
+                ch->Send ( "%d tokens were deducted from your account.\r\n", amount );
+
             for ( counter = 0; counter < amount; counter++ )
             {
                 obj = read_object ( 3301, VIRTUAL );
                 if ( obj )
                     obj_to_char ( obj, ch );
             }
-
-            return;
         }
         else
-        {
             ch->Send ( "You don't have that many tokens on account.\r\n" );
-            return;
-        }
+        return;
     }
     else if ( isname ( "silver", arg2 ) )
     {
-        if ( GET_SILVER_TOKEN_COUNT ( ch ) >= amount )
+        int total_silver = GET_SILVER_TOKEN_COUNT ( ch ) +
+                      10 * GET_GOLD_TOKEN_COUNT ( ch );
+
+        if ( total_silver >= amount )
         {
-            ch->Send (
-                "%d tokens were deducted from your account.\r\n",
-                amount );
-            GET_SILVER_TOKEN_COUNT ( ch ) -= amount;
+            GET_SILVER_TOKEN_COUNT ( ch ) = total_silver - amount;
+            GET_GOLD_TOKEN_COUNT ( ch ) = 0;
+            convert_tokens ( ch );
+
+            if ( amount == 1 )
+                ch->Send ( "One token was deducted from your account.\r\n");
+            else
+                ch->Send ( "%d tokens were deducted from your account.\r\n", amount );
+
             for ( counter = 0; counter < amount; counter++ )
             {
                 obj = read_object ( 3302, VIRTUAL );
                 if ( obj )
                     obj_to_char ( obj, ch );
             }
-
-            return;
         }
         else
-        {
             ch->Send ( "You don't have that many tokens on account.\r\n" );
-            return;
-        }
+        return;
     }
     else if ( isname ( "gold", arg2 ) )
     {
         if ( GET_GOLD_TOKEN_COUNT ( ch ) >= amount )
         {
-            ch->Send (
-                "%d tokens were deducted from your account.\r\n",
-                amount );
+            if ( amount == 1 )
+                ch->Send ( "One token was deducted from your account.\r\n");
+            else
+                ch->Send ( "%d tokens were deducted from your account.\r\n", amount );
+
             GET_GOLD_TOKEN_COUNT ( ch ) -= amount;
             for ( counter = 0; counter < amount; counter++ )
             {
@@ -669,14 +672,10 @@ ACMD ( do_deduct )
                 if ( obj )
                     obj_to_char ( obj, ch );
             }
-
-            return;
         }
         else
-        {
             ch->Send ( "You don't have that many tokens on account.\r\n" );
-            return;
-        }
+        return;
     }
     else
     {
