@@ -369,6 +369,7 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
+void convert_tokens ( Character *ch );
 const char* spec_proc_name ( int (*func) (Character*, void*, int, char*, char*) );
 bool crafted ( obj_data *obj );
 const char* max_quality_name ( obj_data *obj );
@@ -5736,14 +5737,17 @@ int perform_set ( Character *ch, Character *vict, int mode,
 
         case 57:
             GET_BRASS_TOKEN_COUNT ( vict ) += value;
+            convert_tokens ( vict );
             break;
 
         case 58:
             GET_BRONZE_TOKEN_COUNT ( vict ) += value;
+            convert_tokens ( vict );
             break;
 
         case 59:
             GET_SILVER_TOKEN_COUNT ( vict ) += value;
+            convert_tokens ( vict );
             break;
 
         case 60:

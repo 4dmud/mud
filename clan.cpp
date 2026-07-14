@@ -19,7 +19,7 @@
 #include "clan.h"
 #include "descriptor.h"
 
-int num_of_clans;
+void convert_tokens ( Character *ch );
 vector <clan_rec> clan ( MAX_CLANS );
 void tag_argument ( char *argument, char *tag );
 extern Descriptor *descriptor_list;
@@ -35,6 +35,7 @@ void free_clan_lists ( void );
 
 ACMD(do_ctell);
 
+int num_of_clans;
 extern int TEMP_LOAD_CHAR;
 
 vector<clan_list_data> clan_list[MAX_CLANS];
@@ -1726,7 +1727,10 @@ void do_clan_withdraw(Character *ch, char *arg)
       }
       clan[clan_num].treasury.silver -= amount;
       if (GET_LEVEL(ch) < LVL_GOD)
+      {
           GET_SILVER_TOKEN_COUNT(ch) += amount;
+          convert_tokens ( ch );
+      }
   }
   else if (type == DEP_BRONZE) {
       if (clan[clan_num].treasury.bronze < amount) {
@@ -1735,7 +1739,10 @@ void do_clan_withdraw(Character *ch, char *arg)
       }
       clan[clan_num].treasury.bronze -= amount;
       if (GET_LEVEL(ch) < LVL_GOD)
+      {
           GET_BRONZE_TOKEN_COUNT(ch) += amount;
+          convert_tokens ( ch );
+      }
   }
   ch->Send("You withdraw from the clan's treasury.\r\n");
   save_clans();
