@@ -3840,7 +3840,7 @@ ACMD ( do_date )
     int h = ( ourtime / 3600 ) % 24;
     int m = ( ourtime / 60 ) % 60;
 
-    tmstr = ( char * ) asctime ( localtime ( &ourtime ) );
+    tmstr = ( char * ) asctime ( localtime ( &boot_time ) );
     * ( tmstr + strlen ( tmstr ) - 1 ) = '\0';
 
     ch->Send ( "Up since {cC%s{c0: %d day%s, %d:%02d\r\n", tmstr,
