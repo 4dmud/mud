@@ -119,10 +119,11 @@ void strip_cr(char *buffer) {
 /* -------------------------------------------------------------------------- */
 
 void copy_ex_descriptions(struct extra_descr_data **to, struct extra_descr_data *from) {
-    struct extra_descr_data *wpos;
+    if ( !from )
+        return;
 
     CREATE(*to, struct extra_descr_data, 1);
-    wpos = *to;
+    struct extra_descr_data *wpos = *to;
 
     for (; from; from = from->next, wpos = wpos->next) {
         wpos->keyword = str_udup(from->keyword);
