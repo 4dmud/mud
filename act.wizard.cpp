@@ -3245,15 +3245,15 @@ void copyover ( Character *ch )
             char client_name[MAX_INPUT_LENGTH];
             char client_version[MAX_INPUT_LENGTH];
 
-            if ( d->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString )
+            if ( *d->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString )
                 strcpy( client_name, d->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString );
             else
-                *client_name = '\0';
+                strcpy ( client_name, "-" );
 
-            if ( d->pProtocol->pVariables[eMSDP_CLIENT_VERSION]->pValueString )
+            if ( *d->pProtocol->pVariables[eMSDP_CLIENT_VERSION]->pValueString )
                 strcpy( client_version, d->pProtocol->pVariables[eMSDP_CLIENT_VERSION]->pValueString );
             else
-                *client_version = '\0';
+                strcpy ( client_version, "-" );
 
             // Make sure there are no spaces.
 
