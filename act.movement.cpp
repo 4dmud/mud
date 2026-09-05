@@ -63,14 +63,11 @@ string msdp_exits ( const Character *ch );
 
 /* local functions */
 int use_stamina ( Character *ch, int amount );
-void do_doorcmd ( Character *ch, struct obj_data *obj, int door,
-                  int scmd );
+void do_doorcmd ( Character *ch, struct obj_data *obj, int door, int scmd );
 int has_boat ( Character *ch );
-int find_door ( Character *ch, const char *type, char *dir,
-                const char *cmdname );
+int find_door ( Character *ch, const char *type, char *dir, const char *cmdname );
 int has_key ( Character *ch, obj_vnum key );
-int ok_pick ( Character *ch, obj_vnum keynum, int pickproof,
-              int scmd );
+int ok_pick ( Character *ch, obj_vnum keynum, int pickproof, int scmd );
 int skill_cost ( int h, int m, int v, Character *ch );
 OBJ_DATA  *is_trapped ( room_rnum rm );
 int can_enter ( Character *ch, room_vnum room, room_vnum to_room );
@@ -1469,7 +1466,9 @@ int find_door ( Character *ch, const char *type, char *dir, const char *cmdname,
     }
 }
 
-
+// Returns 0: no key
+//         1: ch has the physical key
+//         2: ch has a copy of the key on the keyring
 int has_key ( Character *ch, obj_vnum key )
 {
     struct obj_data *o;
@@ -1486,7 +1485,7 @@ int has_key ( Character *ch, obj_vnum key )
     for ( o = ch->carrying; o; o = o->next_content )
         if ( GET_OBJ_VNUM ( o ) == keyring_vnum && check_owner ( ch, o ) &&
             find ( SPECIALS(ch)->keyring.begin(), SPECIALS(ch)->keyring.end(), key ) != SPECIALS(ch)->keyring.end() )
-                return 1;
+                return 2;
 
     return 0;
 }
@@ -1692,6 +1691,7 @@ ACMD ( do_gen_door )
     if ( ( obj ) || ( door >= 0 ) )
     {
         keynum = DOOR_KEY ( ch, obj, door );
+        int haskey = has_key ( ch, keynum );
         if ( ! ( DOOR_IS_OPENABLE ( ch, obj, door ) ) )
             act ( "You can't $F that!", FALSE, ch, 0, cmd_door[subcmd], TO_CHAR );
         else if ( !DOOR_IS_OPEN ( ch, obj, door )
@@ -1703,24 +1703,30 @@ ACMD ( do_gen_door )
         else if ( ! ( DOOR_IS_LOCKED ( ch, obj, door ) ) &&
                   IS_SET ( flags_door[subcmd], NEED_LOCKED ) )
             send_to_char ( "Oh.. it wasn't locked, after all..\r\n", ch );
+        else if ( ( DOOR_IS_LOCKED ( ch, obj, door ) ) && ( subcmd == SCMD_LOCK ) )
+            send_to_char ( "But it's already locked!\r\n", ch );
         else if ( ! ( DOOR_IS_UNLOCKED ( ch, obj, door ) ) &&
                   IS_SET ( flags_door[subcmd], NEED_UNLOCKED ) )
         {
-            if ( !has_key ( ch, keynum ) )
+            if ( !haskey )
             {
                 send_to_char ( "It seems to be locked.\r\n", ch );
             }
             else  /* if have key, unlock then open in one go - mord*/
             {
+                if ( haskey == 2 )
+                    ch->Send ( "You use your copy of %s.\r\n", obj_proto[ real_object ( keynum ) ].short_description );
                 do_doorcmd ( ch, obj, door, SCMD_UNLOCK );
                 do_doorcmd ( ch, obj, door, subcmd );
             }
         }
-        else if ( !has_key ( ch, keynum ) && ( GET_LEVEL ( ch ) < LVL_GOD ) &&
+        else if ( !haskey && ( GET_LEVEL ( ch ) < LVL_GOD ) &&
                   ( ( subcmd == SCMD_LOCK ) || ( subcmd == SCMD_UNLOCK ) ) )
             send_to_char ( "You don't seem to have the proper key.\r\n", ch );
         else if ( ok_pick ( ch, keynum, DOOR_IS_PICKPROOF ( ch, obj, door ), subcmd ) )
         {
+            if ( haskey == 2 && ( ( subcmd == SCMD_LOCK ) || ( subcmd == SCMD_UNLOCK ) ) )
+                ch->Send ( "You use your copy of %s.\r\n", obj_proto[ real_object ( keynum ) ].short_description );
             do_doorcmd ( ch, obj, door, subcmd );
         }
     }
